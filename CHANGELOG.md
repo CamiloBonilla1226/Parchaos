@@ -627,3 +627,7 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 - **Logos reales de PAR CHAOS** (reemplazan el `logo.svg` provisional): el letrero horizontal (`public/letrero.webp`) va en el nav de arriba (`Nav` de Inicio y `HeaderNegocio` de la carta, a 44 px de alto) y el logo circular (`public/logo.webp`) en el cuerpo, en el inicio de la carta (centrado, máx. 280 px) y en el encabezado de la carta física.
 - Los PNG originales (1,7 MB y 0,7 MB, 2141×734) se convirtieron a WebP: 640 px de ancho, 45 KB el letrero y 119 KB el logo. Al logo se le recortó el margen transparente (el círculo ocupaba solo el 35 % central) y en la carta física pasó de `object-fit: cover` a `contain` para que el círculo no se recorte con el `max-height` de 180 px. `og:image` apunta a `logo.webp`.
 - El nombre del negocio como texto en el nav se reemplazó por la imagen, conservando el nombre como `alt` para lectores de pantalla.
+
+## 2026-10-14 (5)
+- **Nav superior más fino**: el letrero baja de 44 a 30 px de alto y el padding vertical del nav (`.nav__contenido`) y del header de la carta (`.header-negocio__contenido`) de 16 a 4 px, lo que deja la barra en ~38 px en vez de ~76 px.
+- **Logo circular más pequeño** en el inicio de la carta (`.seccion-inicio__logo`): de 70 % / máx. 280 px a 45 % / máx. 180 px, para que no domine la pantalla.

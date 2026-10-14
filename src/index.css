@@ -1,0 +1,3971 @@
+/* Sistema de diseño base: neutro, mobile-first, sin bordes redondeados.
+   Los valores de --color-* son el punto de partida; App.jsx los sobreescribe en
+   tiempo de ejecución con los datos de negocio.config.js (marca por negocio). */
+:root {
+  /* Paleta PAR CHAOS (tema oscuro neón). Fuente de verdad de la marca. */
+  --color-bg: #030617;
+  --color-surface: #080b24;
+  --color-primary: #f000ff;
+  --color-secondary: #7800ff;
+  --color-violet: #7b2cff;
+  --color-accent-cyan: #00e5ff;
+  --color-accent-yellow: #f5ff00;
+  --color-text: #ffffff;
+  --color-success: #00f5a0;
+
+  /* Derivados (no son parte de la paleta base) */
+  --color-surface-2: #0f1336;
+  --color-text-soft: rgba(255, 255, 255, 0.7);
+  --color-border: rgba(255, 255, 255, 0.14);
+  --color-border-strong: rgba(255, 255, 255, 0.3);
+  --color-danger: #ff6b81;
+  --color-closed: #9aa0b8;
+  --gradient-brand: linear-gradient(90deg, #f000ff 0%, #7b2cff 50%, #7800ff 100%);
+  --glow-primary: 0 0 16px rgba(240, 0, 255, 0.35);
+
+  /* Nombres históricos del proyecto, apuntan a la paleta de arriba */
+  --color-fondo: var(--color-surface);
+  --color-texto: var(--color-text);
+  --color-texto-suave: var(--color-text-soft);
+  --color-primario: var(--color-primary);
+  --color-secundario: var(--color-surface-2);
+  --color-acento: var(--color-primary);
+  --color-borde: var(--color-border);
+  --color-error: var(--color-danger);
+  --color-exito: var(--color-success);
+  --fuente: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 16px;
+  --espacio-4: 24px;
+  --espacio-5: 32px;
+  --espacio-6: 48px;
+
+  --ancho-contenido: 640px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* Evita que un swipe horizontal (ej. en el carrusel o el filtro de categorías) se
+     interprete como el gesto de "atrás/adelante" del navegador y saque de la app — sin
+     esto, deslizar dentro de un contenedor con scroll horizontal puede terminar
+     navegando a la página anterior en el historial. */
+  overscroll-behavior-x: none;
+}
+
+body {
+  font-family: var(--fuente);
+  color: var(--color-texto);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Ningún recuadro del proyecto usa esquinas redondeadas: es parte del lenguaje visual. */
+button,
+input,
+select,
+textarea,
+.tarjeta,
+.boton {
+  border-radius: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 var(--espacio-2);
+}
+
+p {
+  margin: 0 0 var(--espacio-2);
+}
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho-contenido);
+  margin: 0 auto;
+  padding: 0 var(--espacio-3);
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) var(--espacio-4);
+  border: 1px solid var(--color-primario);
+  background: var(--color-primario);
+  color: var(--color-fondo);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: var(--glow-primary);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.boton:hover:not(:disabled) {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.boton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.boton--secundario {
+  background: transparent;
+  color: var(--color-primario);
+  box-shadow: none;
+}
+
+.boton--peligro {
+  border-color: var(--color-error);
+  background: var(--color-error);
+  box-shadow: none;
+}
+
+.tarjeta {
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo);
+}
+
+/* Reserva el espacio de la imagen desde antes de que cargue, para evitar saltos de
+   layout (CLS). El aspect-ratio se fija por contexto de uso (thumbnail, hero, etc). */
+.imagen-contenedor {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--relacion-aspecto, 1 / 1);
+  background: var(--color-secundario);
+  overflow: hidden;
+}
+
+.imagen-contenedor img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.precio-producto {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--espacio-2);
+  font-weight: 600;
+}
+
+.precio-producto__tachado {
+  text-decoration: line-through;
+  color: var(--color-texto-suave);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.precio-producto__oferta {
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+.texto-suave {
+  color: var(--color-texto-suave);
+}
+
+.campo__error {
+  color: var(--color-error);
+  font-size: 0.85em;
+}
+
+/* --- Navegación y pie de página --- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-fondo);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.nav__contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--espacio-3);
+}
+
+.nav__marca {
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.nav__enlace {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--color-acento);
+}
+
+.footer {
+  margin-top: auto;
+  border-top: 1px solid var(--color-borde);
+  padding-block: var(--espacio-4);
+}
+
+.footer__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.footer__whatsapp {
+  color: var(--color-acento);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* --- Inicio --- */
+.pagina-inicio {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--espacio-3);
+  padding-block: var(--espacio-6);
+  min-height: 60vh;
+}
+
+.pagina-inicio__cta {
+  text-decoration: none;
+  margin-top: var(--espacio-2);
+}
+
+/* --- Carta / catálogo --- */
+.pagina-carta {
+  flex: 1;
+  padding-block: var(--espacio-4) var(--espacio-6);
+}
+
+.pagina-carta__titulo {
+  margin-bottom: var(--espacio-4);
+}
+
+.filtro-categorias {
+  display: flex;
+  gap: var(--espacio-2);
+  overflow-x: auto;
+  padding-bottom: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+  border-bottom: 1px solid var(--color-borde);
+  scrollbar-width: none;
+}
+
+.filtro-categorias::-webkit-scrollbar {
+  display: none;
+}
+
+.filtro-categorias__item {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-1) var(--espacio-3);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.filtro-categorias__item--activo {
+  background: var(--color-primario);
+  border-color: var(--color-primario);
+  color: var(--color-fondo);
+}
+
+/* --- Carta física (QR en mesa): solo lectura, sin carrito. Una sola página por secciones
+   (una por categoría), con barra fija de buscador + pestañas que siguen el scroll. Las
+   reglas van bajo .carta-fisica / .producto-fisica / .detalle-fisico para no afectar la
+   carta de domicilios. Mismo lenguaje que el resto: esquinas rectas, blanco y negro. */
+.carta-fisica {
+  flex: 1;
+  padding-bottom: var(--espacio-6);
+  /* El swipe a los lados cambia de categoría (ver CartaFisica.jsx): el navegador se queda
+     con el scroll vertical y el zoom; lo horizontal queda para la página. */
+  touch-action: pan-y pinch-zoom;
+}
+
+.carta-fisica__logo {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  background: #000;
+}
+
+.carta-fisica__marca {
+  padding-block: var(--espacio-3) var(--espacio-2);
+}
+
+.carta-fisica__titulo {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.carta-fisica__subtitulo {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+/* Barra fija: buscador y pestañas de secciones. */
+.carta-fisica__barra {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: var(--espacio-2);
+  background: var(--color-fondo);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.carta-fisica__buscador {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: 0 var(--espacio-3);
+  height: 42px;
+  margin-bottom: var(--espacio-1);
+  background: var(--color-secundario);
+  color: var(--color-texto-suave);
+}
+
+.carta-fisica__buscador input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 16px; /* 16px evita el zoom automático de iOS al enfocar */
+  outline: none;
+}
+
+.carta-fisica__buscador input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.carta-fisica__limpiar {
+  padding: 0 var(--espacio-1);
+  border: none;
+  background: none;
+  color: var(--color-texto-suave);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Pestañas de categorías: chips rectos que ocupan el ancho con scroll horizontal (de borde a
+   borde, sin cortarse en el margen). La activa va rellena en negro; cada una muestra cuántos
+   productos tiene. */
+.carta-fisica__pestanas {
+  display: flex;
+  gap: var(--espacio-2);
+  padding: var(--espacio-1) var(--espacio-3) var(--espacio-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--espacio-3);
+}
+
+.carta-fisica__pestanas::-webkit-scrollbar {
+  display: none;
+}
+
+.carta-fisica__pestana {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.carta-fisica__pestana--activa {
+  border-color: var(--color-primario);
+  background: var(--color-primario);
+  color: var(--color-fondo);
+  font-weight: 600;
+}
+
+.carta-fisica__contenido {
+  max-width: 720px;
+}
+
+.carta-fisica__aviso {
+  text-align: center;
+  padding-block: var(--espacio-5);
+}
+
+.carta-fisica__seccion {
+  padding-top: var(--espacio-4);
+  animation: carta-fisica-entrar 0.2s ease;
+}
+
+@keyframes carta-fisica-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carta-fisica__seccion {
+    animation: none;
+  }
+}
+
+.carta-fisica__seccion-encabezado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding-bottom: var(--espacio-2);
+  border-bottom: 1px solid var(--color-texto);
+}
+
+.carta-fisica__seccion-titulo {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.carta-fisica__seccion-encabezado .texto-suave {
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+/* Atajo al final de cada categoría para pasar a la siguiente sin volver arriba. */
+.carta-fisica__siguiente {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: var(--espacio-4);
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  background: none;
+  color: var(--color-texto);
+  font: inherit;
+  cursor: pointer;
+}
+
+.carta-fisica__siguiente > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-weight: 600;
+}
+
+.carta-fisica__adiciones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.carta-fisica__adiciones li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Fila de producto: foto | nombre, descripción (2 líneas) y precio. */
+.productos-fisica {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.productos-fisica li + li .producto-fisica {
+  border-top: 1px solid var(--color-borde);
+}
+
+.producto-fisica {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.producto-fisica:active {
+  background: var(--color-secundario);
+}
+
+.producto-fisica__imagen {
+  flex: 0 0 76px;
+  width: 76px;
+  background: var(--color-secundario);
+}
+
+.producto-fisica__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.producto-fisica__nombre {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.producto-fisica__descripcion {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--color-texto-suave);
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.producto-fisica__precio {
+  margin-top: 2px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* --- Detalle de producto de la carta física --- */
+.detalle-fisico__intro {
+  padding-bottom: var(--espacio-3);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.detalle-fisico__descripcion {
+  margin: var(--espacio-1) 0 0;
+  line-height: 1.45;
+}
+
+.detalle-fisico__precio {
+  margin-top: var(--espacio-2);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.detalle-fisico__bloque {
+  padding-top: var(--espacio-3);
+}
+
+.detalle-fisico__bloque-titulo {
+  margin: 0 0 var(--espacio-1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.detalle-fisico__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.detalle-fisico__lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.detalle-fisico__lista li:last-child {
+  border-bottom: none;
+}
+
+.grid-productos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espacio-3);
+}
+
+@media (min-width: 640px) {
+  .grid-productos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Tarjeta de producto --- */
+.producto-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.producto-card--agotado {
+  opacity: 0.6;
+}
+
+.producto-card__contenido {
+  padding: var(--espacio-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.producto-card__encabezado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.producto-card__nombre {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.producto-card__agotado {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-error);
+  text-transform: uppercase;
+}
+
+.producto-card__descripcion {
+  font-size: 0.9rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.producto-card__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--espacio-2);
+}
+
+.boton--pequeno {
+  padding: var(--espacio-1) var(--espacio-3);
+  font-size: 0.85rem;
+}
+
+/* --- Selector de cantidad --- */
+.selector-cantidad {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  border: 1px solid var(--color-borde);
+}
+
+.selector-cantidad button {
+  background: transparent;
+  border: none;
+  padding: var(--espacio-1) var(--espacio-2);
+  font-size: 1rem;
+}
+
+/* --- Superposición (panel de opciones, carrito, checkout) --- */
+.superposicion {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  /* Por encima del nav-inferior (z-index 30) de la carta de domicilios: si no, el nav fijo
+     queda encima del modal y tapa lo último del contenido (ej. el botón "Agregar" de
+     OpcionesProducto). */
+  z-index: 35;
+}
+
+@media (min-width: 640px) {
+  .superposicion {
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.superposicion__panel,
+.opciones-producto {
+  background: var(--color-fondo);
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  /* Evita que arrastrar hacia abajo en lo más alto del panel recargue la página (Android) o
+     desplace el fondo: ese gesto se usa para cerrar el panel (useSwipeParaCerrar). */
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 640px) {
+  .superposicion__panel,
+  .opciones-producto {
+    max-width: var(--ancho-contenido);
+    border: 1px solid var(--color-borde);
+  }
+}
+
+.superposicion__panel {
+  position: relative;
+  padding: var(--espacio-3);
+}
+
+/* Barrita de agarre arriba de cada panel (móvil): indica de dónde se arrastra hacia abajo
+   para cerrarlo — solo esa franja superior cierra, ver useSwipeParaCerrar.js. */
+.superposicion__panel::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: calc(var(--espacio-1) * -1) auto var(--espacio-3);
+  background: var(--color-borde);
+}
+
+/* En el detalle de producto de la carta la foto ocupa la parte de arriba: la barrita va
+   superpuesta sobre la imagen (blanca con sombra) en vez de empujar el contenido. */
+.opciones-producto {
+  position: relative;
+}
+
+.opciones-producto::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 1;
+  width: 40px;
+  height: 4px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+@media (min-width: 640px) {
+  .superposicion__panel::before,
+  .opciones-producto::before {
+    display: none;
+  }
+}
+
+body.admin .superposicion__panel::before {
+  border-radius: 2px;
+  background: var(--color-border-strong);
+}
+
+.superposicion__cerrar {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  padding: 0 0 var(--espacio-3);
+}
+
+/* Botón "×" para salir del formulario de crear/editar, siempre arriba a la derecha del
+   panel, sin desplazar el resto del contenido (position: absolute). */
+.superposicion__cerrar-x {
+  position: absolute;
+  top: var(--espacio-2);
+  right: var(--espacio-2);
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: var(--espacio-1);
+  color: var(--color-texto-suave);
+}
+
+.superposicion__cerrar-x:hover {
+  color: var(--color-texto);
+}
+
+/* --- Opciones de producto --- */
+.opciones-producto__contenido {
+  padding: var(--espacio-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.grupo-opciones {
+  border: none;
+  border-top: 1px solid var(--color-borde);
+  padding: var(--espacio-2) 0 0;
+  margin: var(--espacio-2) 0 0;
+}
+
+.grupo-opciones__titulo {
+  font-weight: 600;
+  padding: 0;
+}
+
+.grupo-opciones__obligatorio {
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.opcion-item {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-1) 0;
+}
+
+.opciones-producto__cantidad {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--espacio-2);
+}
+
+.opciones-producto__acciones {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
+}
+
+.opciones-producto__acciones .boton {
+  flex: 1;
+}
+
+/* --- Carrito flotante y panel de carrito --- */
+.carrito-flotante {
+  position: fixed;
+  left: var(--espacio-3);
+  right: var(--espacio-3);
+  bottom: var(--espacio-3);
+  z-index: 15;
+}
+
+@media (min-width: 640px) {
+  .carrito-flotante {
+    left: auto;
+    width: 320px;
+  }
+}
+
+/* Carrito minimalista: encabezado corto, filas separadas solo por una línea fina (nombre y
+   precio en una línea, cantidad debajo), sin recuadros ni textos de acción en rojo. */
+.carrito__encabezado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 var(--espacio-3);
+}
+
+.carrito__encabezado h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.carrito__encabezado .texto-suave {
+  font-size: 0.85rem;
+}
+
+.carrito__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ficha de un producto en el carrito: foto a la izquierda (ocupa las dos filas), nombre,
+   variante (en una etiqueta), adiciones y precio por unidad en el centro, subtotal a la
+   derecha, y abajo la cantidad + "Modificar". Toda la ficha abre el detalle para editarla. */
+.carrito__item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  grid-template-areas:
+    'imagen info precio'
+    'imagen pie pie';
+  align-items: start;
+  column-gap: var(--espacio-3);
+  row-gap: var(--espacio-2);
+  padding: var(--espacio-3) 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.carrito__item--editable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.carrito__item--editable:active {
+  background: var(--color-secundario);
+}
+
+.carrito__item-imagen {
+  grid-area: imagen;
+  width: 64px;
+  background: var(--color-secundario);
+}
+
+.carrito__item-variante {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 1px 6px;
+  border: 1px solid var(--color-borde);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.carrito__item-pie {
+  grid-area: pie;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.carrito__editar {
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: var(--color-texto-suave);
+  font: inherit;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.carrito__item:first-child {
+  border-top: 1px solid var(--color-borde);
+}
+
+.carrito__item-info {
+  grid-area: info;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.carrito__item-nombre {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.carrito__item-detalle {
+  font-size: 0.82rem;
+}
+
+.carrito__item-precio {
+  grid-area: precio;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.carrito__cantidad {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo);
+}
+
+.carrito__cantidad button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.carrito__cantidad span {
+  min-width: 24px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.carrito__quitar {
+  background: transparent;
+  border: none;
+  color: var(--color-error);
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+/* Barra de progreso de una oferta con meta de compra (ej. domicilio gratis desde $X). */
+.progreso-ofertas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-4);
+}
+
+.progreso-oferta__mensaje {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  color: var(--color-texto-suave);
+}
+
+.progreso-oferta__pista {
+  height: 3px;
+  background: var(--color-borde);
+  overflow: hidden;
+}
+
+.progreso-oferta__relleno {
+  display: block;
+  height: 100%;
+  background: var(--color-primario);
+  transition: width 0.35s ease;
+}
+
+.progreso-oferta--completa .progreso-oferta__mensaje {
+  color: var(--color-exito);
+  font-weight: 600;
+}
+
+.progreso-oferta--completa .progreso-oferta__relleno {
+  background: var(--color-exito);
+}
+
+.carrito__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: var(--espacio-4);
+}
+
+.carrito__total span {
+  color: var(--color-texto-suave);
+}
+
+.carrito__total strong {
+  font-size: 1.2rem;
+}
+
+.carrito__checkout {
+  width: 100%;
+  margin-top: var(--espacio-3);
+}
+
+.carrito__vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-5) 0;
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+.carrito__vacio strong {
+  color: var(--color-texto);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.carrito__ver-menu {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Recomendados del carrito: mismo carrusel que los destacados de Inicio, con encabezado a
+   la izquierda y un "+" sobre la foto para agregar sin abrir el detalle. */
+.carrusel-destacados--carrito {
+  margin-top: var(--espacio-5);
+}
+
+.carrito--vacio .carrusel-destacados--carrito {
+  margin-top: var(--espacio-2);
+}
+
+.carrusel-destacados--carrito .carrusel-destacados__titulo {
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: var(--espacio-3);
+}
+
+.carrusel-destacados--carrito .carrusel-destacados__tarjeta {
+  flex-basis: 34%;
+}
+
+.carrusel-destacados--carrito .carrusel-destacados__nombre {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.carrusel-destacados--carrito .carrusel-destacados__precio {
+  font-size: 0.82rem;
+  color: var(--color-texto-suave);
+}
+
+@media (min-width: 640px) {
+  .carrusel-destacados--carrito .carrusel-destacados__tarjeta {
+    flex-basis: 24%;
+  }
+}
+
+.carrusel-destacados__imagen {
+  position: relative;
+}
+
+.carrusel-destacados__agregar {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.35);
+  cursor: pointer;
+}
+
+.carrusel-destacados__agregar:active {
+  transform: scale(0.92);
+}
+
+/* --- Checkout --- */
+.checkout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.campo input,
+.campo select {
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-2);
+  font-weight: 400;
+}
+
+.campo--linea {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+/* Campo de contraseña con botón para mostrar/ocultar lo que se está escribiendo. Solo
+   tiene sentido mientras se crea la contraseña (el valor vive en el estado del formulario);
+   una vez guardada, Supabase Auth solo conserva un hash y no hay nada que "revelar" después. */
+.campo-contrasena {
+  display: flex;
+}
+
+.campo-contrasena input {
+  flex: 1;
+  border-right: none;
+}
+
+.campo-contrasena__alternar {
+  border: 1px solid var(--color-borde);
+  background: var(--color-secundario);
+  padding: 0 var(--espacio-3);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* --- Panel admin --- */
+.admin-cargando {
+  padding: var(--espacio-6) var(--espacio-3);
+  text-align: center;
+}
+
+/* Barra superior: fija, oscura y neutra (usa --color-texto, no la marca del negocio, para
+   que el panel admin luzca igual de sobrio sin importar los colores de cada negocio). */
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3) var(--espacio-4);
+  background: var(--color-texto);
+  color: var(--color-fondo);
+}
+
+.admin-header__titulo {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-header__hamburguesa {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.admin-header__hamburguesa span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.admin-header__hamburguesa--abierta span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.admin-header__hamburguesa--abierta span:nth-child(2) {
+  opacity: 0;
+}
+
+.admin-header__hamburguesa--abierta span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Panel lateral (drawer): agrupa toda la navegación del admin, incluido cerrar sesión,
+   detrás de la hamburguesa, tal como se pidió. */
+.admin-drawer__fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 29;
+}
+
+.admin-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(280px, 84vw);
+  background: var(--color-fondo);
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.18);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+}
+
+.admin-drawer--abierto {
+  transform: translateX(0);
+}
+
+.admin-drawer__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.admin-drawer__negocio {
+  font-weight: 700;
+}
+
+.admin-drawer__cerrar {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0 var(--espacio-1);
+  color: var(--color-texto-suave);
+}
+
+.admin-drawer__enlaces {
+  display: flex;
+  flex-direction: column;
+  padding: var(--espacio-2) 0;
+  overflow-y: auto;
+}
+
+.admin-drawer__enlace {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--color-texto);
+  padding: var(--espacio-3) var(--espacio-4);
+  border-left: 3px solid transparent;
+  transition: background 0.15s ease;
+}
+
+.admin-drawer__enlace:hover {
+  background: var(--color-secundario);
+}
+
+.admin-drawer__enlace--activo {
+  border-left-color: var(--color-acento);
+  background: var(--color-secundario);
+}
+
+.admin-drawer__pie {
+  margin-top: auto;
+  padding: var(--espacio-4);
+  border-top: 1px solid var(--color-borde);
+}
+
+.admin-drawer__pie .boton {
+  width: 100%;
+}
+
+.admin-dashboard,
+.admin-pedidos,
+.admin-productos,
+.admin-categorias,
+.admin-adiciones,
+.admin-ofertas,
+.admin-usuarios,
+.admin-negocio {
+  padding-block: var(--espacio-4) var(--espacio-6);
+}
+
+.admin-negocio h1 {
+  margin-bottom: var(--espacio-4);
+}
+
+.admin-dashboard__resumen {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  padding: var(--espacio-4);
+  margin-top: var(--espacio-3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.admin-dashboard__resumen strong {
+  font-size: 1.8rem;
+}
+
+/* Patrón "crear" común a Productos/Categorías/Usuarios: siempre arriba de la lista, nunca
+   al final ni escondido en el encabezado junto al título. Es el mismo estilo (borde
+   punteado) tanto si contiene un formulario corto (categorías/usuarios) como si es en sí
+   mismo el botón que abre el formulario/modal (productos). */
+.admin-crear {
+  border: 1px dashed var(--color-borde);
+  background: var(--color-secundario);
+  padding: var(--espacio-3);
+  margin: var(--espacio-3) 0 var(--espacio-4);
+}
+
+.admin-crear--boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-1);
+  width: auto;
+  padding: var(--espacio-1) var(--espacio-3);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-texto);
+  background: var(--color-secundario);
+}
+
+.admin-crear--boton:hover {
+  background: var(--color-fondo);
+  border-color: var(--color-acento);
+}
+
+.admin-crear__icono {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Pedidos */
+.lista-pedidos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.pedido-item {
+  padding: var(--espacio-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.pedido-item__encabezado {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pedido-item__estado {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px var(--espacio-2);
+  border: 1px solid var(--color-borde);
+}
+
+.pedido-item__estado--nuevo {
+  border-color: var(--color-acento);
+  color: var(--color-acento);
+}
+
+.pedido-item__estado--aprobado {
+  border-color: var(--color-exito);
+  color: var(--color-exito);
+}
+
+.pedido-item__estado--en_preparacion {
+  border-color: var(--color-texto-suave);
+  color: var(--color-texto-suave);
+}
+
+.pedido-item__estado--entregado {
+  border-color: var(--color-exito);
+  background: var(--color-exito);
+  color: var(--color-fondo);
+}
+
+.pedido-item__estado--rechazado {
+  border-color: var(--color-error);
+  background: var(--color-error);
+  color: var(--color-fondo);
+}
+
+.pedido-item__selector-estado select {
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-1) var(--espacio-2);
+  font-weight: 600;
+}
+
+.pedido-item__detalle {
+  margin: var(--espacio-2) 0 0;
+  padding-left: var(--espacio-4);
+}
+
+.pedido-item__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--espacio-2);
+}
+
+/* Productos admin */
+.lista-productos-admin {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+/* Todas las tarjetas comparten la misma estructura y alto: imagen cuadrada fija | info
+   (nombre a una línea, categoría, precio, etiquetas) | acciones. Nada crece ni se parte
+   según el contenido, así la lista se ve simétrica. */
+.producto-admin-item {
+  padding: var(--espacio-3);
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--espacio-3);
+  min-height: 112px;
+  transition: box-shadow 0.15s ease;
+}
+
+.producto-admin-item__imagen {
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  background: var(--color-secundario);
+}
+
+.producto-admin-item__nombre,
+.producto-admin-item__categoria {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.producto-admin-item__precio {
+  font-weight: 600;
+}
+
+.producto-admin-item__etiquetas {
+  display: flex;
+  gap: var(--espacio-1);
+  min-height: 20px;
+}
+
+.producto-admin-item__etiqueta {
+  padding: 1px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--color-secundario);
+  border: 1px solid var(--color-borde);
+}
+
+.producto-admin-item__etiqueta--agotado {
+  color: var(--color-error);
+  border-color: var(--color-error);
+  background: transparent;
+}
+
+.producto-admin-item--clicable {
+  cursor: pointer;
+}
+
+/* Ligera elevación al pasar el mouse sobre cualquier fila de las listas admin: un detalle
+   moderno y sutil (no cambia layout, no interfiere con el tacto en móvil). */
+.producto-admin-item:hover,
+.categoria-admin-item:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+.producto-admin-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Se mantiene presionada la tarjeta para seleccionarla (acciones masivas, ver
+   useMantenerPresionado): sin esto el celular selecciona el texto o abre el menú de
+   "guardar imagen" en vez de dejar que la pulsación llegue a la tarjeta. */
+.producto-admin-item--clicable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.producto-admin-item--clicable img {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* --- Modo selección de Productos (acciones masivas) ---
+   La tarjeta conserva su diseño: la selección se ve con un borde y una marca circular
+   sobre la esquina de la imagen (vacía en modo selección, con ✓ al seleccionarla). */
+.producto-admin-item__imagen {
+  position: relative;
+}
+
+.producto-admin-item__marca {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+/* Seleccionada: círculo blanco relleno con ✓ oscuro — se distingue igual sobre fotos
+   oscuras (ej. un logo negro) que claras, gracias a la sombra. */
+.producto-admin-item--seleccionado .producto-admin-item__marca {
+  background: #fff;
+  color: var(--color-bg);
+  transform: scale(1.1);
+}
+
+.producto-admin-item--seleccionado {
+  outline: 2px solid var(--color-acento);
+  outline-offset: -2px;
+}
+
+/* Mientras se selecciona, el interruptor y "Eliminar" de cada tarjeta se atenúan y no
+   responden: tocar cualquier parte de la tarjeta solo la marca o desmarca. */
+.producto-admin-item--modo-seleccion .producto-admin-item__acciones {
+  opacity: 0.3;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* Barra flotante de acciones: tarjeta oscura sobre la lista, con aire a los lados y abajo
+   (respeta la zona del gesto de inicio del celular). */
+.acciones-masivas {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  width: min(calc(100% - 24px), calc(var(--ancho-contenido) - 16px));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 8px 6px;
+  background: var(--color-surface-2);
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.18);
+  animation: acciones-masivas-entrada 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes acciones-masivas-entrada {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 24px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.acciones-masivas__encabezado {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: 36px;
+}
+
+.acciones-masivas__cerrar {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+}
+
+.acciones-masivas__contador {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.acciones-masivas__todos {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.acciones-masivas__botones {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.acciones-masivas__accion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 56px;
+  padding: 6px 2px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.acciones-masivas__accion:active:not(:disabled),
+.acciones-masivas__cerrar:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.acciones-masivas__accion--peligro {
+  color: #ff8a80;
+}
+
+.acciones-masivas button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.acciones-masivas--ocupada .acciones-masivas__contador::after {
+  content: ' · aplicando…';
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+@media (hover: hover) {
+  .acciones-masivas__accion:hover:not(:disabled),
+  .acciones-masivas__cerrar:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Con la barra flotando, el toast sube por encima de ella. */
+body:has(.acciones-masivas) .toast-contenedor {
+  bottom: calc(160px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Casillas de categorías (formulario de producto y cambio masivo). */
+.selector-categorias {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.selector-categorias__titulo {
+  padding: 0;
+  margin-bottom: var(--espacio-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.selector-categorias__opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+}
+
+.selector-categorias__opcion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-borde);
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.selector-categorias__opcion input {
+  margin: 0;
+  accent-color: var(--color-acento);
+}
+
+.selector-categorias__opcion--marcada {
+  border-color: var(--color-acento);
+  font-weight: 600;
+}
+
+.selector-categorias__nota {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.formulario-categorias-masivo__ayuda {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.producto-admin-item__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--espacio-2);
+}
+
+/* Interruptor de "Disponible": cuadrado (no píldora), acorde al lenguaje visual del
+   proyecto (border-radius: 0 en todas partes). El checkbox real queda oculto mas
+   accesible (foco de teclado, lector de pantalla) y el visual lo dibuja ::after. */
+.interruptor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.interruptor input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.interruptor__pista {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.interruptor__pista::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 16px;
+  height: 16px;
+  background: var(--color-texto-suave);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.interruptor input:checked + .interruptor__pista {
+  background: var(--color-primario);
+  border-color: var(--color-primario);
+}
+
+.interruptor input:checked + .interruptor__pista::after {
+  transform: translateX(16px);
+  background: var(--color-fondo);
+}
+
+.interruptor input:focus-visible + .interruptor__pista {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 2px;
+}
+
+.interruptor__etiqueta {
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+.formulario-producto select {
+  width: 100%;
+}
+
+.campo-imagen {
+  gap: var(--espacio-2);
+}
+
+.campo-imagen .imagen-contenedor {
+  max-width: 240px;
+}
+
+.campo-imagen__subir {
+  align-self: flex-start;
+  cursor: pointer;
+}
+
+/* Gestión de opciones/adiciones */
+.gestion-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-3);
+}
+
+.gestion-opciones__grupo {
+  padding: var(--espacio-3);
+}
+
+.gestion-opciones__grupo-encabezado {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--espacio-2);
+}
+
+.gestion-opciones__lista {
+  list-style: none;
+  margin: 0 0 var(--espacio-2);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.gestion-opciones__lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.gestion-opciones__form-opcion,
+.gestion-opciones__form-grupo {
+  display: flex;
+  gap: var(--espacio-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.gestion-opciones__form-opcion input,
+.gestion-opciones__form-grupo input,
+.gestion-opciones__form-grupo select {
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-1) var(--espacio-2);
+}
+
+/* Variante con precio distinto en la carta física: nombre arriba a lo ancho y debajo los dos
+   precios (domicilios | carta física) + "Quitar". */
+.gestion-opciones__form-opcion--dos-precios {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 52px;
+}
+
+.gestion-opciones__form-opcion--dos-precios input[type='text'] {
+  grid-column: 1 / -1;
+}
+
+.gestion-opciones__form-opcion--dos-precios input {
+  min-width: 0;
+}
+
+/* Encabezado de las dos columnas de precio (sin él, con los campos llenos no se sabe cuál es
+   cuál). Mismas columnas que la fila; la última queda vacía bajo "Quitar". */
+.gestion-opciones__columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 52px;
+  gap: var(--espacio-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+/* Precios del producto: un bloque (domicilios) o dos (domicilios | carta física) cuando el
+   producto tiene precio distinto en el local; lado a lado desde 480px. */
+.precios-carta {
+  display: grid;
+  gap: var(--espacio-3);
+}
+
+@media (min-width: 480px) {
+  .precios-carta:not(.precios-carta--uno) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.precios-carta__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.precios-carta:not(.precios-carta--uno) .precios-carta__grupo {
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+}
+
+.precios-carta__titulo {
+  padding: 0 var(--espacio-1);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.precios-carta__interruptor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.precios-carta__interruptor .texto-suave {
+  font-size: 0.8rem;
+}
+
+body.admin .precios-carta:not(.precios-carta--uno) .precios-carta__grupo {
+  border-color: var(--admin-borde);
+  border-radius: var(--admin-radio);
+}
+
+/* Usuarios admin: lista de tarjetas colapsadas (nombre + número), cada una se expande al
+   tocarla para mostrar los permisos y "Eliminar" — evita una tabla ancha con muchas
+   columnas de interruptores visibles todo el tiempo. */
+.lista-usuarios-admin {
+  list-style: none;
+  margin: 0 0 var(--espacio-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.usuario-admin-item {
+  padding: 0;
+  overflow: hidden;
+}
+
+.usuario-admin-item__encabezado {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: var(--espacio-2) var(--espacio-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.usuario-admin-item__resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.usuario-admin-item__nombre {
+  font-weight: 600;
+}
+
+.usuario-admin-item__flecha {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+  color: var(--color-texto-suave);
+}
+
+.usuario-admin-item__flecha--abierta {
+  transform: rotate(180deg);
+}
+
+.usuario-admin-item__detalle {
+  padding: 0 var(--espacio-3) var(--espacio-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  border-top: 1px solid var(--color-borde);
+  padding-top: var(--espacio-3);
+}
+
+.usuario-admin-item__fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.usuario-admin-item__detalle .carrito__quitar {
+  align-self: flex-start;
+}
+
+.rol-badge--dueno {
+  border-color: var(--color-acento);
+  color: var(--color-acento);
+}
+
+.rol-badge--dueno {
+  border-color: var(--color-acento);
+  color: var(--color-acento);
+}
+
+/* Categorías admin */
+.lista-categorias-admin {
+  list-style: none;
+  margin: 0 0 var(--espacio-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.categoria-admin-item {
+  padding: var(--espacio-2) var(--espacio-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+}
+
+.categoria-admin-item--clicable {
+  cursor: pointer;
+}
+
+.categoria-admin-item__acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  flex-shrink: 0;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Notificaciones (toast) --- */
+.toast-contenedor {
+  position: fixed;
+  left: 50%;
+  bottom: var(--espacio-4);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-2);
+  width: calc(100% - var(--espacio-3) * 2);
+  max-width: 360px;
+  pointer-events: none;
+}
+
+.toast {
+  width: 100%;
+  padding: var(--espacio-2) var(--espacio-3);
+  background: var(--color-texto);
+  color: var(--color-fondo);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  animation: toast-entrada 0.18s ease;
+}
+
+.toast--error {
+  background: var(--color-error);
+}
+
+.toast--saliendo {
+  animation: toast-salida 0.2s ease forwards;
+}
+
+@keyframes toast-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-salida {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* --- Panel admin, pantalla Negocio: una tarjeta por tema (información, redes, oferta,
+   horario) y barra de guardar fija al pie para no tener que bajar hasta el final. --- */
+.formulario-negocio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.negocio-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+}
+
+.negocio-seccion__encabezado h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.negocio-seccion__encabezado p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.negocio-seccion__encabezado--fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+}
+
+.negocio-seccion__contador {
+  float: right;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+/* Horario: cada día es una ficha de dos líneas — arriba el nombre (con "Cerrado" si aplica)
+   y el interruptor; abajo, solo si está abierto, las dos horas repartidas al ancho completo.
+   Así las horas nunca se salen de la ficha, sin importar lo angosta que sea la pantalla. */
+.negocio-horario {
+  display: flex;
+  flex-direction: column;
+}
+
+.negocio-horario__dia {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.negocio-horario__dia:last-child {
+  border-bottom: none;
+}
+
+.negocio-horario__nombre {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.negocio-horario__cerrado {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: -6px;
+  font-size: 0.82rem;
+  color: var(--color-texto-suave);
+}
+
+.negocio-horario__horas {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: var(--color-texto-suave);
+}
+
+.negocio-horario__horas input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: var(--color-fondo);
+  font-size: 0.9rem;
+}
+
+/* Barra de guardar pegada al borde inferior de la pantalla mientras se edita. */
+.negocio-guardar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 calc(var(--espacio-3) * -1);
+  padding: 12px var(--espacio-3) calc(12px + env(safe-area-inset-bottom));
+  background: rgba(3, 6, 23, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--color-borde);
+}
+
+.negocio-guardar .campo__error {
+  margin: 0;
+}
+
+.negocio-guardar__boton {
+  width: 100%;
+  padding-block: 13px;
+}
+
+/* --- Carta de domicilios: shell de pestañas (Inicio / Menú / Carrito) --- */
+:root {
+  /* Incluye el mínimo de --espacio-3 que ahora garantiza el padding-bottom de .nav-inferior
+     (ver ahí el porqué) aunque el dispositivo no reporte safe-area-inset-bottom. */
+  --alto-nav-inferior: 72px;
+}
+
+/* Mientras NavInferior está montado (solo en la carta de domicilios), empuja el toast
+   global por encima del nav fijo y deja espacio al final del contenido para que el nav no
+   tape la última fila de productos ni el botón de checkout. Fuera de esa página (admin,
+   Inicio, carta física) esta clase no se aplica y todo queda como estaba. */
+body.body--con-nav-inferior .toast-contenedor {
+  bottom: calc(var(--espacio-4) + var(--alto-nav-inferior));
+}
+
+.pagina-carta--tabs {
+  padding-bottom: calc(var(--espacio-6) + var(--alto-nav-inferior));
+}
+
+/* Zona donde useSwipeNavegacion escucha el deslizamiento horizontal (Carta.jsx). Sin esto,
+   en celulares reales el navegador podía quedarse con el gesto horizontal y cancelar el
+   toque, así que el swipe entre categorías del Menú no hacía nada. Con pan-y el navegador
+   solo maneja el scroll vertical y el zoom; lo horizontal queda para la página. Los
+   contenedores con scroll horizontal propio (chips, carrusel) no se ven afectados porque
+   touch-action se evalúa solo hasta el contenedor con scroll más cercano. */
+.carta-zona-swipe {
+  touch-action: pan-y pinch-zoom;
+  /* Ocupa todo el alto de #root (flex, min-height 100svh) aunque el contenido sea corto,
+     para que el swipe funcione también en el espacio vacío bajo una lista con pocos
+     productos. <main> (.pagina-carta, flex: 1) se estira dentro. */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mismo criterio que .carta-zona-swipe, para el swipe entre secciones del panel admin
+   (AdminLayout.jsx): ocupa toda la pantalla y deja lo horizontal a la página. */
+.admin-zona-swipe {
+  touch-action: pan-y pinch-zoom;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-negocio {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-fondo);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.header-negocio__contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--espacio-3);
+}
+
+.header-negocio__nombre {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.header-negocio__estado {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1px solid currentColor;
+}
+
+.header-negocio__estado--abierto {
+  color: var(--color-exito);
+}
+
+.header-negocio__estado--cerrado {
+  color: var(--color-closed);
+}
+
+.nav-inferior {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  background: var(--color-fondo);
+  border-top: 1px solid var(--color-borde);
+  /* No basta con env(safe-area-inset-bottom): en varios Android con navegación por gestos
+     ese valor llega en 0 aunque el borde inferior siga reservado para el gesto de "ir a
+     inicio" del sistema, así que un tap ahí nunca llegaba a llegar a los botones (pedido:
+     "cuando presiono muy abajo no me permite" cambiar de sección). Con max(), se respeta el
+     safe area real cuando el navegador sí lo reporta (iOS) y se garantiza igual un mínimo de
+     aire en los demás casos. */
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--espacio-3));
+}
+
+.nav-inferior__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  padding: var(--espacio-2) var(--espacio-1);
+  color: var(--color-texto-suave);
+}
+
+.nav-inferior__item[aria-current='page'] {
+  color: var(--color-acento);
+}
+
+.nav-inferior__icono {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-inferior__icono--rebote {
+  animation: nav-inferior-rebote 0.3s ease;
+}
+
+@keyframes nav-inferior-rebote {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.nav-inferior__contador {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 0;
+  background: var(--color-error);
+  color: var(--color-fondo);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  transition: transform 0.15s ease;
+}
+
+.nav-inferior__etiqueta {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* --- Inicio de la carta: logo --- */
+.seccion-inicio__logo {
+  display: block;
+  width: 100%;
+  margin: var(--espacio-3) 0;
+}
+
+/* --- Inicio de la carta: tarjeta de oferta ---
+   Look "fino": fondo en degradado muy sutil hacia el color de acento del negocio, borde e
+   ícono en ese mismo acento, y un brillo diagonal que atraviesa la tarjeta cada pocos
+   segundos (barrido de luz), como efecto de detalle sin romper el resto del diseño
+   minimalista. `color-mix` deja que el efecto se adapte al acento de cada negocio sin
+   inventar un color fijo. */
+.tarjeta-oferta {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  gap: var(--espacio-3);
+  padding: 0;
+  margin-bottom: var(--espacio-4);
+  border: 1px solid color-mix(in srgb, var(--color-acento) 45%, var(--color-borde));
+  border-radius: 0;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--color-acento) 10%, var(--color-fondo)) 0%,
+    var(--color-fondo) 75%
+  );
+  box-shadow: 0 10px 24px -16px color-mix(in srgb, var(--color-acento) 75%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarjeta-oferta:active {
+  transform: scale(0.985);
+}
+
+.tarjeta-oferta__brillo {
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 35%;
+  background: linear-gradient(
+    115deg,
+    transparent,
+    color-mix(in srgb, var(--color-acento) 30%, transparent),
+    transparent
+  );
+  animation: tarjeta-oferta-brillo 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tarjeta-oferta-brillo {
+  0% {
+    left: -60%;
+  }
+  22% {
+    left: 130%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+
+/* Bloque de ícono a todo el alto de la tarjeta, sólido en el color de acento (el "sello" de
+   la oferta), con el ícono en el color de fondo para que contraste con cualquier paleta. */
+.tarjeta-oferta__icono {
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  color: var(--color-fondo);
+  background: var(--color-acento);
+  border-radius: 0;
+}
+
+.tarjeta-oferta__texto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 0;
+  line-height: 1.25;
+}
+
+.tarjeta-oferta__rotulo {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.tarjeta-oferta__texto strong {
+  display: block;
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tarjeta-oferta__subtitulo {
+  display: block;
+  color: var(--color-acento);
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tarjeta-oferta__flecha {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-right: var(--espacio-3);
+  color: var(--color-acento);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-oferta__brillo {
+    animation: none;
+    display: none;
+  }
+}
+
+/* --- Inicio de la carta: carrusel de destacados --- */
+.carrusel-destacados__titulo {
+  text-align: center;
+}
+
+.carrusel-destacados__subtitulo {
+  text-align: left;
+  margin-bottom: var(--espacio-3);
+}
+
+.carrusel-destacados__pista {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  gap: var(--espacio-3);
+  padding-bottom: var(--espacio-2);
+  scrollbar-width: none;
+}
+
+.carrusel-destacados__pista::-webkit-scrollbar {
+  display: none;
+}
+
+.carrusel-destacados__tarjeta {
+  flex: 0 0 31%;
+  scroll-snap-align: start;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .carrusel-destacados__tarjeta {
+    flex-basis: 22%;
+  }
+}
+
+.carrusel-destacados__info {
+  padding: var(--espacio-2) 2px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--espacio-1);
+  width: 100%;
+  /* Alto fijo (una línea de nombre + una de precio, cada una truncada con "…" si no cabe —
+     ver reglas de abajo) para que todas las tarjetas midan lo mismo sin importar el nombre
+     del producto ni si tiene precio de oferta. */
+  min-height: 2.8em;
+}
+
+.carrusel-destacados__nombre,
+.carrusel-destacados__precio {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.carrusel-destacados__nombre {
+  font-size: 0.9rem;
+}
+
+.carrusel-destacados__precio {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.carrusel-destacados__puntos {
+  display: flex;
+  justify-content: center;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+
+.carrusel-destacados__punto {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 1px solid var(--color-texto-suave);
+  background: transparent;
+}
+
+.carrusel-destacados__punto--activo {
+  background: var(--color-acento);
+  border-color: var(--color-acento);
+}
+
+/* --- Inicio de la carta: categorías --- */
+.seccion-categorias {
+  margin-top: var(--espacio-5);
+}
+
+.seccion-categorias__grid {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: var(--espacio-2);
+  padding-bottom: var(--espacio-1);
+  scrollbar-width: none;
+}
+
+.seccion-categorias__grid::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-categoria {
+  flex: 0 0 auto;
+  border: 1px solid var(--color-borde);
+  background: transparent;
+  padding: var(--espacio-2) var(--espacio-3);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* --- Inicio de la carta: Sobre nosotros ---
+   Compacto: descripción corta y una fila por dato (horario / ubicación / redes), separadas
+   por una línea fina. El horario se despliega solo al tocarlo. */
+.sobre-nosotros {
+  margin-top: var(--espacio-4);
+  padding-top: var(--espacio-3);
+  border-top: 1px solid var(--color-borde);
+}
+
+.sobre-nosotros h2 {
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.sobre-nosotros__descripcion {
+  margin: 0 0 var(--espacio-2);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--color-texto-suave);
+}
+
+.sobre-nosotros__filas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sobre-nosotros__filas > li {
+  border-top: 1px solid var(--color-borde);
+}
+
+/* Fila: etiqueta pequeña a la izquierda, valor a la derecha, flecha opcional al final. */
+.sobre-nosotros__fila,
+.sobre-nosotros__horario summary {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: 11px 0;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.sobre-nosotros__horario summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.sobre-nosotros__horario summary::-webkit-details-marker {
+  display: none;
+}
+
+.sobre-nosotros__etiqueta {
+  flex: 0 0 76px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.sobre-nosotros__valor {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.sobre-nosotros__flecha {
+  flex-shrink: 0;
+  color: var(--color-texto-suave);
+  transition: transform 0.15s ease;
+}
+
+.sobre-nosotros__horario[open] .sobre-nosotros__flecha {
+  transform: rotate(180deg);
+}
+
+.sobre-nosotros__semana {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 10px 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+
+.sobre-nosotros__semana li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sobre-nosotros__redes {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.sobre-nosotros__redes a {
+  font-weight: 600;
+  color: var(--color-acento);
+  text-decoration: none;
+}
+
+/* --- Menú: buscador --- */
+.buscador-productos {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-2) var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+}
+
+.buscador-productos__icono {
+  flex: 0 0 auto;
+  color: var(--color-texto-suave);
+}
+
+.buscador-productos input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+/* --- Menú: lista de productos (tarjeta horizontal) --- */
+.lista-productos-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.producto-lista-item {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-2);
+  cursor: pointer;
+}
+
+.producto-lista-item--agotado {
+  opacity: 0.6;
+}
+
+.producto-lista-item__imagen {
+  flex: 0 0 auto;
+  width: 64px;
+}
+
+.producto-lista-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.producto-lista-item__nombre {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.producto-lista-item__categoria {
+  font-size: 0.8rem;
+}
+
+.producto-lista-item__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-1);
+}
+
+.producto-lista-item__estado {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-exito);
+}
+
+.producto-lista-item__estado--agotado {
+  color: var(--color-error);
+}
+
+.producto-lista-item__agregar {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* --- Confirmación (reemplaza window.confirm) --- */
+.confirmacion {
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-4);
+  width: 100%;
+  max-width: 340px;
+  animation: toast-entrada 0.15s ease;
+}
+
+.confirmacion__mensaje {
+  margin: 0 0 var(--espacio-4);
+}
+
+.confirmacion__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-2);
+}
+
+/* =====================================================================================
+   Tema del panel admin (solo body.admin): minimalista y moderno. Fondo gris muy claro,
+   tarjetas blancas con borde fino y esquinas suaves, sin la marca del negocio (el admin
+   se ve igual de sobrio con cualquier paleta). Va al final para ganar a los estilos base
+   compartidos con la carta pública (.boton, .tarjeta, .campo, .superposicion...).
+   ===================================================================================== */
+body.admin {
+  --admin-fondo: var(--color-bg);
+  --admin-superficie: var(--color-surface);
+  --admin-borde: var(--color-border);
+  --admin-texto: var(--color-text);
+  --admin-suave: var(--color-text-soft);
+  --admin-acento: var(--color-primary);
+  --admin-radio: 12px;
+  --color-borde: var(--admin-borde);
+  --color-secundario: var(--color-surface-2);
+  --color-texto: var(--admin-texto);
+  --color-texto-suave: var(--admin-suave);
+  --color-primario: var(--admin-acento);
+  --color-acento: var(--admin-acento);
+  --color-fondo: var(--admin-superficie);
+  background: var(--admin-fondo);
+  font-size: 15px;
+}
+
+body.admin button,
+body.admin input,
+body.admin select,
+body.admin textarea,
+body.admin .tarjeta,
+body.admin .boton {
+  border-radius: 10px;
+}
+
+body.admin h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--espacio-3);
+}
+
+/* Botones */
+body.admin .boton {
+  padding: 10px 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  border-color: var(--admin-acento);
+  transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+body.admin .boton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+body.admin .boton--secundario {
+  background: var(--admin-superficie);
+  color: var(--admin-texto);
+  border-color: var(--admin-borde);
+}
+
+body.admin .boton--secundario:hover {
+  background: var(--color-surface-2);
+  opacity: 1;
+}
+
+body.admin .boton--peligro {
+  background: var(--color-error);
+  border-color: var(--color-error);
+}
+
+body.admin .carrito__quitar {
+  background: transparent;
+  border: none;
+  color: var(--admin-suave);
+  font-size: 0.85rem;
+  padding: 4px 6px;
+}
+
+body.admin .carrito__quitar:hover {
+  color: var(--color-error);
+}
+
+/* Tarjetas */
+body.admin .tarjeta {
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
+  border-radius: var(--admin-radio);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+body.admin .producto-admin-item:hover,
+body.admin .categoria-admin-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-border-strong);
+}
+
+body.admin .producto-admin-item__imagen {
+  border-radius: 10px;
+}
+
+body.admin .selector-categorias__opcion {
+  border-radius: 999px;
+  border-color: var(--admin-borde);
+}
+
+body.admin .selector-categorias__opcion--marcada {
+  border-color: var(--admin-acento);
+  background: var(--color-surface-2);
+}
+
+body.admin .producto-admin-item--seleccionado {
+  outline-color: var(--admin-acento);
+}
+
+body.admin .acciones-masivas {
+  border-radius: 20px;
+}
+
+body.admin .acciones-masivas__cerrar {
+  border-radius: 50%;
+}
+
+body.admin .acciones-masivas__todos {
+  border-radius: 999px;
+}
+
+body.admin .acciones-masivas__accion {
+  border-radius: 12px;
+}
+
+/* Espacio extra al final para que la barra flotante no tape el último producto. Doble clase
+   para ganarle a la regla general de padding de las páginas admin, que va más abajo. */
+body.admin .admin-productos.admin-productos--seleccionando {
+  padding-bottom: calc(170px + env(safe-area-inset-bottom, 0px));
+}
+
+body.admin .producto-admin-item__etiqueta {
+  border: none;
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: var(--color-surface-2);
+  color: var(--admin-suave);
+}
+
+body.admin .producto-admin-item__etiqueta--agotado {
+  background: rgba(255, 107, 129, 0.14);
+  color: var(--color-error);
+}
+
+/* Campos de formulario */
+body.admin .campo {
+  font-size: 0.85rem;
+  color: var(--admin-texto);
+}
+
+body.admin .campo input,
+body.admin .campo select,
+body.admin .campo textarea,
+body.admin select,
+body.admin input[type="text"],
+body.admin input[type="number"],
+body.admin input[type="tel"],
+body.admin input[type="password"],
+body.admin input[type="time"] {
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.admin .campo input:focus,
+body.admin .campo select:focus,
+body.admin .campo textarea:focus,
+body.admin select:focus,
+body.admin input:focus {
+  outline: none;
+  border-color: var(--admin-acento);
+  box-shadow: 0 0 0 3px rgba(240, 0, 255, 0.25);
+}
+
+body.admin .campo__error {
+  color: var(--color-error);
+  font-weight: 500;
+}
+
+/* Interruptor: píldora */
+body.admin .interruptor__pista {
+  width: 40px;
+  height: 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-border-strong);
+}
+
+body.admin .interruptor__pista::after {
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+body.admin .interruptor input:checked + .interruptor__pista {
+  background: var(--color-exito);
+}
+
+body.admin .interruptor input:checked + .interruptor__pista::after {
+  transform: translateX(16px);
+}
+
+/* Barra superior y menú lateral */
+body.admin .admin-header {
+  background: rgba(8, 11, 36, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--admin-texto);
+  border-bottom: 1px solid var(--admin-borde);
+  padding: 12px var(--espacio-3);
+}
+
+body.admin .admin-header__titulo {
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+body.admin .admin-drawer {
+  border-radius: 0 16px 16px 0;
+  box-shadow: 8px 0 40px rgba(0, 0, 0, 0.12);
+}
+
+body.admin .admin-drawer__fondo {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+body.admin .admin-drawer__encabezado {
+  border-bottom: none;
+  padding-top: var(--espacio-4);
+}
+
+body.admin .admin-drawer__negocio {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+body.admin .admin-drawer__enlaces {
+  padding: var(--espacio-2);
+  gap: 2px;
+}
+
+body.admin .admin-drawer__enlace {
+  border-left: none;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-weight: 500;
+  color: var(--admin-suave);
+}
+
+body.admin .admin-drawer__enlace:hover {
+  background: var(--color-surface-2);
+  color: var(--admin-texto);
+}
+
+body.admin .admin-drawer__enlace--activo {
+  background: var(--admin-acento);
+  color: var(--color-bg);
+  font-weight: 600;
+}
+
+body.admin .admin-drawer__pie {
+  border-top: none;
+  padding: var(--espacio-3);
+}
+
+/* Contenido de páginas */
+body.admin .admin-dashboard,
+body.admin .admin-pedidos,
+body.admin .admin-productos,
+body.admin .admin-categorias,
+body.admin .admin-adiciones,
+body.admin .admin-ofertas,
+body.admin .admin-usuarios,
+body.admin .admin-negocio {
+  padding-block: var(--espacio-4) 72px;
+}
+
+body.admin .admin-dashboard__resumen {
+  display: flex;
+  padding: var(--espacio-4);
+  box-shadow: none;
+}
+
+body.admin .admin-dashboard__resumen strong {
+  font-size: 2.4rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+body.admin .admin-crear {
+  background: var(--admin-superficie);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--admin-radio);
+}
+
+body.admin .admin-crear--boton {
+  background: var(--admin-acento);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+body.admin .admin-crear--boton:hover {
+  background: var(--color-secondary);
+}
+
+/* Pedidos */
+body.admin .pedido-item {
+  padding: var(--espacio-3) var(--espacio-4);
+  gap: var(--espacio-2);
+}
+
+body.admin .pedido-item__estado {
+  border: none;
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: var(--color-surface-2);
+  color: var(--admin-suave);
+  letter-spacing: 0.02em;
+}
+
+body.admin .pedido-item__estado--nuevo {
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--color-accent-cyan);
+}
+
+body.admin .pedido-item__estado--aprobado,
+body.admin .pedido-item__estado--entregado {
+  background: rgba(0, 245, 160, 0.12);
+  color: var(--color-exito);
+}
+
+body.admin .pedido-item__estado--en_preparacion {
+  background: rgba(245, 255, 0, 0.12);
+  color: var(--color-accent-yellow);
+}
+
+body.admin .pedido-item__estado--rechazado {
+  background: rgba(255, 107, 129, 0.14);
+  color: var(--color-error);
+}
+
+/* Usuarios */
+body.admin .rol-badge--dueno {
+  border-radius: 999px;
+}
+
+body.admin .usuario-admin-item__encabezado {
+  padding: 14px var(--espacio-3);
+}
+
+/* Modales y confirmaciones */
+body.admin .superposicion {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+body.admin .superposicion__panel,
+body.admin .confirmacion {
+  border: none;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+body.admin .superposicion__panel {
+  padding: var(--espacio-4);
+}
+
+@media (min-width: 640px) {
+  body.admin .superposicion__panel,
+  body.admin .confirmacion {
+    border-radius: 16px;
+  }
+}
+
+/* Login: una sola columna centrada, sin adornos */
+body.admin .admin-login {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espacio-4) var(--espacio-3);
+  background: var(--admin-fondo);
+}
+
+body.admin .admin-login__tarjeta {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 32px;
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+body.admin .admin-login__negocio {
+  margin: 0 0 var(--espacio-4);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--admin-suave);
+}
+
+body.admin .admin-login__titulo {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+}
+
+body.admin .admin-login__subtitulo {
+  margin: 0 0 var(--espacio-4);
+  color: var(--admin-suave);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+body.admin .admin-login .campo input {
+  padding: 12px 14px;
+  font-size: 1rem;
+}
+
+body.admin .admin-login__error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 107, 129, 0.14);
+  font-size: 0.85rem;
+}
+
+body.admin .admin-login__boton {
+  width: 100%;
+  margin-top: var(--espacio-1);
+  padding-block: 13px;
+  font-size: 1rem;
+}
+
+/* =====================================================================================
+   Filtros de las listas admin (Productos / Adiciones / Pedidos): una barra de una línea
+   con botón "Filtros" + resultados; las opciones se despliegan en un panel solo al pedirlo.
+   ===================================================================================== */
+.filtros-admin {
+  margin: 0 0 var(--espacio-3);
+}
+
+.filtros-admin__barra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filtros-admin__boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.filtros-admin__boton:hover,
+.filtros-admin__boton--abierto {
+  border-color: var(--color-texto);
+}
+
+.filtros-admin__contador {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-texto);
+  color: var(--color-fondo);
+  font-size: 0.7rem;
+  line-height: 18px;
+  text-align: center;
+}
+
+.filtros-admin__resultado {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+.filtros-admin__limpiar {
+  border: none;
+  background: none;
+  padding: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-texto);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.filtros-admin__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 10px;
+  padding: 16px;
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  animation: filtros-entrada 0.15s ease;
+}
+
+@keyframes filtros-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.filtros-admin__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filtros-admin__titulo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+/* Control segmentado: una sola pista gris, la opción activa "flota" en blanco encima. */
+.filtros-admin__segmentos {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--color-surface-2);
+  border-radius: 9px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filtros-admin__segmento {
+  flex: 1 1 0;
+  padding: 7px 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-texto-suave);
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filtros-admin__segmento:hover {
+  color: var(--color-texto);
+}
+
+.filtros-admin__segmento--activo,
+.filtros-admin__segmento--activo:hover {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+
+/* Adiciones y ofertas: mismo esquema que el producto pero sin imagen (info | acciones), con
+   el mismo alto mínimo para que todas las tarjetas queden idénticas. */
+.adicion-admin-item,
+.oferta-admin-item {
+  padding: var(--espacio-3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--espacio-3);
+  min-height: 112px;
+  transition: box-shadow 0.15s ease;
+}
+
+.adicion-admin-item:hover,
+.oferta-admin-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-border-strong);
+}
+
+/* --- Ofertas (panel) --- */
+.admin-ofertas__ayuda {
+  margin: calc(var(--espacio-2) * -1) 0 var(--espacio-3);
+  font-size: 0.88rem;
+}
+
+.admin-ofertas__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-4);
+}
+
+.admin-ofertas__titulo {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.admin-ofertas__grupo .admin-crear {
+  align-self: flex-start;
+  margin: 0;
+}
+
+.oferta-admin-item--en-inicio {
+  outline: 2px solid var(--color-acento);
+  outline-offset: -2px;
+}
+
+.oferta-admin-item__tipo {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.oferta-admin-item__en-inicio {
+  background: var(--color-acento);
+  border-color: var(--color-acento);
+  color: var(--color-bg);
+}
+
+
+.formulario-oferta__vista-previa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3);
+  background: var(--color-secundario);
+}
+
+.formulario-oferta__vista-previa .tarjeta-oferta {
+  pointer-events: none;
+  margin-bottom: 0;
+}
+
+/* La vista previa muestra la tarjeta tal como sale en la carta: esquinas rectas, aunque el
+   tema del admin redondee los botones. */
+body.admin .formulario-oferta__vista-previa .tarjeta-oferta {
+  border-radius: 0;
+}
+
+.formulario-oferta__rotulo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.formulario-oferta__vacia {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.formulario-oferta__ayuda,
+.formulario-oferta__aviso {
+  font-size: 0.8rem;
+}
+
+.formulario-oferta__aviso {
+  margin: 0;
+}
+
+body.admin .oferta-admin-item--en-inicio {
+  outline-color: var(--admin-acento);
+}
+
+body.admin .oferta-admin-item__en-inicio {
+  background: var(--admin-acento);
+  color: var(--color-bg);
+}
+
+body.admin .formulario-oferta__vista-previa {
+  border-radius: var(--admin-radio);
+  background: var(--color-surface-2);
+}
+
+/* =====================================================================================
+   Dashboard (negocio + métricas), filtro de fechas de pedidos y botones "crear" rectos
+   ===================================================================================== */
+body.admin .admin-crear--boton {
+  border-radius: 6px;
+}
+
+.admin-dashboard__negocio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--espacio-4);
+  margin-bottom: var(--espacio-3);
+}
+
+.admin-dashboard__etiqueta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.admin-dashboard__negocio h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.admin-dashboard__dueno {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--espacio-3);
+  padding-top: var(--espacio-3);
+  border-top: 1px solid var(--color-borde);
+}
+
+.admin-dashboard__metricas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espacio-2);
+}
+
+.admin-dashboard__metrica {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--espacio-3);
+  min-height: 116px;
+}
+
+.admin-dashboard__metrica strong {
+  font-size: 2.2rem;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.admin-dashboard__detalle {
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+
+/* Métricas del dashboard que llevan a su sección: se comportan como tarjetas-botón. */
+.admin-dashboard__metrica--enlace {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.admin-dashboard__metrica--enlace:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+.admin-dashboard__metrica--enlace:active {
+  transform: scale(0.98);
+}
+
+.admin-dashboard__flecha {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  color: var(--color-texto-suave);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.admin-dashboard__metrica--enlace:hover .admin-dashboard__flecha {
+  color: var(--color-texto);
+  transform: translateX(3px);
+}
+
+/* --- Dashboard: asistente del negocio (análisis + recomendaciones) --- */
+.asistente {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-4);
+}
+
+.asistente__titulo {
+  margin: 0 0 var(--espacio-1);
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+.asistente h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.asistente__nota {
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
+.asistente__dinero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--espacio-4);
+}
+
+.asistente__dinero strong {
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.asistente__dinero-detalle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.asistente__sube {
+  color: var(--color-exito);
+  font-weight: 600;
+}
+
+.asistente__baja {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.asistente__bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--espacio-3) var(--espacio-4);
+}
+
+.asistente__bloque p {
+  margin: 0;
+}
+
+.asistente__barras,
+.asistente__productos {
+  list-style: none;
+  margin: var(--espacio-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.asistente__barra-fila {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.asistente__barra-dia {
+  color: var(--color-texto-suave);
+}
+
+.asistente__barra-pista {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.asistente__barra {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: width 0.3s ease;
+}
+
+.asistente__barra--max {
+  background: var(--color-texto);
+}
+
+.asistente__barra-valor {
+  text-align: right;
+  font-weight: 600;
+}
+
+.asistente__productos li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-borde);
+  font-size: 0.88rem;
+}
+
+.asistente__productos li:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.asistente__producto-nombre {
+  font-weight: 600;
+}
+
+.asistente__recomendaciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+
+.asistente__recomendacion {
+  display: flex;
+  flex-direction: column;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-left: 3px solid var(--color-texto);
+}
+
+.asistente__recomendacion strong {
+  font-size: 0.92rem;
+}
+
+.asistente__recomendacion p {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-texto-suave);
+}
+
+.asistente__otra {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-texto);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

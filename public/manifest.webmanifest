@@ -1,0 +1,12 @@
+{
+  "name": "PAR CHAOS",
+  "short_name": "PAR CHAOS",
+  "description": "Carta digital y pedidos por WhatsApp de PAR CHAOS en Popayán.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030617",
+  "theme_color": "#030617",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

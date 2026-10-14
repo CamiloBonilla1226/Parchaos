@@ -206,7 +206,7 @@ export function Carta() {
 
       <main className="contenedor pagina-carta pagina-carta--tabs">
         <section hidden={seccion !== 'inicio'} className="seccion-inicio">
-          <img src="/logo.svg" alt={negocioConfig.nombre} className="seccion-inicio__logo" />
+          <img src="/logo.webp" alt={negocioConfig.nombre} width="640" height="628" className="seccion-inicio__logo" />
           <TarjetaOferta oferta={ofertaActiva} onClick={() => setSeccion('menu')} />
           <CarruselDestacados productos={destacados} onAbrirDetalle={setProductoSeleccionado} />
           <SobreNosotros />

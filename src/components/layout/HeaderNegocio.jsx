@@ -20,7 +20,13 @@ export function HeaderNegocio() {
   return (
     <header className="header-negocio">
       <div className="contenedor header-negocio__contenido">
-        <span className="header-negocio__nombre">{negocioConfig.nombre}</span>
+        <img
+          src="/letrero.webp"
+          alt={negocioConfig.nombre}
+          className="header-negocio__letrero"
+          width="640"
+          height="219"
+        />
         {estado && (
           <span className={`header-negocio__estado header-negocio__estado--${estado}`}>
             {estado === 'abierto' ? 'Abierto' : 'Cerrado'}

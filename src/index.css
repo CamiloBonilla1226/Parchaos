@@ -234,7 +234,15 @@ p {
   padding-block: var(--espacio-3);
 }
 
+.nav__letrero,
+.header-negocio__letrero {
+  display: block;
+  height: 44px;
+  width: auto;
+}
+
 .nav__marca {
+  display: flex;
   font-weight: 700;
   text-decoration: none;
   font-size: 1.1rem;
@@ -336,8 +344,8 @@ p {
   display: block;
   width: 100%;
   max-height: 180px;
-  object-fit: cover;
-  background: #000;
+  object-fit: contain;
+  background: var(--color-bg);
 }
 
 .carta-fisica__marca {
@@ -2533,8 +2541,10 @@ body.body--con-nav-inferior .toast-contenedor {
 /* --- Inicio de la carta: logo --- */
 .seccion-inicio__logo {
   display: block;
-  width: 100%;
-  margin: var(--espacio-3) 0;
+  width: 70%;
+  max-width: 280px;
+  height: auto;
+  margin: var(--espacio-3) auto;
 }
 
 /* --- Inicio de la carta: tarjeta de oferta ---

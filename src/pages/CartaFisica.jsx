@@ -112,7 +112,7 @@ export function CartaFisica() {
       onTouchEnd={resultados ? undefined : swipe.onTouchEnd}
     >
       <header className="carta-fisica__encabezado" ref={encabezadoRef}>
-        <img src="/logo.svg" alt="" className="carta-fisica__logo" />
+        <img src="/logo.webp" alt="" className="carta-fisica__logo" />
         <div className="contenedor carta-fisica__marca">
           <h1 className="carta-fisica__titulo">{negocioConfig.nombre}</h1>
           <p className="carta-fisica__subtitulo">Carta</p>

@@ -622,3 +622,8 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (3)
 - `como-crear-usuario-admin-manual.txt`: el INSERT de `usuarios_admin` del Paso 3 ahora incluye la columna `nombre`, que es `NOT NULL` (ver `explicacion-script-bd.txt`). Sin ella, el alta manual del primer dueño fallaba con un error de columna nula.
+
+## 2026-10-14 (4)
+- **Logos reales de PAR CHAOS** (reemplazan el `logo.svg` provisional): el letrero horizontal (`public/letrero.webp`) va en el nav de arriba (`Nav` de Inicio y `HeaderNegocio` de la carta, a 44 px de alto) y el logo circular (`public/logo.webp`) en el cuerpo, en el inicio de la carta (centrado, máx. 280 px) y en el encabezado de la carta física.
+- Los PNG originales (1,7 MB y 0,7 MB, 2141×734) se convirtieron a WebP: 640 px de ancho, 45 KB el letrero y 119 KB el logo. Al logo se le recortó el margen transparente (el círculo ocupaba solo el 35 % central) y en la carta física pasó de `object-fit: cover` a `contain` para que el círculo no se recorte con el `max-height` de 180 px. `og:image` apunta a `logo.webp`.
+- El nombre del negocio como texto en el nav se reemplazó por la imagen, conservando el nombre como `alt` para lectores de pantalla.

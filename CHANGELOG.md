@@ -616,3 +616,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 - **Tema oscuro neón**: la paleta vive en `:root` de `index.css` (`--color-bg`, `--color-surface`, `--color-primary`, `--color-secondary`, `--color-violet`, `--color-accent-cyan`, `--color-accent-yellow`, `--color-text`, `--color-success`). Los nombres históricos (`--color-fondo`, `--color-primario`...) ahora apuntan a ella, así que todo el CSS existente la hereda. El panel admin (`body.admin`) y los modales dejaron de ser claros. `App.jsx` ya no inyecta colores en runtime (solo la fuente); si se inyectaran, pisarían la paleta.
 - Botones: fondo fucsia con brillo suave, hover a #7800FF. El texto del botón en reposo es oscuro (#080B24) y no blanco, porque blanco sobre #F000FF da ~3.4:1 y el oscuro ~5.9:1; en hover pasa a blanco (sobre #7800FF). "Abierto" en #00F5A0; "Cerrado" en gris #9AA0B8.
 - `.gitignore`: se ignoran `.env*` (menos `.env.example`) y `.claude/settings.local.json`.
+
+## 2026-10-14 (2)
+- **WhatsApp real de PAR CHAOS**: `whatsappContacto` en `negocio.config.js` pasa del valor provisional `570000000000` a `573146032055`. Es el número al que llegan los pedidos del checkout y el que usa el botón del footer.

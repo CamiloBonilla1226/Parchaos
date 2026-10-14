@@ -15,9 +15,8 @@ export const negocioConfig = {
   nombre: 'PAR CHAOS',
 
   // Número de WhatsApp del negocio, en formato internacional sin signos (ej. 573001234567).
-  // PENDIENTE: reemplazar el 570000000000 provisional por el número real de PAR CHAOS.
   // Se usa para armar el link wa.me del checkout.
-  whatsappContacto: '570000000000',
+  whatsappContacto: '573146032055',
 
   // Los colores de la marca viven en :root de src/index.css (--color-bg, --color-primary...).
   // Aquí solo queda la tipografía, que App.jsx aplica como variable CSS.

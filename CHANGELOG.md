@@ -637,3 +637,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (7)
 - **Se revirtió el ajuste de espacio del logo del inicio** (entrada 2026-10-14 (6)): `.seccion-inicio__logo` vuelve a `margin: var(--espacio-3) auto`, con 16 px de aire arriba y abajo, a pedido del dueño (prefirió el espaciado anterior). El tamaño del logo (45 % / máx. 180 px) y el nav fino no cambian.
+
+## 2026-10-14 (8)
+- **Menos espacio solo arriba del logo del inicio**: `.seccion-inicio__logo` pasa de `margin: 16px auto` a `4px auto 16px`. Se quitan 12 px por arriba (el logo queda más cerca del nav) y el espacio de abajo, hasta la tarjeta de oferta, no cambia.

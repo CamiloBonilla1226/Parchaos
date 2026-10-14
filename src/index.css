@@ -2544,7 +2544,7 @@ body.body--con-nav-inferior .toast-contenedor {
   width: 45%;
   max-width: 180px;
   height: auto;
-  margin: var(--espacio-3) auto;
+  margin: var(--espacio-1) auto var(--espacio-3);
 }
 
 /* --- Inicio de la carta: tarjeta de oferta ---

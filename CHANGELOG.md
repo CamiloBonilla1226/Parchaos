@@ -640,3 +640,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (8)
 - **Menos espacio solo arriba del logo del inicio**: `.seccion-inicio__logo` pasa de `margin: 16px auto` a `4px auto 16px`. Se quitan 12 px por arriba (el logo queda más cerca del nav) y el espacio de abajo, hasta la tarjeta de oferta, no cambia.
+
+## 2026-10-14 (9)
+- **Aún menos espacio arriba del logo del inicio**: el margen superior de `.seccion-inicio__logo` pasa de 4 px a -8 px. El margen negativo es necesario porque el padding de 24 px de `.pagina-carta` ya dejaba aire por encima aunque el margen del logo fuera 0; con -8 px quedan ~16 px entre el nav y el logo en vez de 28. El margen de abajo sigue en 16 px.

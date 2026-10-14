@@ -2544,9 +2544,7 @@ body.body--con-nav-inferior .toast-contenedor {
   width: 45%;
   max-width: 180px;
   height: auto;
-  /* El margen negativo de arriba compensa el padding de .pagina-carta para que el logo
-     quede pegado al nav; abajo queda un aire mínimo antes de la tarjeta de oferta. */
-  margin: calc(-1 * var(--espacio-3)) auto var(--espacio-1);
+  margin: var(--espacio-3) auto;
 }
 
 /* --- Inicio de la carta: tarjeta de oferta ---

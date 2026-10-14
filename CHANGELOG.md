@@ -631,3 +631,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 ## 2026-10-14 (5)
 - **Nav superior más fino**: el letrero baja de 44 a 30 px de alto y el padding vertical del nav (`.nav__contenido`) y del header de la carta (`.header-negocio__contenido`) de 16 a 4 px, lo que deja la barra en ~38 px en vez de ~76 px.
 - **Logo circular más pequeño** en el inicio de la carta (`.seccion-inicio__logo`): de 70 % / máx. 280 px a 45 % / máx. 180 px, para que no domine la pantalla.
+
+## 2026-10-14 (6)
+- **Logo del inicio ocupa menos espacio vertical** sin cambiar su tamaño: se quitó el margen de 16 px de arriba y de abajo (`.seccion-inicio__logo`). Arriba se usa un margen negativo de 16 px que compensa parte del padding de 24 px de `.pagina-carta` (el logo queda más pegado al nav) y abajo quedan 4 px antes de la tarjeta de oferta. El ahorro es de ~44 px.

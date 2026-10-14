@@ -619,3 +619,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (2)
 - **WhatsApp real de PAR CHAOS**: `whatsappContacto` en `negocio.config.js` pasa del valor provisional `570000000000` a `573146032055`. Es el número al que llegan los pedidos del checkout y el que usa el botón del footer.
+
+## 2026-10-14 (3)
+- `como-crear-usuario-admin-manual.txt`: el INSERT de `usuarios_admin` del Paso 3 ahora incluye la columna `nombre`, que es `NOT NULL` (ver `explicacion-script-bd.txt`). Sin ella, el alta manual del primer dueño fallaba con un error de columna nula.

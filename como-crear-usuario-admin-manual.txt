@@ -84,17 +84,18 @@ El resultado debe mostrar algo como:
 PASO 3 — Crear la fila correspondiente en usuarios_admin
 ----------------------------------------------------------------
 Esta tabla es la que usa el panel admin para mostrar la lista de usuarios
-del negocio (nombre/número, rol) — es distinta de auth.users, que es la
+del negocio (nombre/número, rol). La columna "nombre" es NOT NULL: sin ella el
+INSERT falla — es distinta de auth.users, que es la
 tabla interna de autenticación de Supabase. Ambas deben existir y
 coincidir en negocio_id y rol.
 
-    insert into usuarios_admin (negocio_id, numero, rol)
-    values ('EL_ID_DEL_NEGOCIO', 'NUMERO', 'dueño');
+    insert into usuarios_admin (negocio_id, numero, nombre, rol)
+    values ('EL_ID_DEL_NEGOCIO', 'NUMERO', 'NOMBRE_DEL_DUEÑO', 'dueño');
 
 Ejemplo real:
 
-    insert into usuarios_admin (negocio_id, numero, rol)
-    values ('8ea9a00c-f4aa-4360-b74a-2ccac581a8c7', '3001234567', 'dueño');
+    insert into usuarios_admin (negocio_id, numero, nombre, rol)
+    values ('8ea9a00c-f4aa-4360-b74a-2ccac581a8c7', '3001234567', 'Juan Pérez', 'dueño');
 
 
 PASO 4 — Probar el login

@@ -646,3 +646,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (10)
 - **Se revirtió el nav superior fino** (entrada 2026-10-14 (5)), a pedido del dueño: el letrero vuelve a 44 px de alto y el padding vertical de `.nav__contenido` y `.header-negocio__contenido` a 16 px. El logo del inicio conserva su tamaño reducido (45 % / máx. 180 px) y el margen superior de -8 px.
+
+## 2026-10-14 (11)
+- **Nav superior un poco más bajo** (punto intermedio entre el original y el fino): letrero de 44 a 40 px y padding vertical de `.nav__contenido` y `.header-negocio__contenido` de 16 a 8 px. La barra pasa de ~76 px a ~57 px.

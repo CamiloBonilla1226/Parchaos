@@ -231,13 +231,13 @@ p {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: var(--espacio-1);
+  padding-block: var(--espacio-3);
 }
 
 .nav__letrero,
 .header-negocio__letrero {
   display: block;
-  height: 30px;
+  height: 44px;
   width: auto;
 }
 
@@ -2436,7 +2436,7 @@ body.body--con-nav-inferior .toast-contenedor {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: var(--espacio-1);
+  padding-block: var(--espacio-3);
 }
 
 .header-negocio__nombre {

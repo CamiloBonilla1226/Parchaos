@@ -643,3 +643,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (9)
 - **Aún menos espacio arriba del logo del inicio**: el margen superior de `.seccion-inicio__logo` pasa de 4 px a -8 px. El margen negativo es necesario porque el padding de 24 px de `.pagina-carta` ya dejaba aire por encima aunque el margen del logo fuera 0; con -8 px quedan ~16 px entre el nav y el logo en vez de 28. El margen de abajo sigue en 16 px.
+
+## 2026-10-14 (10)
+- **Se revirtió el nav superior fino** (entrada 2026-10-14 (5)), a pedido del dueño: el letrero vuelve a 44 px de alto y el padding vertical de `.nav__contenido` y `.header-negocio__contenido` a 16 px. El logo del inicio conserva su tamaño reducido (45 % / máx. 180 px) y el margen superior de -8 px.

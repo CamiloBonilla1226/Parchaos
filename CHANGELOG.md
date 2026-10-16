@@ -649,3 +649,7 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-14 (11)
 - **Nav superior un poco más bajo** (punto intermedio entre el original y el fino): letrero de 44 a 40 px y padding vertical de `.nav__contenido` y `.header-negocio__contenido` de 16 a 8 px. La barra pasa de ~76 px a ~57 px.
+
+## 2026-10-16
+- **Prompts para Google Stitch** en `docs/prompts-stitch.md`: un prompt base para el inicio de la carta móvil, uno por cada pantalla siguiente (menú, detalle de producto, carrito, datos de entrega, pedido enviado y variantes de carrito vacío y negocio cerrado) y cuatro para el panel admin de escritorio (pedidos, productos, negocio/horarios y estadísticas). Sirven para explorar el rediseño visual antes de tocar código.
+- Los prompts siguen lo que el proyecto hace hoy y no el planteamiento genérico de "app con perfil y seguimiento": un solo negocio por app, sin cuenta de cliente y con el pedido enviado por WhatsApp. Por eso "seguimiento" y "perfil" se reemplazaron por "datos de entrega" y "pedido enviado". La paleta es la de `src/index.css`. La tipografía (Space Grotesk + Inter) es una propuesta: hoy se usa la fuente del sistema.

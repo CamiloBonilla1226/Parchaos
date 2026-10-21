@@ -25,6 +25,13 @@ export function textoDomicilioGratis(monto) {
   return { titulo: 'Domicilio gratis', subtitulo: largo.length <= SUBTITULO_MAX ? largo : `Desde ${precio}` }
 }
 
+// Monto mínimo de la oferta de domicilio gratis si es la oferta activa (si no, null). Lo usan la
+// tarjeta y los pasos de Inicio para mostrar siempre el valor configurado en /admin/ofertas.
+export function montoDomicilioGratis(oferta) {
+  if (oferta?.tipo !== TIPO_DOMICILIO_GRATIS) return null
+  return Number(oferta.configuracion?.monto_minimo) || null
+}
+
 const COMPORTAMIENTOS = {
   [TIPO_DOMICILIO_GRATIS]: (config, total) => {
     const meta = Number(config.monto_minimo) || 0

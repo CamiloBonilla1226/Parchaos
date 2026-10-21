@@ -1,10 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { negocioConfig } from '../config/negocio.config'
 import { HeaderNegocio } from '../components/layout/HeaderNegocio'
 import { NavInferior } from '../components/layout/NavInferior'
-import { SobreNosotros } from '../components/layout/SobreNosotros'
-import { TarjetaOferta } from '../components/layout/TarjetaOferta'
-import { CarruselDestacados } from '../components/menu/CarruselDestacados'
+import { Inicio } from './Inicio'
 import { BuscadorProductos } from '../components/menu/BuscadorProductos'
 import { ProductoListaItem } from '../components/menu/ProductoListaItem'
 import { CategoriaFiltro } from '../components/menu/CategoriaFiltro'
@@ -65,6 +62,7 @@ export function Carta() {
     categorias: categoriasCargadas,
     cargando: cargandoCategorias,
     error: errorCategorias,
+    recargar: recargarCategorias,
   } = useCategorias({
     soloActivas: true,
     soloVisibleDomicilios: true,
@@ -73,6 +71,7 @@ export function Carta() {
     productos: productosCargados,
     cargando: cargandoProductos,
     error: errorProductos,
+    recargar: recargarProductos,
   } = useProductos({ soloDisponibles: true, soloVisibleDomicilios: true })
   const productosVisibles = useMemo(
     () => filtrarProductosVisibles(productosCargados, 'visible_domicilios'),
@@ -179,6 +178,14 @@ export function Carta() {
     setProductoSeleccionado(producto)
   }
 
+  // Desde Inicio (oferta, "Ver todo", una categoría): abre el Menú con esa categoría (o todas)
+  // y sin búsqueda previa, para que se vea exactamente lo que se tocó.
+  const irAlMenu = (categoriaId = null) => {
+    setCategoriaSeleccionada(categoriaId)
+    setBusqueda('')
+    setSeccion('menu')
+  }
+
   const cerrarDetalle = () => {
     setProductoSeleccionado(null)
     setItemEditando(null)
@@ -201,15 +208,29 @@ export function Carta() {
           contenido, espacio vacío debajo de una lista corta y nav inferior): el gesto debe
           funcionar en cualquier parte. Si solo cubriera el contenido, en una categoría con
           pocos productos el dedo caía en el vacío de abajo y el swipe no hacía nada. */}
-      <div className="carta-zona-swipe" onTouchStart={swipe.onTouchStart} onTouchEnd={swipe.onTouchEnd}>
+      <div
+        className={`carta-zona-swipe${seccion === 'inicio' ? ' carta-zona-swipe--inicio' : ''}`}
+        onTouchStart={swipe.onTouchStart}
+        onTouchEnd={swipe.onTouchEnd}
+      >
       <HeaderNegocio />
 
       <main className="contenedor pagina-carta pagina-carta--tabs">
         <section hidden={seccion !== 'inicio'} className="seccion-inicio">
-          <img src="/logo.webp" alt={negocioConfig.nombre} width="640" height="628" className="seccion-inicio__logo" />
-          <TarjetaOferta oferta={ofertaActiva} onClick={() => setSeccion('menu')} />
-          <CarruselDestacados productos={destacados} onAbrirDetalle={setProductoSeleccionado} />
-          <SobreNosotros />
+          <Inicio
+            ofertaActiva={ofertaActiva}
+            destacados={destacados}
+            categorias={categorias}
+            cargandoProductos={cargandoProductos}
+            errorProductos={errorProductos}
+            cargandoCategorias={cargandoCategorias}
+            errorCategorias={errorCategorias}
+            onReintentarProductos={() => recargarProductos()}
+            onReintentarCategorias={() => recargarCategorias()}
+            onIrAlMenu={irAlMenu}
+            onAbrirDetalle={setProductoSeleccionado}
+            onAgregar={agregarRapido}
+          />
         </section>
 
         <section hidden={seccion !== 'menu'} className="seccion-menu">

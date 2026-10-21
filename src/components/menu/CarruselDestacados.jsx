@@ -13,10 +13,10 @@ const formatoPrecio = new Intl.NumberFormat('es-CO', {
 // Como se ven varias tarjetas a la vez (no una por "página"), el índice activo y el scroll
 // de los puntos de paginación se calculan con el ancho real de UNA tarjeta + su gap, no con
 // el ancho completo de la pista (que sería el de ~3 tarjetas y desincroniza los puntos).
-// Tocar la tarjeta abre el detalle del producto (ahí está el botón real de "Agregar"). En
-// Inicio no hay un "+" propio en la tarjeta; el carrito reutiliza el carrusel para sus
-// recomendaciones y ahí sí lo muestra (`onAgregarRapido`, mismo comportamiento que el "+" del
-// Menú). `titulo`, `subtitulo` y `variante` (clase modificadora) cambian el encabezado.
+// Tocar la tarjeta abre el detalle del producto. Hoy solo lo usa el Carrito para sus
+// recomendaciones, con "+" (`onAgregarRapido`, mismo comportamiento que el "+" del Menú); el
+// Inicio tiene su propio carrusel (components/inicio/CarruselMasPedidos.jsx).
+// `titulo`, `subtitulo` y `variante` (clase modificadora) cambian el encabezado.
 export function CarruselDestacados({
   productos,
   onAbrirDetalle,

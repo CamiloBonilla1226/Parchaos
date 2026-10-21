@@ -1,5 +1,7 @@
+import { negocioConfig } from '../../config/negocio.config'
 import { useNegocioConfig } from '../../hooks/useNegocioConfig'
 import { agruparHorario, DIAS } from '../../lib/horario'
+import { IconoRedes, IconoReloj, IconoUbicacion } from '../inicio/iconos'
 
 const REDES = [
   ['instagram', 'Instagram'],
@@ -7,86 +9,117 @@ const REDES = [
   ['whatsapp', 'WhatsApp'],
 ]
 
-// Contenido propio de cada negocio (descripción, horario, dirección, redes), leído de la
-// tabla `negocio_config` (ver useNegocioConfig.js) para que cada negocio lo edite desde su
-// panel admin sin tocar código. Si el negocio todavía no llenó nada de esto, la sección
-// entera no se muestra en vez de dejar espacios vacíos.
-//
-// Diseño compacto: una fila por dato (horario / ubicación / redes) en vez de un bloque con
-// título cada uno. El horario muestra solo el de hoy y se despliega para ver la semana.
+// El dueño puede guardar en redes_sociales un link completo o solo el usuario/número (desde
+// /admin/negocio). Sin http se arma el link de cada red, para que nunca quede un enlace
+// relativo roto dentro de la carta.
+function enlaceRed(clave, valor) {
+  const texto = valor.trim()
+  if (/^https?:\/\//i.test(texto)) return texto
+  if (clave === 'whatsapp') {
+    const digitos = texto.replace(/\D/g, '')
+    return `https://wa.me/${digitos.length === 10 ? `57${digitos}` : digitos}`
+  }
+  const usuario = texto.replace(/^@/, '')
+  return clave === 'instagram' ? `https://instagram.com/${usuario}` : `https://facebook.com/${usuario}`
+}
+
+// Bloque minimalista al final de Inicio: rótulo, nombre del negocio y una fila por dato
+// (horario / ubicación / redes), leídos de `negocio_config` (ver useNegocioConfig.js) para
+// que el dueño los edite desde su panel. El horario muestra el de hoy y se despliega para ver
+// la semana. Las filas sin dato no se muestran; si no hay ninguna, la sección tampoco.
 export function SobreNosotros() {
-  const { config, cargando } = useNegocioConfig()
-  if (cargando || !config) return null
+  const { config, cargando, error } = useNegocioConfig()
+  if (cargando) return null
 
-  const { descripcion, direccion, horario, redes_sociales: redesSociales } = config
-  const redesConLink = REDES.filter(([clave]) => redesSociales?.[clave])
+  const { direccion, horario, redes_sociales: redesSociales } = config ?? {}
+  const redesConLink = REDES.filter(([clave]) => redesSociales?.[clave]?.trim())
   const gruposHorario = agruparHorario(horario)
+  const sinDatos = !direccion && gruposHorario.length === 0 && redesConLink.length === 0
 
-  if (!descripcion && !direccion && gruposHorario.length === 0 && redesConLink.length === 0) return null
+  if (sinDatos && !error) return null
 
   const hoy = DIAS[new Date().getDay()]
   const grupoHoy = gruposHorario.find((grupo) => grupo.claves.includes(hoy))
 
   return (
-    <section className="sobre-nosotros">
-      <h2>Sobre nosotros</h2>
-      {descripcion && <p className="sobre-nosotros__descripcion">{descripcion}</p>}
+    <section className="sobre-nosotros" aria-labelledby="titulo-sobre-nosotros">
+      <p className="sobre-nosotros__rotulo">Sobre nosotros</p>
+      <h2 id="titulo-sobre-nosotros" className="sobre-nosotros__nombre">
+        {negocioConfig.nombre}
+      </h2>
+      <span className="sobre-nosotros__raya" aria-hidden="true" />
 
-      <ul className="sobre-nosotros__filas">
-        {gruposHorario.length > 0 && (
-          <li>
-            <details className="sobre-nosotros__horario">
-              <summary>
-                <span className="sobre-nosotros__etiqueta">Horario</span>
-                <span className="sobre-nosotros__valor">
-                  {grupoHoy ? `Hoy · ${grupoHoy.texto}` : 'Ver horario'}
-                </span>
-                <span className="sobre-nosotros__flecha" aria-hidden="true">
-                  ▾
-                </span>
-              </summary>
-              <ul className="sobre-nosotros__semana">
-                {gruposHorario.map((grupo) => (
-                  <li key={grupo.etiquetaDias}>
-                    <span>{grupo.etiquetaDias}</span>
-                    <span className="texto-suave">{grupo.texto}</span>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </li>
-        )}
+      {error ? (
+        <p className="sobre-nosotros__error" role="alert">
+          No pudimos cargar el horario y la ubicación.
+        </p>
+      ) : (
+        <ul className="sobre-nosotros__filas">
+          {gruposHorario.length > 0 && (
+            <li>
+              <details className="sobre-nosotros__horario">
+                <summary className="sobre-nosotros__fila">
+                  <IconoReloj tamano={20} />
+                  <span className="sobre-nosotros__dato">
+                    <span className="sobre-nosotros__etiqueta">Horario</span>
+                    <span className="sobre-nosotros__valor">
+                      {grupoHoy ? `Hoy · ${grupoHoy.texto}` : 'Ver horario'}
+                    </span>
+                  </span>
+                  <svg className="sobre-nosotros__flecha" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                  </svg>
+                </summary>
+                <ul className="sobre-nosotros__semana">
+                  {gruposHorario.map((grupo) => (
+                    <li key={grupo.etiquetaDias}>
+                      <span>{grupo.etiquetaDias}</span>
+                      <span>{grupo.texto}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+          )}
 
-        {direccion && (
-          <li>
-            <a
-              className="sobre-nosotros__fila"
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="sobre-nosotros__etiqueta">Ubicación</span>
-              <span className="sobre-nosotros__valor">{direccion}</span>
-              <span className="sobre-nosotros__flecha" aria-hidden="true">
-                ↗
+          {direccion && (
+            <li>
+              <a
+                className="sobre-nosotros__fila"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <IconoUbicacion tamano={20} />
+                <span className="sobre-nosotros__dato">
+                  <span className="sobre-nosotros__etiqueta">Ubicación</span>
+                  <span className="sobre-nosotros__valor">{direccion}</span>
+                </span>
+                <svg className="sobre-nosotros__flecha" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                </svg>
+                <span className="visualmente-oculto">(abre el mapa)</span>
+              </a>
+            </li>
+          )}
+
+          {redesConLink.length > 0 && (
+            <li className="sobre-nosotros__fila">
+              <IconoRedes tamano={20} />
+              <span className="sobre-nosotros__dato">
+                <span className="sobre-nosotros__etiqueta">Redes</span>
+                <span className="sobre-nosotros__redes">
+                  {redesConLink.map(([clave, etiqueta]) => (
+                    <a key={clave} href={enlaceRed(clave, redesSociales[clave])} target="_blank" rel="noreferrer">
+                      {etiqueta}
+                    </a>
+                  ))}
+                </span>
               </span>
-            </a>
-          </li>
-        )}
-
-        {redesConLink.length > 0 && (
-          <li className="sobre-nosotros__fila">
-            <span className="sobre-nosotros__etiqueta">Redes</span>
-            <span className="sobre-nosotros__redes">
-              {redesConLink.map(([clave, etiqueta]) => (
-                <a key={clave} href={redesSociales[clave]} target="_blank" rel="noreferrer">
-                  {etiqueta}
-                </a>
-              ))}
-            </span>
-          </li>
-        )}
-      </ul>
+            </li>
+          )}
+        </ul>
+      )}
     </section>
   )
 }

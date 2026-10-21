@@ -13,6 +13,8 @@ export const negocioConfig = {
   // ID del negocio en Supabase (columna `negocios.id`). Reemplazar por el real.
   negocioId: '67facc9e-0e67-4f27-af82-8261cec62ce0',
   nombre: 'PAR CHAOS',
+  // Lema que se muestra bajo el logo en Inicio.
+  lema: 'Hielo, sabor y mucho chaos',
 
   // Número de WhatsApp del negocio, en formato internacional sin signos (ej. 573001234567).
   // Se usa para armar el link wa.me del checkout.

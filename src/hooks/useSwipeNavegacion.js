@@ -4,7 +4,7 @@ const UMBRAL_PX = 50
 
 // Contenedores con su propio scroll horizontal (carrusel, chips de categoría): un swipe que
 // empieza ahí debe scrollearlos a ellos, no disparar la navegación de secciones/categorías.
-const SELECTOR_SCROLL_INTERNO = '.carrusel-destacados__pista, .seccion-categorias__grid, .filtro-categorias'
+const SELECTOR_SCROLL_INTERNO = '.carrusel-destacados__pista, .carrusel-pedidos__pista, .filtro-categorias'
 
 // Un swipe que empieza sobre el nav inferior debe cambiar de sección directamente, incluso
 // estando en Menú — ahí no tiene sentido recorrer categorías primero, porque el dedo ya

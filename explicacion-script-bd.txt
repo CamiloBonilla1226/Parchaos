@@ -357,8 +357,8 @@ del panel guarda estas columnas y sin ellas falla al guardar):
 
     commit;
 
-ESTADO: PENDIENTE — entregado al dueño el 2026-10-21, todavía no se ha
-corrido.
+ESTADO: YA SE CORRIÓ (2026-10-21). Verificado después: en_inicio y
+emoji_inicio responden en la API.
 
 CONSECUENCIA EN EL CÓDIGO:
 - Formulario de categoría: bloque "Inicio de la carta" con la casilla

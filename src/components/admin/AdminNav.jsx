@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { negocioConfig } from '../../config/negocio.config'
 import { seccionesAdminVisibles } from '../../lib/seccionesAdmin'
+import { BotonTema } from './BotonTema'
 
 export function AdminNav() {
   const auth = useAuth()
@@ -46,6 +47,7 @@ export function AdminNav() {
           <span />
         </button>
         <span className="admin-header__titulo">Administrador</span>
+        <BotonTema />
       </header>
 
       {abierto && <div className="admin-drawer__fondo" onClick={cerrar} />}

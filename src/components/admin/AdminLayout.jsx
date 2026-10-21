@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useSwipeNavegacion } from '../../hooks/useSwipeNavegacion'
 import { seccionesAdminVisibles } from '../../lib/seccionesAdmin'
+import { useTemaAdmin } from '../../hooks/useTemaAdmin'
 
 // Donde un swipe horizontal no debe cambiar de sección: modales y confirmaciones (ahí
 // deslizar ya sirve para cerrarlos, ver useSwipeParaCerrar), el menú lateral abierto,
@@ -29,6 +30,8 @@ export function AdminLayout() {
   const auth = useAuth()
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  // Tema claro/oscuro del panel: las páginas lo leen con useOutletContext (ver BotonTema.jsx).
+  const temaAdmin = useTemaAdmin()
 
   useEffect(() => {
     document.body.classList.add('admin')
@@ -60,7 +63,7 @@ export function AdminLayout() {
 
   return (
     <div className="admin-zona-swipe" onTouchStart={swipe.onTouchStart} onTouchEnd={swipe.onTouchEnd}>
-      <Outlet />
+      <Outlet context={temaAdmin} />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { negocioConfig } from '../../config/negocio.config'
+import { BotonTema } from '../../components/admin/BotonTema'
 
 export function Login() {
   const { autenticado, cargando, iniciarSesion, error } = useAuth()
@@ -32,6 +33,7 @@ export function Login() {
 
   return (
     <main className="admin-login">
+      <BotonTema className="admin-login__tema" />
       <div className="admin-login__tarjeta">
         <p className="admin-login__negocio">{negocioConfig.nombre}</p>
         <h1 className="admin-login__titulo">Iniciar sesión</h1>

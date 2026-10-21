@@ -3476,28 +3476,108 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 /* =====================================================================================
-   Tema del panel admin (solo body.admin): minimalista y moderno. Fondo gris muy claro,
-   tarjetas blancas con borde fino y esquinas suaves, sin la marca del negocio (el admin
-   se ve igual de sobrio con cualquier paleta). Va al final para ganar a los estilos base
-   compartidos con la carta pública (.boton, .tarjeta, .campo, .superposicion...).
+   Tema del panel admin (solo body.admin): minimalista y moderno, con paleta neutra propia
+   (grises + un acento monocromo) que NO usa los colores de la marca del negocio, para que
+   el panel se vea sobrio y profesional con cualquier carta. Tiene modo claro (por defecto)
+   y oscuro (body.admin[data-tema='oscuro'], ver useTemaAdmin.js). Los colores semánticos
+   (éxito, aviso, error, info) solo se usan para estados. Va al final para ganar a los
+   estilos base compartidos con la carta pública (.boton, .tarjeta, .campo...).
    ===================================================================================== */
 body.admin {
-  --admin-fondo: var(--color-bg);
-  --admin-superficie: var(--color-surface);
-  --admin-borde: var(--color-border);
-  --admin-texto: var(--color-text);
-  --admin-suave: var(--color-text-soft);
-  --admin-acento: var(--color-primary);
+  --admin-fondo: #f6f6f7;
+  --admin-superficie: #ffffff;
+  --admin-superficie-2: #f1f1f3;
+  --admin-borde: #e4e4e7;
+  --admin-borde-fuerte: #d4d4d8;
+  --admin-texto: #18181b;
+  --admin-suave: #5f5f68;
+  --admin-acento: #18181b;
+  --admin-acento-hover: #3f3f46;
+  --admin-acento-texto: #ffffff;
+  --admin-foco: rgba(37, 99, 235, 0.35);
+  --admin-header: rgba(255, 255, 255, 0.85);
+  --admin-velo: rgba(24, 24, 27, 0.45);
+  --admin-barra: #18181b;
+  --admin-exito: #15803d;
+  --admin-aviso: #b45309;
+  --admin-error: #dc2626;
+  --admin-info: #1d4ed8;
+  --admin-sombra: 0 1px 2px rgba(24, 24, 27, 0.04);
+  --admin-sombra-alta: 0 8px 24px rgba(24, 24, 27, 0.08);
   --admin-radio: 12px;
+
+  /* Las reglas compartidas con la carta leen estas variables: se apuntan a la paleta del
+     admin para que nada del panel herede la marca. */
   --color-borde: var(--admin-borde);
-  --color-secundario: var(--color-surface-2);
+  --color-border: var(--admin-borde);
+  --color-border-strong: var(--admin-borde-fuerte);
+  --color-secundario: var(--admin-superficie-2);
+  --color-surface-2: var(--admin-superficie-2);
   --color-texto: var(--admin-texto);
   --color-texto-suave: var(--admin-suave);
+  --color-text-soft: var(--admin-suave);
   --color-primario: var(--admin-acento);
   --color-acento: var(--admin-acento);
+  --color-secondary: var(--admin-acento-hover);
   --color-fondo: var(--admin-superficie);
+  --color-error: var(--admin-error);
+  --color-danger: var(--admin-error);
+  --color-exito: var(--admin-exito);
+  --color-success: var(--admin-exito);
+  --color-accent-yellow: var(--admin-aviso);
+  --color-accent-cyan: var(--admin-info);
+  --glow-primary: none;
   background: var(--admin-fondo);
+  color: var(--admin-texto);
+  color-scheme: light;
+  font-family: var(--fuente-ui);
   font-size: 15px;
+}
+
+body.admin[data-tema='oscuro'] {
+  --admin-fondo: #0e0e10;
+  --admin-superficie: #18181b;
+  --admin-superficie-2: #232327;
+  --admin-borde: #2c2c31;
+  --admin-borde-fuerte: #3f3f46;
+  --admin-texto: #f4f4f5;
+  --admin-suave: #a1a1aa;
+  --admin-acento: #f4f4f5;
+  --admin-acento-hover: #d4d4d8;
+  --admin-acento-texto: #18181b;
+  --admin-foco: rgba(96, 165, 250, 0.4);
+  --admin-header: rgba(14, 14, 16, 0.85);
+  --admin-velo: rgba(0, 0, 0, 0.6);
+  --admin-barra: #27272a;
+  --admin-exito: #4ade80;
+  --admin-aviso: #fbbf24;
+  --admin-error: #f87171;
+  --admin-info: #60a5fa;
+  --admin-sombra: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --admin-sombra-alta: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+/* Botón sol/luna del tema (barra superior y login). */
+.boton-tema {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--admin-borde);
+  color: var(--admin-texto);
+}
+
+.boton-tema:hover {
+  background: var(--admin-superficie-2);
+}
+
+body.admin .boton-tema {
+  border-radius: 10px;
 }
 
 body.admin button,
@@ -3525,6 +3605,26 @@ body.admin .boton {
   transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
 }
 
+body.admin .boton:hover:not(:disabled) {
+  background: var(--admin-acento-hover);
+  border-color: var(--admin-acento-hover);
+  color: var(--admin-acento-texto);
+}
+
+body.admin .boton--peligro:hover:not(:disabled) {
+  background: var(--admin-error);
+  border-color: var(--admin-error);
+  color: var(--admin-superficie);
+  opacity: 0.9;
+}
+
+body.admin .boton:focus-visible,
+body.admin button:focus-visible,
+body.admin a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--admin-foco);
+}
+
 body.admin .boton:active:not(:disabled) {
   transform: scale(0.98);
 }
@@ -3535,8 +3635,10 @@ body.admin .boton--secundario {
   border-color: var(--admin-borde);
 }
 
-body.admin .boton--secundario:hover {
-  background: var(--color-surface-2);
+body.admin .boton--secundario:hover:not(:disabled) {
+  background: var(--admin-superficie-2);
+  border-color: var(--admin-borde-fuerte);
+  color: var(--admin-texto);
   opacity: 1;
 }
 
@@ -3562,12 +3664,12 @@ body.admin .tarjeta {
   background: var(--admin-superficie);
   border: 1px solid var(--admin-borde);
   border-radius: var(--admin-radio);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--admin-sombra);
 }
 
 body.admin .producto-admin-item:hover,
 body.admin .categoria-admin-item:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--admin-sombra-alta);
   border-color: var(--color-border-strong);
 }
 
@@ -3620,7 +3722,7 @@ body.admin .producto-admin-item__etiqueta {
 }
 
 body.admin .producto-admin-item__etiqueta--agotado {
-  background: rgba(255, 107, 129, 0.14);
+  background: color-mix(in srgb, var(--admin-error) 12%, var(--admin-superficie));
   color: var(--color-error);
 }
 
@@ -3653,7 +3755,7 @@ body.admin select:focus,
 body.admin input:focus {
   outline: none;
   border-color: var(--admin-acento);
-  box-shadow: 0 0 0 3px rgba(240, 0, 255, 0.25);
+  box-shadow: 0 0 0 3px var(--admin-foco);
 }
 
 body.admin .campo__error {
@@ -3676,7 +3778,7 @@ body.admin .interruptor__pista::after {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: #ffffff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
@@ -3690,7 +3792,7 @@ body.admin .interruptor input:checked + .interruptor__pista::after {
 
 /* Barra superior y menú lateral */
 body.admin .admin-header {
-  background: rgba(8, 11, 36, 0.88);
+  background: var(--admin-header);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--admin-texto);
@@ -3699,6 +3801,7 @@ body.admin .admin-header {
 }
 
 body.admin .admin-header__titulo {
+  flex: 1;
   font-size: 0.95rem;
   letter-spacing: -0.01em;
   text-transform: none;
@@ -3706,11 +3809,19 @@ body.admin .admin-header__titulo {
 
 body.admin .admin-drawer {
   border-radius: 0 16px 16px 0;
+  background: var(--admin-superficie);
+  color: var(--admin-texto);
+  box-shadow: none;
+}
+
+/* La sombra solo con el menú abierto: cerrado queda fuera de pantalla, pero su sombra se
+   asomaba como una franja gris en el borde izquierdo del tema claro. */
+body.admin .admin-drawer--abierto {
   box-shadow: 8px 0 40px rgba(0, 0, 0, 0.12);
 }
 
 body.admin .admin-drawer__fondo {
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--admin-velo);
   backdrop-filter: blur(2px);
 }
 
@@ -3738,13 +3849,14 @@ body.admin .admin-drawer__enlace {
 }
 
 body.admin .admin-drawer__enlace:hover {
-  background: var(--color-surface-2);
+  background: var(--admin-superficie-2);
   color: var(--admin-texto);
 }
 
-body.admin .admin-drawer__enlace--activo {
+body.admin .admin-drawer__enlace--activo,
+body.admin .admin-drawer__enlace--activo:hover {
   background: var(--admin-acento);
-  color: var(--color-bg);
+  color: var(--admin-acento-texto);
   font-weight: 600;
 }
 
@@ -3785,7 +3897,7 @@ body.admin .admin-crear {
 
 body.admin .admin-crear--boton {
   background: var(--admin-acento);
-  color: var(--color-bg);
+  color: var(--admin-acento-texto);
   border: none;
   border-radius: 999px;
   padding: 8px 16px;
@@ -3793,7 +3905,7 @@ body.admin .admin-crear--boton {
 }
 
 body.admin .admin-crear--boton:hover {
-  background: var(--color-secondary);
+  background: var(--admin-acento-hover);
 }
 
 /* Pedidos */
@@ -3812,24 +3924,24 @@ body.admin .pedido-item__estado {
 }
 
 body.admin .pedido-item__estado--nuevo {
-  background: rgba(0, 229, 255, 0.12);
-  color: var(--color-accent-cyan);
+  background: color-mix(in srgb, var(--admin-info) 12%, var(--admin-superficie));
+  color: var(--admin-info);
 }
 
 body.admin .pedido-item__estado--aprobado,
 body.admin .pedido-item__estado--entregado {
-  background: rgba(0, 245, 160, 0.12);
-  color: var(--color-exito);
+  background: color-mix(in srgb, var(--admin-exito) 12%, var(--admin-superficie));
+  color: var(--admin-exito);
 }
 
 body.admin .pedido-item__estado--en_preparacion {
-  background: rgba(245, 255, 0, 0.12);
-  color: var(--color-accent-yellow);
+  background: color-mix(in srgb, var(--admin-aviso) 14%, var(--admin-superficie));
+  color: var(--admin-aviso);
 }
 
 body.admin .pedido-item__estado--rechazado {
-  background: rgba(255, 107, 129, 0.14);
-  color: var(--color-error);
+  background: color-mix(in srgb, var(--admin-error) 12%, var(--admin-superficie));
+  color: var(--admin-error);
 }
 
 /* Usuarios */
@@ -3843,7 +3955,7 @@ body.admin .usuario-admin-item__encabezado {
 
 /* Modales y confirmaciones */
 body.admin .superposicion {
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--admin-velo);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
@@ -3851,6 +3963,8 @@ body.admin .superposicion {
 body.admin .superposicion__panel,
 body.admin .confirmacion {
   border: none;
+  background: var(--admin-superficie);
+  color: var(--admin-texto);
   border-radius: 16px 16px 0 0;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
@@ -3868,6 +3982,7 @@ body.admin .superposicion__panel {
 
 /* Login: una sola columna centrada, sin adornos */
 body.admin .admin-login {
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -3913,11 +4028,17 @@ body.admin .admin-login .campo input {
   font-size: 1rem;
 }
 
+body.admin .admin-login__tema {
+  position: absolute;
+  top: var(--espacio-3);
+  right: var(--espacio-3);
+}
+
 body.admin .admin-login__error {
   margin: 0;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(255, 107, 129, 0.14);
+  background: color-mix(in srgb, var(--admin-error) 12%, var(--admin-superficie));
   font-size: 0.85rem;
 }
 
@@ -4171,7 +4292,7 @@ body.admin .oferta-admin-item--en-inicio {
 
 body.admin .oferta-admin-item__en-inicio {
   background: var(--admin-acento);
-  color: var(--color-bg);
+  color: var(--admin-acento-texto);
 }
 
 body.admin .formulario-oferta__vista-previa {
@@ -4439,4 +4560,48 @@ body.admin .admin-crear--boton {
   color: var(--color-texto);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* --- Panel admin: piezas con colores fijos que no deben tomar la marca --- */
+/* Barra flotante de acciones masivas: siempre oscura con texto blanco, en los dos temas. */
+body.admin .acciones-masivas {
+  background: var(--admin-barra);
+  color: #ffffff;
+}
+
+/* Barra fija de "Guardar" en Negocio. */
+body.admin .negocio-guardar {
+  background: var(--admin-header);
+  border-top-color: var(--admin-borde);
+}
+
+/* Barras del asistente del dashboard. */
+body.admin .asistente__barra {
+  background: var(--admin-borde-fuerte);
+}
+
+body.admin .asistente__barra--max {
+  background: var(--admin-texto);
+}
+
+/* Aviso de categorías ancladas al inicio. */
+body.admin .estado-inicio-categorias {
+  border-radius: 10px;
+  border-left-color: var(--admin-aviso);
+}
+
+body.admin .estado-inicio-categorias--ok {
+  border-left-color: var(--admin-exito);
+}
+
+body.admin .categoria-admin-item__inicio,
+body.admin .selector-emoji__opcion,
+body.admin .categoria-inicio {
+  border-radius: 8px;
+}
+
+body.admin .selector-emoji__opcion[aria-pressed='true'] {
+  border-color: var(--admin-acento);
+  background: var(--admin-superficie-2);
+  box-shadow: inset 0 0 0 1px var(--admin-acento);
 }

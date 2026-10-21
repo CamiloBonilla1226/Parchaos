@@ -738,3 +738,13 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-21 (12)
 - **Sin zoom automático en el celular**: en iPhone la pantalla se acercaba sola al abrir el formulario de un producto o una categoría (el campo Nombre se enfoca solo) o al tocar un buscador, y quedaba acercada al cambiar de sección. Causa: Safari hace zoom cuando se enfoca un campo con letra menor a 16px. Se agregó al final de `index.css` una regla para pantallas táctiles (`pointer: coarse`) que deja todo campo de texto, select y textarea en al menos 16px. Se descartó `maximum-scale=1` en el viewport porque en Android también bloquea el zoom con dos dedos (accesibilidad).
+
+## 2026-10-21 (13)
+- **Adiciones pedidas solas desde el Menú** (pedido del dueño). Nuevo interruptor general en Admin → Adiciones, "Mostrar adiciones en el menú" (columna nueva `negocio_config.adiciones_en_menu`, sección 20 de `explicacion-script-bd.txt`). Con el interruptor activado:
+  - El filtro del Menú suma la pestaña "Adiciones", siempre de última, y en "Todas" las adiciones aparecen al final de la lista, después de todos los productos, con el título "Adiciones". El buscador también las encuentra, después de los productos.
+  - Cada adición es una tarjeta igual a la de producto (`AdicionListaItem`); tocarla o tocar "+" la agrega directo al carrito, porque no tiene variantes ni opciones.
+  - En el carrito es su propia línea (`useCarrito.agregarAdicion`); varias veces la misma suma cantidad, y no tiene "Modificar".
+  - En el pedido se guarda con `producto_id: null`, `adicion_id` y `tipo: 'adicion'`; el panel de pedidos y WhatsApp la muestran como una línea más.
+- Decisiones del dueño: las adiciones se pueden pedir solas (no solo informativas) y se activan con un interruptor general, no una por una.
+- El interruptor solo lo puede mover quien tiene permiso de Negocio, porque la RLS de `negocio_config` así lo exige; los demás ven si está activado.
+- **Orden de despliegue**: correr el SQL de la sección 20 **antes** de subir este código, porque la carta lee esa columna para el Inicio. Este commit queda sin push hasta confirmar que el SQL se corrió.

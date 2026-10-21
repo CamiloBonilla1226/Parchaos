@@ -31,8 +31,11 @@ export function Checkout({ items, total, ofertas = [], onPedidoConfirmado }) {
     setEnviando(true)
     setErrorEnvio(null)
 
+    // Una adición pedida sola va con producto_id null y su adicion_id (ver useCarrito:
+    // agregarAdicion); el panel y WhatsApp la muestran igual que cualquier línea.
     const productosDetalle = items.map((item) => ({
       producto_id: item.productoId,
+      ...(item.adicionId && { adicion_id: item.adicionId, tipo: 'adicion' }),
       nombre: item.nombre,
       variante_elegida: item.varianteNombre,
       cantidad: item.cantidad,

@@ -12,6 +12,9 @@ import { useSwipeParaCerrar } from '../../hooks/useSwipeParaCerrar'
 import { alSoltarFondo } from '../../lib/superposicion'
 import { useToast } from '../../hooks/useToast'
 import { useConfirmacion } from '../../hooks/useConfirmacion'
+import { useNegocioConfig } from '../../hooks/useNegocioConfig'
+import { useAuth } from '../../hooks/useAuth'
+import { Interruptor } from '../../components/admin/Interruptor'
 
 export function Adiciones() {
   const { adiciones, cargando, error, crearAdicion, actualizarAdicion, eliminarAdicion, toggleDisponible } =
@@ -24,6 +27,25 @@ export function Adiciones() {
   const swipe = useSwipeParaCerrar(cerrarModal)
   const mostrarToast = useToast()
   const confirmar = useConfirmacion()
+  // Ajuste del negocio (negocio_config.adiciones_en_menu): por RLS solo lo cambia quien puede
+  // editar Negocio; los demás lo ven pero sin poder moverlo.
+  const { config, cargando: cargandoConfig, guardarConfig } = useNegocioConfig()
+  const { puedeNegocio } = useAuth()
+  const [guardandoAjuste, setGuardandoAjuste] = useState(false)
+
+  const cambiarAdicionesEnMenu = async (valor) => {
+    setGuardandoAjuste(true)
+    const { exito } = await guardarConfig({ adiciones_en_menu: valor })
+    setGuardandoAjuste(false)
+    mostrarToast(
+      exito
+        ? valor
+          ? 'Las adiciones ahora se pueden pedir solas desde el menú'
+          : 'Las adiciones ya no aparecen en el menú'
+        : 'No se pudo guardar el ajuste',
+      exito ? 'exito' : 'error'
+    )
+  }
 
   const guardarAdicion = async (datos) => {
     const esNueva = adicionEnEdicion === 'nuevo'
@@ -56,6 +78,29 @@ export function Adiciones() {
           </span>
           Nueva adición
         </button>
+
+        {!cargandoConfig && config && (
+          <section className="tarjeta ajuste-adiciones-menu" aria-busy={guardandoAjuste}>
+            <div>
+              <p className="ajuste-adiciones-menu__titulo">Mostrar adiciones en el menú</p>
+              <p className="ajuste-adiciones-menu__texto">
+                El cliente puede pedirlas solas desde la carta de domicilios. Siempre aparecen al final del menú.
+              </p>
+              {!puedeNegocio && (
+                <p className="ajuste-adiciones-menu__texto">Solo quien tiene el permiso de Negocio puede cambiarlo.</p>
+              )}
+            </div>
+            {puedeNegocio ? (
+              <Interruptor
+                activo={config.adiciones_en_menu === true}
+                etiqueta={config.adiciones_en_menu ? 'Sí' : 'No'}
+                onCambiar={(valor) => !guardandoAjuste && cambiarAdicionesEnMenu(valor)}
+              />
+            ) : (
+              <span className="ajuste-adiciones-menu__estado">{config.adiciones_en_menu ? 'Activado' : 'Desactivado'}</span>
+            )}
+          </section>
+        )}
 
         {cargando && <p className="texto-suave">Cargando adiciones…</p>}
         {error && <p className="campo__error">No se pudieron cargar las adiciones.</p>}

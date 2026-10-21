@@ -67,6 +67,43 @@ export function useCarrito() {
     })
   }, [])
 
+  // Adición pedida sola desde el Menú (cuando el negocio activa "Mostrar adiciones en el menú"):
+  // es su propia línea, sin producto, variante ni opciones. Varias veces la misma adición suma
+  // cantidad. La línea no se puede "modificar" (no hay detalle que abrir), solo cambiar cantidad.
+  const agregarAdicion = useCallback((adicion, cantidad = 1) => {
+    const itemId = `adicion|${adicion.id}`
+    const precioBase = adicion.precio ?? 0
+
+    setItems((actuales) => {
+      const existente = actuales.find((item) => item.itemId === itemId)
+      if (existente) {
+        const nuevaCantidad = existente.cantidad + cantidad
+        return actuales.map((item) =>
+          item.itemId === itemId
+            ? { ...item, cantidad: nuevaCantidad, subtotal: calcularSubtotal(precioBase, [], nuevaCantidad) }
+            : item
+        )
+      }
+
+      return [
+        ...actuales,
+        {
+          itemId,
+          productoId: null,
+          adicionId: adicion.id,
+          nombre: adicion.nombre,
+          imagenUrl: adicion.imagen_url ?? null,
+          varianteId: null,
+          varianteNombre: null,
+          precioBase,
+          cantidad,
+          opcionesElegidas: [],
+          subtotal: calcularSubtotal(precioBase, [], cantidad),
+        },
+      ]
+    })
+  }, [])
+
   const quitarItem = useCallback((itemId) => {
     setItems((actuales) => actuales.filter((item) => item.itemId !== itemId))
   }, [])
@@ -141,6 +178,7 @@ export function useCarrito() {
     total,
     cantidadTotal,
     agregarProducto,
+    agregarAdicion,
     quitarItem,
     cambiarCantidad,
     reemplazarItem,

@@ -3468,6 +3468,21 @@ body.body--con-nav-inferior .toast-contenedor {
   gap: var(--espacio-2);
 }
 
+/* Adiciones pedidas solas, siempre al final del Menú (ver Carta.jsx). */
+.menu-adiciones {
+  margin-top: var(--espacio-4);
+}
+
+.menu-adiciones__titulo {
+  margin: 0 0 var(--espacio-2);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.lista-productos-menu:empty + .menu-adiciones {
+  margin-top: 0;
+}
+
 .producto-lista-item {
   display: flex;
   align-items: center;
@@ -4644,6 +4659,37 @@ body.admin .admin-crear--boton {
   font-size: 0.8rem;
   font-weight: 400;
   color: var(--color-texto-suave);
+}
+
+/* --- Panel admin: ajuste "Mostrar adiciones en el menú" (Adiciones) --- */
+.ajuste-adiciones-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  margin: 0 0 var(--espacio-3);
+  padding: var(--espacio-3);
+}
+
+.ajuste-adiciones-menu__titulo {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ajuste-adiciones-menu__texto {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--color-texto-suave);
+}
+
+.ajuste-adiciones-menu__estado {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ajuste-adiciones-menu .interruptor {
+  flex-shrink: 0;
 }
 
 /* --- Panel admin: fichas de categoría (lista) y zona de peligro del formulario --- */

@@ -4,6 +4,7 @@ import { NavInferior } from '../components/layout/NavInferior'
 import { Inicio } from './Inicio'
 import { BuscadorProductos } from '../components/menu/BuscadorProductos'
 import { ProductoListaItem } from '../components/menu/ProductoListaItem'
+import { AdicionListaItem } from '../components/menu/AdicionListaItem'
 import { CategoriaFiltro } from '../components/menu/CategoriaFiltro'
 import { OpcionesProducto } from '../components/menu/OpcionesProducto'
 import { Carrito } from '../components/carrito/Carrito'
@@ -12,6 +13,7 @@ import { useCategorias } from '../hooks/useCategorias'
 import { useProductos } from '../hooks/useProductos'
 import { useAdiciones } from '../hooks/useAdiciones'
 import { useOfertas } from '../hooks/useOfertas'
+import { useNegocioConfig } from '../hooks/useNegocioConfig'
 import { useCarrito } from '../hooks/useCarrito'
 import { useToast } from '../hooks/useToast'
 import { useSwipeNavegacion } from '../hooks/useSwipeNavegacion'
@@ -28,6 +30,9 @@ import {
 import { variantesDisponibles } from '../lib/variantes'
 import { categoriasDeInicio } from '../lib/categoriasInicio'
 import { normalizarTexto } from '../lib/texto'
+
+// Pestaña "Adiciones" del filtro del Menú: no es una categoría real, va siempre de última.
+const SECCION_ADICIONES = '__adiciones__'
 
 export function Carta() {
   // 'inicio' | 'menu' | 'carrito' | 'checkout'. Cada cambio queda en el historial del navegador,
@@ -95,6 +100,16 @@ export function Carta() {
   }, [productosVisibles, categoriaSeleccionada, busqueda])
 
   const { adiciones } = useAdiciones({ soloDisponibles: true, soloVisibleDomicilios: true })
+  // Si el negocio lo activa (Admin → Adiciones), las adiciones también se pueden pedir solas
+  // desde el Menú: pestaña "Adiciones" al final del filtro y, en "Todas", al final de la lista.
+  const { config: configNegocio } = useNegocioConfig()
+  const adicionesEnMenu = configNegocio?.adiciones_en_menu === true && adiciones.length > 0
+  const adicionesMenu = useMemo(() => {
+    if (!adicionesEnMenu) return []
+    if (categoriaSeleccionada !== null && categoriaSeleccionada !== SECCION_ADICIONES) return []
+    const textoBuscado = normalizarTexto(busqueda)
+    return adiciones.filter((adicion) => !textoBuscado || normalizarTexto(adicion.nombre).includes(textoBuscado))
+  }, [adicionesEnMenu, adiciones, categoriaSeleccionada, busqueda])
   // Solo hay una oferta activa: se muestra en la tarjeta de Inicio y es la única que aplica su
   // comportamiento (barra del carrito, línea en WhatsApp). Sin oferta activa no hay barra.
   const { ofertaActiva } = useOfertas({ soloActivas: true })
@@ -116,7 +131,10 @@ export function Carta() {
   // "Todas" (categoriaSeleccionada === null) cuenta como la primera posición, igual que ya
   // se ve en CategoriaFiltro. El swipe en Menú recorre esta lista antes de cambiar de
   // sección: solo pasa a Carrito/Inicio cuando ya está en el último/primer extremo.
-  const categoriasConTodas = useMemo(() => [null, ...categorias.map((c) => c.id)], [categorias])
+  const categoriasConTodas = useMemo(
+    () => [null, ...categorias.map((c) => c.id), ...(adicionesEnMenu ? [SECCION_ADICIONES] : [])],
+    [categorias, adicionesEnMenu]
+  )
   const indiceCategoria = categoriasConTodas.indexOf(categoriaSeleccionada)
 
   const swipe = useSwipeNavegacion({
@@ -167,6 +185,11 @@ export function Carta() {
       carrito.agregarProducto(producto, [], 1)
       mostrarToast('Agregado al carrito')
     }
+  }
+
+  const agregarAdicion = (adicion) => {
+    carrito.agregarAdicion(adicion)
+    mostrarToast('Agregado al carrito')
   }
 
   // Tocar una línea del carrito abre el mismo detalle del producto con lo que eligió el cliente
@@ -243,12 +266,13 @@ export function Carta() {
               categorias={categorias}
               categoriaActivaId={categoriaSeleccionada}
               onSeleccionar={setCategoriaSeleccionada}
+              tabsExtra={adicionesEnMenu ? [{ id: SECCION_ADICIONES, etiqueta: 'Adiciones' }] : []}
             />
           )}
 
           {cargandoProductos && <p className="texto-suave">Cargando productos…</p>}
           {errorProductos && <p className="campo__error">No se pudieron cargar los productos. Intenta de nuevo.</p>}
-          {!cargandoProductos && !errorProductos && productosMenu.length === 0 && (
+          {!cargandoProductos && !errorProductos && productosMenu.length === 0 && adicionesMenu.length === 0 && (
             <p className="texto-suave">No hay productos que coincidan con la búsqueda.</p>
           )}
 
@@ -262,6 +286,17 @@ export function Carta() {
               />
             ))}
           </div>
+
+          {!cargandoProductos && adicionesMenu.length > 0 && (
+            <div className="menu-adiciones">
+              {categoriaSeleccionada === null && <h2 className="menu-adiciones__titulo">Adiciones</h2>}
+              <div className="lista-productos-menu">
+                {adicionesMenu.map((adicion) => (
+                  <AdicionListaItem key={adicion.id} adicion={adicion} onAgregar={agregarAdicion} />
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section hidden={seccion !== 'carrito'} className="seccion-carrito">

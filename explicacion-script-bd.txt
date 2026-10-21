@@ -1543,6 +1543,52 @@ CONSECUENCIA EN EL CÓDIGO:
   editor de tablas de Supabase o con el update de ejemplo.
 
 
+20. ADICIONES PEDIDAS SOLAS EN EL MENÚ (negocio_config.adiciones_en_menu)
+--------------------------------------------------------------------
+TABLA AFECTADA: negocio_config (columna nueva). pedidos no cambia de
+esquema, solo el contenido de productos_detalle.
+
+QUÉ CAMBIÓ (2026-10-21, pedido del dueño): las adiciones, además de
+marcarse dentro de un producto, se pueden pedir solas desde el Menú de
+la carta de domicilios (ej. unas gomitas sin granizado). Se activa con
+un interruptor general en Admin → Adiciones, que guarda:
+
+- adiciones_en_menu: boolean, default false. Con false todo sigue igual
+  que antes; con true aparece la pestaña "Adiciones" de última en el
+  filtro del Menú y, en "Todas", las adiciones al final de la lista.
+  Solo salen las adiciones disponibles y visibles en domicilios.
+
+POR QUÉ UNA COLUMNA DEL NEGOCIO Y NO UNA POR ADICIÓN: el dueño eligió un
+interruptor general (muestra u oculta todas juntas). Cuál adición se ve
+ya lo deciden disponible y visible_domicilios de cada una.
+
+SCRIPT SQL (correrlo ANTES de desplegar el código: la carta y el panel
+piden esta columna al leer negocio_config):
+
+    alter table negocio_config
+      add column adiciones_en_menu boolean not null default false;
+
+No hacen falta políticas nuevas: la lectura pública y la escritura del
+dueño (y de empleados con puede_negocio, sección 3) ya cubren la tabla.
+
+ESTADO: PENDIENTE — entregado al dueño el 2026-10-21, todavía no se ha
+corrido.
+
+CONSECUENCIA EN EL CÓDIGO:
+- hooks/useNegocioConfig.js lee adiciones_en_menu.
+- pages/admin/Adiciones.jsx: interruptor "Mostrar adiciones en el menú"
+  (solo lo puede mover quien tiene permiso de Negocio, igual que la RLS;
+  los demás ven si está activado).
+- pages/Carta.jsx + components/menu/AdicionListaItem.jsx: pestaña y
+  sección "Adiciones" siempre de últimas; el buscador también las
+  encuentra (después de los productos).
+- hooks/useCarrito.js (agregarAdicion): la adición es su propia línea
+  del carrito, sin variante ni opciones, y no se puede "Modificar".
+- pedidos.productos_detalle: la línea de una adición sola va con
+  producto_id null, adicion_id y tipo 'adicion' (además de nombre,
+  cantidad, precio_base y subtotal como cualquier línea). El panel de
+  pedidos y el mensaje de WhatsApp la muestran como una línea más.
+
 RESUMEN GENERAL
 --------------------------------------------------------------------
 La base de datos completa (negocios, usuarios_admin, categorias,

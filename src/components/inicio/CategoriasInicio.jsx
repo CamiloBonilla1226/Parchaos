@@ -35,7 +35,7 @@ export function CategoriasInicio({ categorias, cargando, error, onReintentar, on
                   onClick={() => onSeleccionar(categoria.id)}
                 >
                   <span className="categorias-inicio__icono">
-                    <IconoCategoria clave={categoria.emoji_inicio} tamano={26} />
+                    <IconoCategoria clave={categoria.emoji_inicio} tamano={32} />
                   </span>
                   <span className="categorias-inicio__numero" aria-hidden="true">
                     {String(indice + 1).padStart(2, '0')}

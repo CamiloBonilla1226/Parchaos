@@ -1,12 +1,12 @@
 import { negocioConfig } from '../../config/negocio.config'
 import { useNegocioConfig } from '../../hooks/useNegocioConfig'
 import { agruparHorario, DIAS } from '../../lib/horario'
-import { IconoRedes, IconoReloj, IconoUbicacion } from '../inicio/iconos'
+import { IconoFacebook, IconoInstagram, IconoRedes, IconoReloj, IconoUbicacion, IconoWhatsapp } from '../inicio/iconos'
 
 const REDES = [
-  ['instagram', 'Instagram'],
-  ['facebook', 'Facebook'],
-  ['whatsapp', 'WhatsApp'],
+  ['instagram', 'Instagram', IconoInstagram],
+  ['facebook', 'Facebook', IconoFacebook],
+  ['whatsapp', 'WhatsApp', IconoWhatsapp],
 ]
 
 // El dueño puede guardar en redes_sociales un link completo o solo el usuario/número (desde
@@ -109,9 +109,10 @@ export function SobreNosotros() {
               <span className="sobre-nosotros__dato">
                 <span className="sobre-nosotros__etiqueta">Redes</span>
                 <span className="sobre-nosotros__redes">
-                  {redesConLink.map(([clave, etiqueta]) => (
+                  {redesConLink.map(([clave, etiqueta, Icono]) => (
                     <a key={clave} href={enlaceRed(clave, redesSociales[clave])} target="_blank" rel="noreferrer">
-                      {etiqueta}
+                      <Icono tamano={18} />
+                      <span>{etiqueta}</span>
                     </a>
                   ))}
                 </span>

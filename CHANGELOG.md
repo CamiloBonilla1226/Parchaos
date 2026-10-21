@@ -708,3 +708,8 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - Se guarda la clave del ícono en la misma columna `categorias.emoji_inicio` (sin migración; ver sección 4 de `explicacion-script-bd.txt`). Las dos categorías que ya estaban ancladas con 🥤 y 🍸 se muestran solas con el ícono equivalente (`claveIcono` en `lib/categoriasInicio.js`), sin tener que editarlas.
 - **Carrusel "Los más pedidos" más fino**: tarjetas de 150 px en vez de 210 px (se ven unas 2½ en el celular en vez de 1½). La imagen pasa a 4:3 con `object-fit: contain` sobre un fondo neutro, así la foto se ve completa en vez de recortada. Nombre y descripción en una línea cada uno, textos más pequeños y botón "+" de 32 px (con área tocable de 44 px).
 - Verificación con Playwright (Edge, 390 y 360 px) contra un Supabase simulado, con la foto real del producto destacado: Inicio 46/46 (tarjeta de 150 px, imagen 4:3 con `contain`, al menos 2 tarjetas completas a la vista, todo lo tocable ≥ 44 px, sin scroll horizontal) y categorías ancladas 16/16 (elegir ícono, guardar la clave, emojis antiguos dibujados como íconos). Capturas revisadas. `npm run build` y `oxlint` sin errores nuevos.
+
+## 2026-10-21 (8)
+- **Íconos de categorías más gruesos y centrados** (pedido del dueño): trazo de 1,5 a 1,9 px y tamaño de 26 a 32 px; el ícono y el nombre van centrados en la casilla (el número sigue arriba a la derecha).
+- **Redes sociales con ícono** en "Sobre nosotros": Instagram, Facebook y WhatsApp llevan su ícono de línea en magenta junto al nombre (que sigue subrayado).
+- Verificación: Inicio 46/46 con Playwright (Edge, 390 y 360 px) y capturas revisadas. `npm run build` sin errores.

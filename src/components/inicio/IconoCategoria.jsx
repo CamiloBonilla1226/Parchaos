@@ -3,7 +3,7 @@ import { claveIcono } from '../../lib/categoriasInicio'
 // Íconos de línea delgada para las categorías ancladas al Inicio (lista y claves en
 // lib/categoriasInicio.js). Sin ícono reconocible se dibuja el vaso.
 
-const trazo = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round' }
+const trazo = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }
 
 const dibujos = {
   vaso: (

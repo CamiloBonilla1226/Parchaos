@@ -41,6 +41,20 @@ export const IconoRedes = ({ tamano }) => (
   </Svg>
 )
 
+export const IconoInstagram = ({ tamano }) => (
+  <Svg tamano={tamano}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+    <circle cx="12" cy="12" r="4" />
+    <path d="M17 7h.01" />
+  </Svg>
+)
+
+export const IconoFacebook = ({ tamano }) => (
+  <Svg tamano={tamano}>
+    <path d="M14.5 21v-7.5h2.5l.5-3h-3V8.7c0-.9.3-1.5 1.6-1.5h1.5V4.5c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.2H9v3h2.5V21" />
+  </Svg>
+)
+
 export const IconoWhatsapp = ({ tamano }) => (
   <Svg tamano={tamano}>
     <path d="M4 20l1.3-4A8 8 0 1 1 8.4 19L4 20Z" />

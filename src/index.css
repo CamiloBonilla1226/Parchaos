@@ -3179,10 +3179,11 @@ body.body--con-nav-inferior .toast-contenedor {
   min-height: 112px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px;
-  text-align: left;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 14px 14px;
+  text-align: center;
   font: inherit;
   color: var(--pc-texto);
   background: var(--pc-fondo);
@@ -3201,7 +3202,7 @@ body.body--con-nav-inferior .toast-contenedor {
   background: var(--pc-superficie);
 }
 
-/* Ícono de línea delgada (trazo 1.5) en menta, sin recuadro ni brillo. */
+/* Ícono de línea (trazo 1.9) en menta, centrado en la casilla, sin recuadro ni brillo. */
 .categorias-inicio__icono {
   display: flex;
   color: var(--pc-menta);
@@ -3392,10 +3393,20 @@ body.body--con-nav-inferior .toast-contenedor {
 .sobre-nosotros__redes a {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
   min-height: 44px;
   font-size: 0.9375rem;
   font-weight: 500;
   color: var(--pc-texto);
+  text-decoration: none;
+}
+
+.sobre-nosotros__redes a svg {
+  flex-shrink: 0;
+  color: var(--pc-magenta);
+}
+
+.sobre-nosotros__redes a span {
   text-decoration: underline;
   text-decoration-color: var(--pc-magenta);
   text-decoration-thickness: 1px;

@@ -151,6 +151,142 @@ completo (para las 4 tablas) es:
 puede_productos/puede_categorias respectivamente, y para adiciones con
 puede_adiciones).
 
+CAMBIO — un permiso por sección del panel (2026-10-21, pedido del dueño:
+"no me aparecen todas las opciones"). Además de productos, categorías y
+adiciones, el dueño puede darle a cada empleado acceso a Pedidos, Ofertas
+y Negocio. Inicio lo ve cualquier usuario del panel; Usuarios sigue siendo
+solo del dueño (gestionar cuentas no se delega: un empleado podría darse
+más permisos o crear cuentas nuevas).
+
+CAMPOS NUEVOS:
+- puede_pedidos: default TRUE, para que los empleados que ya existen
+  sigan viendo los pedidos como hasta ahora (antes era automático).
+- puede_ofertas / puede_negocio: default false.
+
+POLÍTICAS:
+- pedidos: una política RESTRICTIVA para usuarios autenticados. Las
+  políticas restrictivas se combinan con AND con las que ya existen
+  (cuyos nombres no estaban documentados), así que no hace falta
+  reemplazarlas: un empleado sin puede_pedidos deja de ver y de cambiar
+  pedidos. No afecta al checkout público, que inserta como anon.
+- ofertas, negocio_config: políticas permisivas nuevas para empleados
+  con el permiso (se suman con OR a las del dueño, que no cambian).
+- productos_categorias: política nueva para empleados con
+  puede_categorias, para que puedan elegir los productos de una
+  categoría desde su formulario (antes solo puede_productos).
+- usuarios_admin no cambia: solo el dueño puede editar permisos, así que
+  un empleado no puede dárselos a sí mismo.
+
+SCRIPT SQL (correrlo ANTES de desplegar el código nuevo: el panel pide
+estas columnas al iniciar sesión):
+
+    begin;
+
+    alter table usuarios_admin
+      add column puede_pedidos boolean not null default true,
+      add column puede_ofertas boolean not null default false,
+      add column puede_negocio boolean not null default false;
+
+    create policy "Solo dueño o empleados con permiso ven pedidos"
+    on pedidos as restrictive for all to authenticated
+    using (
+      (auth.jwt() -> 'app_metadata' ->> 'rol') = 'dueño'
+      or exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = pedidos.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_pedidos = true
+        )
+    )
+    with check (
+      (auth.jwt() -> 'app_metadata' ->> 'rol') = 'dueño'
+      or exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = pedidos.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_pedidos = true
+        )
+    );
+
+    create policy "Empleados con permiso gestionan ofertas"
+    on ofertas for all to authenticated
+    using (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = ofertas.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_ofertas = true
+        )
+    )
+    with check (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = ofertas.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_ofertas = true
+        )
+    );
+
+    create policy "Empleados con permiso editan negocio_config"
+    on negocio_config for all to authenticated
+    using (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = negocio_config.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_negocio = true
+        )
+    )
+    with check (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = negocio_config.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_negocio = true
+        )
+    );
+
+    create policy "Empleados con permiso de categorías gestionan productos_categorias"
+    on productos_categorias for all to authenticated
+    using (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = productos_categorias.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_categorias = true
+        )
+    )
+    with check (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+          select 1 from usuarios_admin ua
+          where ua.negocio_id = productos_categorias.negocio_id
+            and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+            and ua.activo = true and ua.puede_categorias = true
+        )
+    );
+
+    commit;
+
+ESTADO: PENDIENTE — entregado al dueño el 2026-10-21, todavía no se ha
+corrido.
+
+CONSECUENCIA EN EL CÓDIGO:
+- lib/seccionesAdmin.js: PERMISOS_EMPLEADO (columna, nombre en useAuth,
+  etiqueta y descripción) es la única lista de permisos; la usan el menú,
+  useAuth, useUsuariosAdmin y la pantalla Usuarios.
+- /admin/usuarios: seis interruptores por empleado (Pedidos, Productos,
+  Categorías, Adiciones, Ofertas, Negocio).
+- Rutas: Pedidos, Ofertas y Negocio piden su permiso; sin permiso se
+  vuelve a Inicio (antes a Pedidos).
+- Inicio del panel: sin permiso de pedidos no muestra la métrica de
+  pedidos ni el asistente de ventas.
+
 NOTA TÉCNICA: split_part(auth.jwt() ->> 'email', '.', 1) funciona porque
 el correo interno tiene el formato numero.negocioId@interno.local, y el
 negocioId (un UUID) usa guiones, no puntos — así que cortar por el primer

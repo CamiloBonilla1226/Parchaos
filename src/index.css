@@ -4769,6 +4769,32 @@ body.admin .categoria-productos__limpiar {
   border-radius: 8px;
 }
 
+/* --- Panel admin: permisos por sección en Usuarios --- */
+.usuario-admin-item__subtitulo {
+  margin: var(--espacio-2) 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.usuario-admin-item__permiso {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.usuario-admin-item__permiso .texto-suave {
+  font-size: 0.8rem;
+}
+
+.usuario-admin-item__nota {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
 /* --- Panel admin: piezas con colores fijos que no deben tomar la marca --- */
 /* Barra flotante de acciones masivas: siempre oscura con texto blanco, en los dos temas. */
 body.admin .acciones-masivas {

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { negocioConfig } from '../config/negocio.config'
 import { mensajeAmigableEdgeFunction } from '../lib/erroresAmigables'
+import { PERMISOS_EMPLEADO } from '../lib/seccionesAdmin'
 
 // Gestión de usuarios_admin (dueño/empleados) del negocio. Igual que useGruposOpciones,
 // no estaba en la lista original de hooks del brief, pero es necesaria para el punto 8
@@ -17,7 +18,7 @@ export function useUsuariosAdmin() {
 
     const { data, error: errorConsulta } = await supabase
       .from('usuarios_admin')
-      .select('id, numero, nombre, rol, activo, puede_productos, puede_categorias, puede_adiciones, creado_en')
+      .select(`id, numero, nombre, rol, activo, ${PERMISOS_EMPLEADO.map((permiso) => permiso.columna).join(', ')}, creado_en`)
       .eq('negocio_id', negocioConfig.negocioId)
       .order('creado_en', { ascending: true })
 
@@ -99,7 +100,7 @@ export function useUsuariosAdmin() {
     [recargar]
   )
 
-  // `permiso` es 'puede_productos' | 'puede_categorias' | 'puede_adiciones'. Solo tiene
+  // `permiso` es una columna de PERMISOS_EMPLEADO (lib/seccionesAdmin.js). Solo tiene
   // efecto real sobre un empleado — el dueño siempre tiene acceso completo sin depender de
   // estas columnas (ver useAuth.js).
   const togglePermiso = useCallback(

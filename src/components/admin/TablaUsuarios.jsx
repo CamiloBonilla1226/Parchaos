@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Interruptor } from './Interruptor'
+import { PERMISOS_EMPLEADO } from '../../lib/seccionesAdmin'
 
 function TarjetaUsuario({ usuario, onEliminar, onToggleActivo, onTogglePermiso }) {
   const [abierta, setAbierta] = useState(false)
@@ -27,30 +28,23 @@ function TarjetaUsuario({ usuario, onEliminar, onToggleActivo, onTogglePermiso }
             <span>Activo</span>
             <Interruptor activo={usuario.activo} etiqueta="" onCambiar={(valor) => onToggleActivo(usuario.id, valor)} />
           </div>
-          <div className="usuario-admin-item__fila">
-            <span>Puede gestionar productos</span>
-            <Interruptor
-              activo={usuario.puede_productos}
-              etiqueta=""
-              onCambiar={(valor) => onTogglePermiso(usuario.id, 'puede_productos', valor)}
-            />
-          </div>
-          <div className="usuario-admin-item__fila">
-            <span>Puede gestionar categorías</span>
-            <Interruptor
-              activo={usuario.puede_categorias}
-              etiqueta=""
-              onCambiar={(valor) => onTogglePermiso(usuario.id, 'puede_categorias', valor)}
-            />
-          </div>
-          <div className="usuario-admin-item__fila">
-            <span>Puede gestionar adiciones</span>
-            <Interruptor
-              activo={usuario.puede_adiciones}
-              etiqueta=""
-              onCambiar={(valor) => onTogglePermiso(usuario.id, 'puede_adiciones', valor)}
-            />
-          </div>
+          <p className="usuario-admin-item__subtitulo">Secciones del panel</p>
+          {PERMISOS_EMPLEADO.map((permiso) => (
+            <div key={permiso.columna} className="usuario-admin-item__fila">
+              <span className="usuario-admin-item__permiso">
+                <span>{permiso.etiqueta}</span>
+                <span className="texto-suave">{permiso.descripcion}</span>
+              </span>
+              <Interruptor
+                activo={usuario[permiso.columna] === true}
+                etiqueta=""
+                onCambiar={(valor) => onTogglePermiso(usuario.id, permiso.columna, valor)}
+              />
+            </div>
+          ))}
+          <p className="texto-suave usuario-admin-item__nota">
+            Inicio lo ven todos. Usuarios es solo del dueño.
+          </p>
           <button type="button" className="carrito__quitar" onClick={() => onEliminar(usuario.id)}>
             Eliminar
           </button>

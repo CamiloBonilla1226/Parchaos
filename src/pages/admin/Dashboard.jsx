@@ -32,7 +32,7 @@ function Metrica({ titulo, valor, detalle, cargando, a }) {
 }
 
 export function Dashboard() {
-  const { puedeProductos } = useAuth()
+  const { puedeProductos, puedePedidos } = useAuth()
   const { pedidos, cargando: cargandoPedidos } = usePedidos()
   const { productos, cargando: cargandoProductos } = useProductos()
   const { usuarios, cargando: cargandoUsuarios } = useUsuariosAdmin()
@@ -58,13 +58,15 @@ export function Dashboard() {
         </section>
 
         <div className="admin-dashboard__metricas">
-          <Metrica
-            titulo="Pedidos"
-            a="/admin/pedidos"
-            valor={pedidosRecientes.length}
-            detalle={`${pedidosNuevos} nuevos · últimos 30 días`}
-            cargando={cargandoPedidos}
-          />
+          {puedePedidos && (
+            <Metrica
+              titulo="Pedidos"
+              a="/admin/pedidos"
+              valor={pedidosRecientes.length}
+              detalle={`${pedidosNuevos} nuevos · últimos 30 días`}
+              cargando={cargandoPedidos}
+            />
+          )}
           <Metrica
             titulo="Productos"
             a={puedeProductos ? '/admin/productos' : undefined}
@@ -74,7 +76,10 @@ export function Dashboard() {
           />
         </div>
 
-        <AsistenteNegocio pedidos={pedidos} productos={productos} cargando={cargandoPedidos || cargandoProductos} />
+        {/* Las ventas y recomendaciones salen de los pedidos: solo con ese permiso. */}
+        {puedePedidos && (
+          <AsistenteNegocio pedidos={pedidos} productos={productos} cargando={cargandoPedidos || cargandoProductos} />
+        )}
       </main>
     </>
   )

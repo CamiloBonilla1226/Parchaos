@@ -24,8 +24,9 @@ export function RutaProtegida({ children, soloDueno = false, permiso }) {
   // saberlo por sí mismo.
   if (!cuentaValida) return <Navigate to="/admin/login" replace state={{ cuentaInvalida: true }} />
 
-  if (soloDueno && !esDueno) return <Navigate to="/admin/pedidos" replace />
-  if (permiso && !auth[permiso]) return <Navigate to="/admin/pedidos" replace />
+  // Sin permiso se vuelve a Inicio, la única sección que ve cualquier usuario del panel.
+  if (soloDueno && !esDueno) return <Navigate to="/admin" replace />
+  if (permiso && !auth[permiso]) return <Navigate to="/admin" replace />
 
   return children
 }

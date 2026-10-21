@@ -2,6 +2,7 @@ import { createContext, createElement, useCallback, useContext, useEffect, useSt
 import { supabase } from '../lib/supabaseClient'
 import { correoInternoANumero, numeroACorreoInterno } from '../lib/phoneAuth'
 import { negocioConfig } from '../config/negocio.config'
+import { PERMISOS_EMPLEADO } from '../lib/seccionesAdmin'
 
 const AuthContext = createContext(null)
 
@@ -112,7 +113,7 @@ function useAuthInterno() {
     const consultarPerfil = () =>
       supabase
         .from('usuarios_admin')
-        .select('nombre, activo, puede_productos, puede_categorias, puede_adiciones')
+        .select(`nombre, activo, ${PERMISOS_EMPLEADO.map((permiso) => permiso.columna).join(', ')}`)
         .eq('negocio_id', negocioConfig.negocioId)
         .eq('numero', numero)
         .maybeSingle()
@@ -266,10 +267,11 @@ function useAuthInterno() {
     esEmpleado: estado.rol === 'empleado',
     nombre: perfil?.nombre ?? null,
     // El dueño siempre tiene acceso completo, sin depender de estas columnas (que solo
-    // aplican a empleados).
-    puedeProductos: esDueno || perfil?.puede_productos === true,
-    puedeCategorias: esDueno || perfil?.puede_categorias === true,
-    puedeAdiciones: esDueno || perfil?.puede_adiciones === true,
+    // aplican a empleados): puedePedidos, puedeProductos, puedeCategorias, puedeAdiciones,
+    // puedeOfertas, puedeNegocio (ver PERMISOS_EMPLEADO).
+    ...Object.fromEntries(
+      PERMISOS_EMPLEADO.map((permiso) => [permiso.clave, esDueno || perfil?.[permiso.columna] === true])
+    ),
     error,
     iniciarSesion,
     cerrarSesion,

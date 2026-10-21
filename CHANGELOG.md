@@ -747,4 +747,4 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - En el pedido se guarda con `producto_id: null`, `adicion_id` y `tipo: 'adicion'`; el panel de pedidos y WhatsApp la muestran como una línea más.
 - Decisiones del dueño: las adiciones se pueden pedir solas (no solo informativas) y se activan con un interruptor general, no una por una.
 - El interruptor solo lo puede mover quien tiene permiso de Negocio, porque la RLS de `negocio_config` así lo exige; los demás ven si está activado.
-- **Orden de despliegue**: correr el SQL de la sección 20 **antes** de subir este código, porque la carta lee esa columna para el Inicio. Este commit queda sin push hasta confirmar que el SQL se corrió.
+- **Orden de despliegue**: correr el SQL de la sección 20 **antes** de subir este código, porque la carta lee esa columna para el Inicio. El dueño corrió el SQL el 2026-10-21 y se verificó (consulta de solo lectura) antes del push.

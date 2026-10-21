@@ -1571,8 +1571,8 @@ piden esta columna al leer negocio_config):
 No hacen falta políticas nuevas: la lectura pública y la escritura del
 dueño (y de empleados con puede_negocio, sección 3) ya cubren la tabla.
 
-ESTADO: PENDIENTE — entregado al dueño el 2026-10-21, todavía no se ha
-corrido.
+ESTADO: YA SE CORRIÓ — el dueño lo ejecutó el 2026-10-21; verificado con una
+consulta de solo lectura (la columna responde).
 
 CONSECUENCIA EN EL CÓDIGO:
 - hooks/useNegocioConfig.js lee adiciones_en_menu.

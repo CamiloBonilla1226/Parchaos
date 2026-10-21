@@ -5,7 +5,8 @@ import { calcularEstadoAbierto } from '../../lib/horario'
 
 // Header fijo de la carta de domicilios: nombre del negocio + estado Abierto/Cerrado.
 // El estado se recalcula cada minuto para que, si alguien deja la carta abierta justo
-// cuando cruza la hora de cierre, el badge cambie solo sin necesitar un refresh.
+// cuando cruza la hora de cierre, el indicador cambie solo sin necesitar un refresh. Sin
+// horario configurado (o mientras carga) no se muestra el indicador.
 export function HeaderNegocio() {
   const { config } = useNegocioConfig()
   const [ahora, setAhora] = useState(() => new Date())
@@ -20,15 +21,10 @@ export function HeaderNegocio() {
   return (
     <header className="header-negocio">
       <div className="contenedor header-negocio__contenido">
-        <img
-          src="/letrero.webp"
-          alt={negocioConfig.nombre}
-          className="header-negocio__letrero"
-          width="640"
-          height="219"
-        />
+        <span className="header-negocio__marca">{negocioConfig.nombre}</span>
         {estado && (
-          <span className={`header-negocio__estado header-negocio__estado--${estado}`}>
+          <span className={`estado-negocio estado-negocio--${estado}`}>
+            {estado === 'abierto' && <span className="estado-negocio__punto" aria-hidden="true" />}
             {estado === 'abierto' ? 'Abierto' : 'Cerrado'}
           </span>
         )}

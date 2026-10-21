@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Inicio } from './pages/Inicio'
 import { Carta } from './pages/Carta'
 import { CartaFisica } from './pages/CartaFisica'
 import { Login } from './pages/admin/Login'
@@ -38,7 +37,7 @@ function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Inicio />} />
+              <Route path="/" element={<Carta />} />
               <Route path="/carta" element={<Carta />} />
               <Route path="/carta-fisica" element={<CartaFisica />} />
 

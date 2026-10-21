@@ -44,6 +44,25 @@
 
   --ancho-contenido: 640px;
 
+  /* Paleta del rediseño de Inicio (2026-10-21). La usan el header, la nav inferior y la
+     sección Inicio de la carta; Menú y Carrito siguen con la paleta de arriba. */
+  --pc-fondo: #0b0b14;
+  --pc-superficie: #14141f;
+  --pc-linea: #25253a;
+  --pc-texto: #f4f4f8;
+  --pc-texto-2: #a3a3b8;
+  /* Terciario: el pedido era #6f6f88, pero sobre la superficie da ~3.7:1. #7e7e98 es el
+     tono más cercano que llega a 4.5:1 sobre fondo y superficie. */
+  --pc-texto-3: #7e7e98;
+  --pc-magenta: #ff3fd8;
+  --pc-amarillo: #ffd23f;
+  --pc-menta: #2ee6b6;
+  --pc-menta-borde: #1d5c4c;
+  --pc-menta-tinta: #002219;
+  --pc-naranja: #ff8a5c;
+  --fuente-titulos: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
+  --fuente-ui: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+
   color-scheme: dark;
 }
 
@@ -216,77 +235,6 @@ p {
 .campo__error {
   color: var(--color-error);
   font-size: 0.85em;
-}
-
-/* --- Navegación y pie de página --- */
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--color-fondo);
-  border-bottom: 1px solid var(--color-borde);
-}
-
-.nav__contenido {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-block: var(--espacio-2);
-}
-
-.nav__letrero,
-.header-negocio__letrero {
-  display: block;
-  height: 40px;
-  width: auto;
-}
-
-.nav__marca {
-  display: flex;
-  font-weight: 700;
-  text-decoration: none;
-  font-size: 1.1rem;
-}
-
-.nav__enlace {
-  text-decoration: none;
-  font-weight: 600;
-  color: var(--color-acento);
-}
-
-.footer {
-  margin-top: auto;
-  border-top: 1px solid var(--color-borde);
-  padding-block: var(--espacio-4);
-}
-
-.footer__contenido {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espacio-2);
-}
-
-.footer__whatsapp {
-  color: var(--color-acento);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-/* --- Inicio --- */
-.pagina-inicio {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--espacio-3);
-  padding-block: var(--espacio-6);
-  min-height: 60vh;
-}
-
-.pagina-inicio__cta {
-  text-decoration: none;
-  margin-top: var(--espacio-2);
 }
 
 /* --- Carta / catálogo --- */
@@ -2428,37 +2376,53 @@ body.body--con-nav-inferior .toast-contenedor {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--color-fondo);
-  border-bottom: 1px solid var(--color-borde);
+  background: var(--pc-fondo);
+  border-bottom: 1px solid var(--pc-linea);
+  font-family: var(--fuente-ui);
 }
 
 .header-negocio__contenido {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: var(--espacio-2);
+  gap: var(--espacio-3);
+  min-height: 56px;
 }
 
-.header-negocio__nombre {
-  font-weight: 700;
-  font-size: 1.1rem;
+.header-negocio__marca {
+  font-family: var(--fuente-titulos);
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+  color: var(--pc-texto);
+  white-space: nowrap;
 }
 
-.header-negocio__estado {
-  font-size: 0.75rem;
+.estado-negocio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--pc-linea);
+  color: var(--pc-texto-2);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: var(--espacio-1) var(--espacio-2);
-  border: 1px solid currentColor;
+  line-height: 1;
 }
 
-.header-negocio__estado--abierto {
-  color: var(--color-exito);
+.estado-negocio--abierto {
+  border-color: var(--pc-menta-borde);
+  color: var(--pc-menta);
 }
 
-.header-negocio__estado--cerrado {
-  color: var(--color-closed);
+/* Único elemento redondo junto con el logo (pedido de diseño). */
+.estado-negocio__punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pc-menta);
+  box-shadow: 0 0 6px var(--pc-menta);
 }
 
 .nav-inferior {
@@ -2468,8 +2432,9 @@ body.body--con-nav-inferior .toast-contenedor {
   bottom: 0;
   z-index: 30;
   display: flex;
-  background: var(--color-fondo);
-  border-top: 1px solid var(--color-borde);
+  background: var(--pc-fondo);
+  border-top: 1px solid var(--pc-linea);
+  font-family: var(--fuente-ui);
   /* No basta con env(safe-area-inset-bottom): en varios Android con navegación por gestos
      ese valor llega en 0 aunque el borde inferior siga reservado para el gesto de "ir a
      inicio" del sistema, así que un tap ahí nunca llegaba a llegar a los botones (pedido:
@@ -2485,14 +2450,15 @@ body.body--con-nav-inferior .toast-contenedor {
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  min-height: 48px;
   background: transparent;
   border: none;
   padding: var(--espacio-2) var(--espacio-1);
-  color: var(--color-texto-suave);
+  color: var(--pc-texto-2);
 }
 
 .nav-inferior__item[aria-current='page'] {
-  color: var(--color-acento);
+  color: var(--pc-magenta);
 }
 
 .nav-inferior__icono {

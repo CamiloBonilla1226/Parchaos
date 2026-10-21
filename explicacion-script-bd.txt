@@ -1282,6 +1282,42 @@ CONSECUENCIA EN EL CÓDIGO:
   precio distinto.
 
 
+19. ETIQUETA DE PRODUCTO EN INICIO (productos.etiqueta) — PROPUESTA
+--------------------------------------------------------------------
+QUÉ CAMBIA (2026-10-21, rediseño de Inicio): las tarjetas de "Los más
+pedidos" pueden llevar una etiqueta en la esquina: "MÁS VENDIDO"
+(amarilla) o "NUEVO" (menta). Hoy no existe ningún dato para eso; el
+carrusel en sí sale de la columna destacado, que ya existía (sección 5).
+
+POR QUÉ UNA COLUMNA DE TEXTO CON CHECK (y no dos booleanas): un producto
+lleva como máximo una etiqueta, y con un solo campo no puede quedar
+marcado como "nuevo" y "más vendido" a la vez. El check limita los
+valores a los que el código sabe mostrar; NULL = sin etiqueta. No toca
+RLS: la columna hereda las políticas que ya tiene productos.
+
+SCRIPT SQL (se puede correr ANTES o DESPUÉS de desplegar: el código ya
+desplegado lee productos con select *, así que sin la columna
+simplemente no muestra etiquetas, y con ella las muestra sin otro
+cambio):
+
+    alter table productos
+      add column etiqueta text
+        check (etiqueta is null or etiqueta in ('mas_vendido', 'nuevo'));
+
+    -- Ejemplo para marcar un producto mientras no exista el campo en el panel:
+    -- update productos set etiqueta = 'mas_vendido' where id = '<id del producto>';
+
+ESTADO: PENDIENTE — propuesto, todavía no se ha corrido.
+
+CONSECUENCIA EN EL CÓDIGO:
+- components/inicio/CarruselMasPedidos.jsx ya lee producto.etiqueta
+  ('mas_vendido' → "Más vendido", 'nuevo' → "Nuevo"); cualquier otro
+  valor o NULL no muestra nada.
+- Pendiente (siguiente paso, si se aprueba): un selector "Etiqueta" en
+  el formulario de producto del admin. Mientras tanto se marca desde el
+  editor de tablas de Supabase o con el update de ejemplo.
+
+
 RESUMEN GENERAL
 --------------------------------------------------------------------
 La base de datos completa (negocios, usuarios_admin, categorias,

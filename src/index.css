@@ -2638,6 +2638,10 @@ body.body--con-nav-inferior .toast-contenedor {
   object-fit: cover;
 }
 
+.inicio-hero__lema--cargando {
+  visibility: hidden;
+}
+
 .inicio-hero__lema {
   max-width: 300px;
   margin: 0;
@@ -2649,7 +2653,11 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 /* --- Inicio: tarjeta de oferta (también la vista previa de /admin/ofertas) --- */
+/* Efecto: el borde y el bloque amarillo "respiran" con un halo suave, y un destello de luz
+   cruza la tarjeta cada pocos segundos. Sin movimiento si el sistema pide reducirlo. */
 .tarjeta-oferta {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   min-height: 76px;
   display: flex;
@@ -2660,9 +2668,43 @@ body.body--con-nav-inferior .toast-contenedor {
   font-family: var(--fuente-ui);
   color: var(--pc-texto);
   background: var(--pc-superficie);
-  border: 1px solid var(--pc-linea);
+  border: 1px solid color-mix(in srgb, var(--pc-amarillo) 45%, var(--pc-linea));
   border-radius: 0;
   cursor: pointer;
+  animation: oferta-respira 2.8s ease-in-out infinite;
+}
+
+.tarjeta-oferta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 35%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  transform: skewX(-12deg);
+  pointer-events: none;
+  animation: oferta-destello 4.5s ease-in-out infinite;
+}
+
+@keyframes oferta-respira {
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(255, 210, 63, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(255, 210, 63, 0.38);
+  }
+}
+
+@keyframes oferta-destello {
+  0% {
+    left: -45%;
+  }
+  30%,
+  100% {
+    left: 125%;
+  }
 }
 
 .tarjeta-oferta:active {
@@ -2676,6 +2718,29 @@ body.body--con-nav-inferior .toast-contenedor {
   justify-content: center;
   background: var(--pc-amarillo);
   color: var(--pc-fondo);
+  animation: oferta-icono 2.8s ease-in-out infinite;
+}
+
+@keyframes oferta-icono {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(255, 210, 63, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(255, 210, 63, 0.75);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-oferta,
+  .tarjeta-oferta__icono,
+  .categorias-inicio__emoji {
+    animation: none;
+  }
+
+  .tarjeta-oferta::after {
+    display: none;
+  }
 }
 
 .tarjeta-oferta__texto {
@@ -3136,9 +3201,62 @@ body.body--con-nav-inferior .toast-contenedor {
   background: var(--pc-superficie);
 }
 
+/* Emoji "neón": el emoji va dentro de un recuadro con borde y halo del color de la casilla,
+   y el propio emoji brilla (drop-shadow doble, como un tubo de neón) con un parpadeo lento.
+   El color rota magenta / amarillo / menta / naranja. */
 .categorias-inicio__emoji {
-  font-size: 1.75rem;
+  --neon: var(--pc-magenta);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
   line-height: 1;
+  border: 1px solid var(--neon);
+  background: color-mix(in srgb, var(--neon) 10%, transparent);
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--neon) 45%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--neon) 30%, transparent);
+  filter: saturate(1.25) drop-shadow(0 0 3px var(--neon)) drop-shadow(0 0 9px color-mix(in srgb, var(--neon) 70%, transparent));
+  animation: neon-zumbido 4s ease-in-out infinite;
+}
+
+.categorias-inicio__emoji--amarillo {
+  --neon: var(--pc-amarillo);
+  animation-delay: -1s;
+}
+
+.categorias-inicio__emoji--menta {
+  --neon: var(--pc-menta);
+  animation-delay: -2s;
+}
+
+.categorias-inicio__emoji--naranja {
+  --neon: var(--pc-naranja);
+  animation-delay: -3s;
+}
+
+@keyframes neon-zumbido {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.82;
+  }
+  52% {
+    opacity: 1;
+  }
+  54% {
+    opacity: 0.9;
+  }
+  56% {
+    opacity: 1;
+  }
 }
 
 .categorias-inicio__numero {
@@ -4560,6 +4678,13 @@ body.admin .admin-crear--boton {
   color: var(--color-texto);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Línea de ayuda bajo un campo de formulario. */
+.campo__ayuda {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
 }
 
 /* --- Panel admin: piezas con colores fijos que no deben tomar la marca --- */

@@ -94,17 +94,18 @@ export function FormularioNegocio({ configuracion, onGuardar }) {
       <section className="tarjeta negocio-seccion">
         <header className="negocio-seccion__encabezado">
           <h2>Información</h2>
-          <p>Lo que ven tus clientes en "Sobre nosotros".</p>
+          <p>Lo que ven tus clientes en la carta.</p>
         </header>
         <label className="campo">
-          <span>Descripción corta</span>
+          <span>Frase de inicio</span>
           <input
             type="text"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
-            maxLength={200}
-            placeholder="Ej. Licores y cocteles a domicilio"
+            maxLength={60}
+            placeholder="Ej. ¿Un granizado o miedo?"
           />
+          <small className="campo__ayuda">Se muestra en grande debajo del logo, al abrir la carta.</small>
         </label>
         <label className="campo">
           <span>Dirección</span>

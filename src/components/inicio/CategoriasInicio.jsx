@@ -1,3 +1,6 @@
+// Color del brillo neón de cada emoji, rotando por casilla.
+const NEONES = ['magenta', 'amarillo', 'menta', 'naranja']
+
 // "Explora por categoría": cuadrícula de 2 columnas con las categorías que el admin ancló al
 // inicio, cada una con el emoji que eligió (ver lib/categoriasInicio.js: solo llegan aquí si
 // son 2 o 4). Tocar una abre el Menú filtrado por ella. Sin categorías la sección no se muestra.
@@ -32,7 +35,10 @@ export function CategoriasInicio({ categorias, cargando, error, onReintentar, on
                   className="categorias-inicio__casilla"
                   onClick={() => onSeleccionar(categoria.id)}
                 >
-                  <span className="categorias-inicio__emoji" aria-hidden="true">
+                  <span
+                    className={`categorias-inicio__emoji categorias-inicio__emoji--${NEONES[indice % NEONES.length]}`}
+                    aria-hidden="true"
+                  >
                     {categoria.emoji_inicio}
                   </span>
                   <span className="categorias-inicio__numero" aria-hidden="true">

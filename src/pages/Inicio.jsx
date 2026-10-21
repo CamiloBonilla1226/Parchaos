@@ -6,6 +6,7 @@ import { CategoriasInicio } from '../components/inicio/CategoriasInicio'
 import { PasosPedido } from '../components/inicio/PasosPedido'
 import { BotonWhatsapp } from '../components/inicio/BotonWhatsapp'
 import { montoDomicilioGratis } from '../lib/tiposOferta'
+import { useNegocioConfig } from '../hooks/useNegocioConfig'
 
 // Sección Inicio de la carta de domicilios. Vive dentro de Carta.jsx (no es una ruta propia)
 // porque comparte con Menú y Carrito el carrito, la nav inferior, el detalle del producto y
@@ -25,13 +26,19 @@ export function Inicio({
   onAbrirDetalle,
   onAgregar,
 }) {
+  // Frase bajo el logo: la que el dueño escribe en /admin/negocio ("Frase de inicio", columna
+  // negocio_config.descripcion). Sin frase guardada (o si falla la carga) se usa la de
+  // negocio.config.js. Mientras carga el espacio queda reservado para que nada salte.
+  const { config, cargando: cargandoConfig } = useNegocioConfig()
+  const lema = config?.descripcion?.trim() || negocioConfig.lema
+
   return (
     <div className="inicio">
       <div className="inicio-hero">
         <div className="inicio-hero__logo">
           <img src="/logo.webp" alt={negocioConfig.nombre} width="640" height="628" fetchPriority="high" />
         </div>
-        <h1 className="inicio-hero__lema">{negocioConfig.lema}</h1>
+        <h1 className={`inicio-hero__lema${cargandoConfig ? ' inicio-hero__lema--cargando' : ''}`}>{lema}</h1>
       </div>
 
       <TarjetaOferta oferta={ofertaActiva} onClick={() => onIrAlMenu()} />

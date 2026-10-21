@@ -4646,6 +4646,129 @@ body.admin .admin-crear--boton {
   color: var(--color-texto-suave);
 }
 
+/* --- Panel admin: productos de una categoría (formulario de categoría) --- */
+.categoria-productos {
+  margin: 0;
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  min-width: 0;
+}
+
+.categoria-productos legend {
+  padding: 0 var(--espacio-1);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.categoria-productos__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.categoria-productos__contador {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.categoria-productos__limpiar {
+  min-height: 36px;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.categoria-productos__buscar {
+  width: 100%;
+  border: 1px solid var(--color-borde);
+  padding: 10px 12px;
+  background: var(--color-fondo);
+}
+
+.categoria-productos__atajos {
+  display: flex;
+  gap: var(--espacio-3);
+}
+
+.categoria-productos__atajos button {
+  min-height: 32px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-texto);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.categoria-productos__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--color-borde);
+}
+
+.categoria-productos__lista li + li {
+  border-top: 1px solid var(--color-borde);
+}
+
+.categoria-productos__fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.categoria-productos__fila input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.categoria-productos__nombre {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoria-productos__etiqueta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+.categoria-productos__vacio {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+
+.categoria-admin-item__cantidad {
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
+body.admin .categoria-productos,
+body.admin .categoria-productos__lista,
+body.admin .categoria-productos__buscar,
+body.admin .categoria-productos__limpiar {
+  border-radius: 8px;
+}
+
 /* --- Panel admin: piezas con colores fijos que no deben tomar la marca --- */
 /* Barra flotante de acciones masivas: siempre oscura con texto blanco, en los dos temas. */
 body.admin .acciones-masivas {

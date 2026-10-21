@@ -2,18 +2,37 @@ import { useState } from 'react'
 import { mensajeAmigablePostgres } from '../../lib/erroresAmigables'
 import { claveIcono, ICONOS_CATEGORIA, MAX_CATEGORIAS_INICIO } from '../../lib/categoriasInicio'
 import { IconoCategoria } from '../inicio/IconoCategoria'
+import { SelectorProductosCategoria } from './SelectorProductosCategoria'
 
 // `ancladasOtras`: cuántas OTRAS categorías están ancladas al inicio de la carta, para no
 // dejar anclar una quinta (la base de datos también lo impide) y avisar si queda en 2 o 4.
-export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGuardar, onCancelar }) {
+// `productos`: todos los productos del negocio; `productosIniciales`: ids de los que ya están
+// en esta categoría. Al guardar, `onGuardar(datos, idsProductos)` recibe los marcados.
+// `onLimpiar` quita al instante todos los productos de la categoría (con confirmación).
+export function FormularioCategoria({
+  categoriaInicial,
+  ancladasOtras = 0,
+  productos = [],
+  productosIniciales = [],
+  productosNoDisponibles = false,
+  onGuardar,
+  onLimpiar,
+  onCancelar,
+}) {
   const [nombre, setNombre] = useState(categoriaInicial?.nombre ?? '')
   const [visibleDomicilios, setVisibleDomicilios] = useState(categoriaInicial?.visible_domicilios ?? true)
   const [visibleCartaFisica, setVisibleCartaFisica] = useState(categoriaInicial?.visible_carta_fisica ?? true)
   const [enInicio, setEnInicio] = useState(categoriaInicial?.en_inicio ?? false)
   // Clave del ícono (las ancladas antes con emoji se traducen al ícono equivalente).
   const [icono, setIcono] = useState(() => claveIcono(categoriaInicial?.emoji_inicio))
+  const [productoIds, setProductoIds] = useState(productosIniciales)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState(null)
+
+  const limpiar = async () => {
+    const resultado = await onLimpiar()
+    if (resultado?.exito) setProductoIds([])
+  }
 
   const sinCupo = !enInicio && ancladasOtras >= MAX_CATEGORIAS_INICIO
   const totalAncladas = ancladasOtras + (enInicio ? 1 : 0)
@@ -27,7 +46,8 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
     setGuardando(true)
     setError(null)
 
-    const resultado = await onGuardar({
+    const resultado = await onGuardar(
+      {
       nombre: nombre.trim(),
       visible_domicilios: visibleDomicilios,
       visible_carta_fisica: visibleCartaFisica,
@@ -35,7 +55,9 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
       // Al desanclar se conserva el ícono, por si se vuelve a anclar después. La columna se
       // llama emoji_inicio por historia: hoy guarda la clave del ícono.
       emoji_inicio: icono,
-    })
+      },
+      productosNoDisponibles ? null : productoIds
+    )
 
     setGuardando(false)
     if (resultado && !resultado.exito) {
@@ -67,6 +89,20 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
         />
         <span>Mostrar en carta física</span>
       </label>
+
+      {productosNoDisponibles ? (
+        <p className="campo__error">
+          No se pudieron cargar los productos: se guardará la categoría sin cambiar sus productos.
+        </p>
+      ) : (
+        <SelectorProductosCategoria
+          productos={productos}
+          seleccionados={productoIds}
+          onCambiar={setProductoIds}
+          onLimpiar={limpiar}
+          puedeLimpiar={Boolean(categoriaInicial) && productosIniciales.length > 0}
+        />
+      )}
 
       <fieldset className="categoria-inicio">
         <legend>Inicio de la carta</legend>

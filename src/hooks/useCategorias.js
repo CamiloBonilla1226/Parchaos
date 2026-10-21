@@ -67,12 +67,14 @@ export function useCategorias({
         return { exito: false, error: new Error('Ya existe una categoría con ese nombre.') }
       }
 
-      const { error: errorCrear } = await supabase
+      const { data: creada, error: errorCrear } = await supabase
         .from('categorias')
         .insert({ ...datos, nombre: nombreLimpio, negocio_id: negocioConfig.negocioId })
+        .select('id')
+        .single()
 
       if (!errorCrear) await recargar()
-      return { exito: !errorCrear, error: errorCrear }
+      return { exito: !errorCrear, error: errorCrear, id: creada?.id }
     },
     [recargar]
   )
@@ -130,7 +132,7 @@ export function useCategorias({
         return {
           exito: false,
           error: new Error(
-            `No se puede eliminar: hay ${count} producto${count === 1 ? '' : 's'} usando esta categoría.`
+            `No se puede eliminar: hay ${count} producto${count === 1 ? '' : 's'} en esta categoría. Usa "Limpiar categoría" para quitarlos (no se borran).`
           ),
         }
       }
@@ -160,6 +162,56 @@ export function useCategorias({
     [recargar]
   )
 
+  // Deja en la categoría exactamente los productos de `idsNuevos` (tabla productos_categorias):
+  // quita los que se desmarcaron y agrega los nuevos. Los productos no se tocan; solo cambia en
+  // qué categorías están. `idsActuales` son los que tenía al abrir el formulario.
+  const asignarProductos = useCallback(async (categoriaId, idsNuevos, idsActuales) => {
+    const nuevos = new Set(idsNuevos)
+    const actuales = new Set(idsActuales)
+    const quitar = idsActuales.filter((id) => !nuevos.has(id))
+    const agregar = idsNuevos.filter((id) => !actuales.has(id))
+
+    if (quitar.length > 0) {
+      const { data, error: errorQuitar } = await supabase
+        .from('productos_categorias')
+        .delete()
+        .eq('categoria_id', categoriaId)
+        .in('producto_id', quitar)
+        .select('producto_id')
+      if (errorQuitar) return { exito: false, error: errorQuitar }
+      // Un delete que RLS no deja hacer no da error: afecta 0 filas.
+      if ((data?.length ?? 0) < quitar.length) {
+        return { exito: false, error: new Error('No tienes permiso para cambiar los productos de esta categoría.') }
+      }
+    }
+
+    if (agregar.length > 0) {
+      const { error: errorAgregar } = await supabase.from('productos_categorias').upsert(
+        agregar.map((productoId) => ({
+          producto_id: productoId,
+          categoria_id: categoriaId,
+          negocio_id: negocioConfig.negocioId,
+        })),
+        { onConflict: 'producto_id,categoria_id', ignoreDuplicates: true }
+      )
+      if (errorAgregar) return { exito: false, error: errorAgregar }
+    }
+
+    return { exito: true, cambios: quitar.length + agregar.length }
+  }, [])
+
+  // "Limpiar categoría": quita todos sus productos (los productos siguen existiendo y
+  // conservan sus otras categorías). Devuelve cuántos se quitaron.
+  const limpiarCategoria = useCallback(async (categoriaId) => {
+    const { data, error: errorLimpiar } = await supabase
+      .from('productos_categorias')
+      .delete()
+      .eq('categoria_id', categoriaId)
+      .select('producto_id')
+    if (errorLimpiar) return { exito: false, error: errorLimpiar }
+    return { exito: true, quitados: data?.length ?? 0 }
+  }, [])
+
   return {
     categorias,
     cargando,
@@ -169,5 +221,7 @@ export function useCategorias({
     actualizarCategoria,
     eliminarCategoria,
     toggleActivo,
+    asignarProductos,
+    limpiarCategoria,
   }
 }

@@ -4989,3 +4989,16 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
   background: var(--admin-superficie-2);
   box-shadow: inset 0 0 0 1px var(--admin-acento);
 }
+
+/* --- Sin zoom automático al escribir en el celular ---
+   Safari de iPhone acerca la página cuando se enfoca un campo con letra menor a 16px (y los
+   formularios del panel enfocan el nombre al abrirse), y la deja acercada al cerrar. En
+   pantallas táctiles todo campo de texto usa al menos 16px. El !important es a propósito:
+   tiene que ganarle a los tamaños más pequeños de cada componente (buscadores, filtros). */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  select,
+  textarea {
+    font-size: max(16px, 1em) !important;
+  }
+}

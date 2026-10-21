@@ -90,11 +90,17 @@ export function Categorias() {
     return resultado
   }
 
-  const confirmarEliminar = async (id) => {
-    const confirmado = await confirmar('¿Eliminar esta categoría?')
+  // Solo se ofrece dentro del formulario de la categoría (no en la lista), para evitar
+  // borrados por un toque accidental. Si se elimina, el formulario se cierra.
+  const confirmarEliminar = async () => {
+    const { id, nombre } = categoriaEnEdicion
+    const confirmado = await confirmar(`¿Eliminar la categoría "${nombre}"? Esta acción no se puede deshacer.`, {
+      textoConfirmar: 'Eliminar categoría',
+    })
     if (!confirmado) return
 
     const { exito, error: errorEliminar } = await eliminarCategoria(id)
+    if (exito) setCategoriaEnEdicion(null)
     mostrarToast(
       exito ? 'Categoría eliminada' : mensajeAmigablePostgres(errorEliminar, 'No se pudo eliminar la categoría.'),
       exito ? 'exito' : 'error'
@@ -138,7 +144,6 @@ export function Categorias() {
             categorias={categorias}
             cantidadProductos={(categoriaId) => idsEnCategoria(categoriaId).length}
             onEditar={setCategoriaEnEdicion}
-            onEliminar={confirmarEliminar}
             onToggleActivo={cambiarActivo}
           />
         )}
@@ -170,6 +175,7 @@ export function Categorias() {
                 productosNoDisponibles={Boolean(errorProductos)}
                 onGuardar={guardarCategoria}
                 onLimpiar={confirmarLimpiar}
+                onEliminar={confirmarEliminar}
                 onCancelar={() => setCategoriaEnEdicion(null)}
               />
             )}

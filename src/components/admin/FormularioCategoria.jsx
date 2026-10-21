@@ -17,6 +17,7 @@ export function FormularioCategoria({
   productosNoDisponibles = false,
   onGuardar,
   onLimpiar,
+  onEliminar,
   onCancelar,
 }) {
   const [nombre, setNombre] = useState(categoriaInicial?.nombre ?? '')
@@ -156,6 +157,20 @@ export function FormularioCategoria({
           {guardando ? 'Guardando…' : 'Guardar'}
         </button>
       </div>
+
+      {categoriaInicial && onEliminar && (
+        <section className="zona-peligro" aria-label="Eliminar categoría">
+          <div>
+            <p className="zona-peligro__titulo">Eliminar categoría</p>
+            <p className="zona-peligro__texto">
+              Solo se puede eliminar si no tiene productos. Si solo quieres ocultarla, desactívala.
+            </p>
+          </div>
+          <button type="button" className="zona-peligro__boton" onClick={onEliminar} disabled={guardando}>
+            Eliminar categoría
+          </button>
+        </section>
+      )}
     </form>
   )
 }

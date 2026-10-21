@@ -748,3 +748,24 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 - Decisiones del dueño: las adiciones se pueden pedir solas (no solo informativas) y se activan con un interruptor general, no una por una.
 - El interruptor solo lo puede mover quien tiene permiso de Negocio, porque la RLS de `negocio_config` así lo exige; los demás ven si está activado.
 - **Orden de despliegue**: correr el SQL de la sección 20 **antes** de subir este código, porque la carta lee esa columna para el Inicio. El dueño corrió el SQL el 2026-10-21 y se verificó (consulta de solo lectura) antes del push.
+
+## 2026-10-21 (14)
+- **Diseño responsive para tableta y computador** (pedido del dueño: "que funcione para cualquier dispositivo", moderno, profesional y no genérico). El celular no cambia. Todo vive en un bloque al final de `index.css` con tres puntos de quiebre: 768px (tableta), 1024px (computador) y 1280px (pantalla amplia, más 1440px para algunas listas del panel). Mismos colores, tipografías y esquinas rectas en la carta.
+- **Carta de domicilios**:
+  - **Navegación**: en computador el nav inferior sube al encabezado. Las pestañas Inicio, Menú y Carrito quedan arriba a la derecha con una raya magenta bajo la activa, alineadas con el contenido (ancho máximo 1180px).
+  - **Inicio**: composición editorial en dos columnas.
+    - Logo y frase grandes a la izquierda; la oferta a la derecha.
+    - "Los más pedidos" pasa de carrusel a una fila fija de 5, porque con mouse no hay deslizamiento cómodo.
+    - Las categorías van en una sola fila.
+    - Los pasos van al lado de "Sobre nosotros".
+    - En tableta, los pasos se muestran en tres columnas.
+  - **Menú**: las categorías pasan a una barra lateral fija a la izquierda, rotulada "Categorías", con la activa marcada en magenta. Los productos van en cuadrícula de 2 columnas (3 desde 1280px), y las adiciones siguen al final.
+  - **Carrito**: la lista queda a la izquierda y el resumen (total + "Continuar con el pedido") en una tarjeta fija a la derecha. El checkout queda centrado a 560px.
+  - **Detalle de producto**: modal de dos columnas, con la imagen a la izquierda y las opciones a la derecha.
+- **Carta física**: buscador, pestañas y contenido alineados en una misma columna; en el celular las pestañas siguen yendo de borde a borde. Los productos van en dos columnas desde tableta.
+- **Panel admin**:
+  - Desde 1024px, el menú lateral (antes detrás de la hamburguesa) queda fijo como barra lateral. Cada sección tiene un ícono de línea, que también se ve en el menú del celular.
+  - `AdminNav` usa el hook nuevo `useMediaQuery` para no marcar la barra como `aria-hidden` ni bloquear el scroll en computador.
+  - **Listas en cuadrícula**: pedidos en 2 columnas desde tableta (3 desde 1440px); productos y categorías en 2 columnas desde 1280px, porque con menos ancho el interruptor y las acciones cortaban los nombres.
+  - **Inicio del panel**: el negocio y las métricas van en una misma fila, y el asistente en dos columnas.
+- Verificado con capturas en 390, 768, 1024, 1280 y 1440px (sin scroll horizontal en ninguna pantalla) y con las pruebas funcionales de categorías, adiciones en el menú, permisos y navegación en computador.

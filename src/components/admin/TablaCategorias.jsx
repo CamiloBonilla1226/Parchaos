@@ -1,4 +1,5 @@
 import { Interruptor } from './Interruptor'
+import { IconoCategoria } from '../inicio/IconoCategoria'
 
 export function TablaCategorias({ categorias, onEditar, onEliminar, onToggleActivo }) {
   if (categorias.length === 0) {
@@ -17,7 +18,7 @@ export function TablaCategorias({ categorias, onEditar, onEliminar, onToggleActi
             {categoria.nombre}
             {categoria.en_inicio && (
               <span className="categoria-admin-item__inicio" title="Anclada al inicio de la carta">
-                {categoria.emoji_inicio} Inicio
+                <IconoCategoria clave={categoria.emoji_inicio} tamano={14} /> Inicio
               </span>
             )}
           </span>

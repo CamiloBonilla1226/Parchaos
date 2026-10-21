@@ -95,9 +95,9 @@ export function CarruselMasPedidos({ productos, cargando, error, onReintentar, o
                     <button type="button" className="tarjeta-pedido__abrir" onClick={() => onAbrirDetalle(producto)}>
                       <span className={`tarjeta-pedido__imagen tarjeta-pedido__imagen--${ACENTOS[indice % ACENTOS.length]}`}>
                         {producto.imagen_url ? (
-                          <img src={producto.imagen_url} alt="" width="210" height="156" loading="lazy" decoding="async" />
+                          <img src={producto.imagen_url} alt="" width="150" height="113" loading="lazy" decoding="async" />
                         ) : (
-                          <IconoVaso tamano={44} />
+                          <IconoVaso tamano={32} />
                         )}
                         {etiqueta && (
                           <span className={`tarjeta-pedido__etiqueta tarjeta-pedido__etiqueta--${etiqueta.variante}`}>
@@ -124,7 +124,7 @@ export function CarruselMasPedidos({ productos, cargando, error, onReintentar, o
                         aria-label={`Agregar ${producto.nombre} al carrito`}
                         onClick={() => onAgregar(producto)}
                       >
-                        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                           <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" fill="none" />
                         </svg>
                       </button>

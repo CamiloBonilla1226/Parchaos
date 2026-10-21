@@ -360,6 +360,16 @@ del panel guarda estas columnas y sin ellas falla al guardar):
 ESTADO: YA SE CORRIÓ (2026-10-21). Verificado después: en_inicio y
 emoji_inicio responden en la API.
 
+CAMBIO DE USO (2026-10-21, sin cambio de esquema): emoji_inicio ya no
+guarda un emoji sino la CLAVE de un ícono de línea (ej. 'vaso',
+'vaso-pitillo', 'jarra', 'coctel', 'combo'...; lista completa en
+src/lib/categoriasInicio.js). El dueño prefirió íconos delgados a los
+emojis. La columna conserva su nombre para no hacer una migración; las
+claves caben en el check de 16 caracteres. Las filas que ya tenían un
+emoji (🥤, 🍸) no se tocaron: el código traduce cada emoji antiguo al
+ícono equivalente al mostrarlo, y al editar la categoría en el panel se
+guarda la clave.
+
 CONSECUENCIA EN EL CÓDIGO:
 - Formulario de categoría: bloque "Inicio de la carta" con la casilla
   "Anclar en el inicio de la carta de domicilios" y, al marcarla, un

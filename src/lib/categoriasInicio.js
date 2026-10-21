@@ -6,21 +6,51 @@
 export const MAX_CATEGORIAS_INICIO = 4
 const CANTIDADES_VALIDAS = [2, 4]
 
-// Sugerencias del selector del admin; también se puede pegar cualquier otro emoji.
-export const EMOJIS_SUGERIDOS = [
-  '🍧', '🥤', '🧊', '🍹', '🍸', '🍺', '🍻', '🍾', '🥃', '🍷',
-  '🍓', '🍋', '🥭', '🍍', '🍉', '🍒', '🥥', '🍑', '🫐', '🍫',
-  '🍬', '🍿', '🍟', '🌭', '🎁', '🔥', '⭐', '💥', '🎉', '❤️',
+// Íconos de línea que el admin puede elegir (los dibujos están en
+// components/inicio/IconoCategoria.jsx). Se guarda la clave en categorias.emoji_inicio: la
+// columna conserva el nombre de cuando guardaba un emoji.
+export const ICONOS_CATEGORIA = [
+  ['vaso', 'Vaso'],
+  ['vaso-pitillo', 'Vaso con pitillo'],
+  ['helado', 'Helado'],
+  ['hielo', 'Hielo'],
+  ['jarra', 'Cerveza'],
+  ['botella', 'Botella'],
+  ['coctel', 'Coctel'],
+  ['copa', 'Copa'],
+  ['shot', 'Shot'],
+  ['fruta', 'Fruta'],
+  ['combo', 'Combo'],
+  ['snack', 'Snack'],
+  ['estrella', 'Estrella'],
+  ['fuego', 'Fuego'],
+  ['rayo', 'Rayo'],
+  ['corazon', 'Corazón'],
 ]
 
-// Un emoji (incluye los compuestos: tonos de piel, banderas, secuencias con ZWJ), sin texto.
-export function esEmojiValido(texto) {
-  const limpio = texto.trim()
-  return limpio.length > 0 && limpio.length <= 16 && /^(?=.*(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|\u20E3))(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|\p{Emoji_Modifier}|\uFE0F|\u200D|\u20E3|[#*0-9])+$/u.test(limpio)
+const CLAVES = new Set(ICONOS_CATEGORIA.map(([clave]) => clave))
+
+// Las primeras categorías ancladas se guardaron con un emoji (antes del cambio a íconos):
+// se traducen al ícono más parecido para no tener que volver a elegirlo.
+const EMOJI_A_ICONO = {
+  '🍧': 'vaso', '🥤': 'vaso-pitillo', '🧊': 'hielo', '🍹': 'coctel', '🍸': 'coctel',
+  '🍺': 'jarra', '🍻': 'jarra', '🍾': 'botella', '🥃': 'shot', '🍷': 'copa',
+  '🍓': 'fruta', '🍋': 'fruta', '🥭': 'fruta', '🍍': 'fruta', '🍉': 'fruta',
+  '🍒': 'fruta', '🥥': 'fruta', '🍑': 'fruta', '🫐': 'fruta',
+  '🍫': 'snack', '🍬': 'snack', '🍿': 'snack', '🍟': 'snack', '🌭': 'snack',
+  '🎁': 'combo', '🔥': 'fuego', '⭐': 'estrella', '💥': 'rayo', '🎉': 'rayo', '❤️': 'corazon',
+}
+
+// Clave de ícono a partir de lo guardado (clave nueva o emoji antiguo); null si no hay.
+export function claveIcono(valor) {
+  if (!valor) return null
+  const limpio = valor.trim()
+  if (CLAVES.has(limpio)) return limpio
+  return EMOJI_A_ICONO[limpio] ?? null
 }
 
 // De las categorías que ya se ven en la carta (activas, visibles en domicilios y con
-// productos), las ancladas con emoji. Si no son exactamente 2 o 4, Inicio no muestra la sección.
+// productos), las ancladas con ícono. Si no son exactamente 2 o 4, Inicio no muestra la sección.
 export function categoriasDeInicio(categoriasVisibles) {
   const ancladas = categoriasVisibles.filter((categoria) => categoria.en_inicio && categoria.emoji_inicio)
   return CANTIDADES_VALIDAS.includes(ancladas.length) ? ancladas : []

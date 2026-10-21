@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { mensajeAmigablePostgres } from '../../lib/erroresAmigables'
-import { EMOJIS_SUGERIDOS, esEmojiValido, MAX_CATEGORIAS_INICIO } from '../../lib/categoriasInicio'
+import { claveIcono, ICONOS_CATEGORIA, MAX_CATEGORIAS_INICIO } from '../../lib/categoriasInicio'
+import { IconoCategoria } from '../inicio/IconoCategoria'
 
 // `ancladasOtras`: cuántas OTRAS categorías están ancladas al inicio de la carta, para no
 // dejar anclar una quinta (la base de datos también lo impide) y avisar si queda en 2 o 4.
@@ -9,7 +10,8 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
   const [visibleDomicilios, setVisibleDomicilios] = useState(categoriaInicial?.visible_domicilios ?? true)
   const [visibleCartaFisica, setVisibleCartaFisica] = useState(categoriaInicial?.visible_carta_fisica ?? true)
   const [enInicio, setEnInicio] = useState(categoriaInicial?.en_inicio ?? false)
-  const [emoji, setEmoji] = useState(categoriaInicial?.emoji_inicio ?? '')
+  // Clave del ícono (las ancladas antes con emoji se traducen al ícono equivalente).
+  const [icono, setIcono] = useState(() => claveIcono(categoriaInicial?.emoji_inicio))
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState(null)
 
@@ -18,8 +20,8 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
 
   const enviar = async (evento) => {
     evento.preventDefault()
-    if (enInicio && !esEmojiValido(emoji)) {
-      setError('Elige el emoji que se mostrará en el inicio de la carta.')
+    if (enInicio && !icono) {
+      setError('Elige el ícono que se mostrará en el inicio de la carta.')
       return
     }
     setGuardando(true)
@@ -30,8 +32,9 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
       visible_domicilios: visibleDomicilios,
       visible_carta_fisica: visibleCartaFisica,
       en_inicio: enInicio,
-      // Al desanclar se conserva el emoji, por si se vuelve a anclar después.
-      emoji_inicio: esEmojiValido(emoji) ? emoji.trim() : null,
+      // Al desanclar se conserva el ícono, por si se vuelve a anclar después. La columna se
+      // llama emoji_inicio por historia: hoy guarda la clave del ícono.
+      emoji_inicio: icono,
     })
 
     setGuardando(false)
@@ -84,29 +87,25 @@ export function FormularioCategoria({ categoriaInicial, ancladasOtras = 0, onGua
 
         {enInicio && (
           <div className="categoria-inicio__emoji">
-            <span className="categoria-inicio__etiqueta">
-              Emoji {emoji && <span className="categoria-inicio__elegido">{emoji}</span>}
-            </span>
-            <div className="selector-emoji" role="group" aria-label="Elegir emoji">
-              {EMOJIS_SUGERIDOS.map((opcion) => (
+            <span className="categoria-inicio__etiqueta">Ícono</span>
+            <div className="selector-emoji" role="group" aria-label="Elegir ícono">
+              {ICONOS_CATEGORIA.map(([clave, etiqueta]) => (
                 <button
-                  key={opcion}
+                  key={clave}
                   type="button"
                   className="selector-emoji__opcion"
-                  aria-pressed={emoji === opcion}
+                  aria-pressed={icono === clave}
+                  aria-label={etiqueta}
+                  title={etiqueta}
                   onClick={() => {
-                    setEmoji(opcion)
+                    setIcono(clave)
                     setError(null)
                   }}
                 >
-                  {opcion}
+                  <IconoCategoria clave={clave} tamano={22} />
                 </button>
               ))}
             </div>
-            <label className="campo">
-              <span>¿Otro? Pégalo aquí</span>
-              <input type="text" value={emoji} onChange={(e) => setEmoji(e.target.value)} maxLength={16} />
-            </label>
           </div>
         )}
       </fieldset>

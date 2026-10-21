@@ -26,6 +26,7 @@ import {
   productosRecomendados,
 } from '../lib/productosVisibles'
 import { variantesDisponibles } from '../lib/variantes'
+import { categoriasDeInicio } from '../lib/categoriasInicio'
 import { normalizarTexto } from '../lib/texto'
 
 export function Carta() {
@@ -220,7 +221,7 @@ export function Carta() {
           <Inicio
             ofertaActiva={ofertaActiva}
             destacados={destacados}
-            categorias={categorias}
+            categorias={categoriasDeInicio(categorias)}
             cargandoProductos={cargandoProductos}
             errorProductos={errorProductos}
             cargandoCategorias={cargandoCategorias}

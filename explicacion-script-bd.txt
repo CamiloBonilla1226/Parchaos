@@ -293,6 +293,85 @@ HISTORIAL DE CAMBIOS SOBRE ESTA TABLA:
   (sección 16). Desactivar una categoría ya no desactiva sus productos:
   solo la oculta. Se agregó unique (id, negocio_id) para las llaves
   compuestas de esa tabla.
+- 2026-10-21: se agregaron en_inicio y emoji_inicio (categorías
+  ancladas al Inicio de la carta), ver "CAMBIO — categorías en el
+  Inicio" abajo.
+
+CAMBIO — categorías en el Inicio de la carta (2026-10-21, pedido del
+dueño): el admin elige qué categorías salen en la cuadrícula "Explora
+por categoría" del Inicio de la carta de domicilios, y el emoji de cada
+una. La cuadrícula es de 2 columnas, así que solo se muestra con 2 o 4
+ancladas (nunca una casilla suelta).
+
+CÓMO FUNCIONA CADA CAMPO:
+- en_inicio: true/false, default false — si está anclada al Inicio.
+- emoji_inicio: el emoji que se muestra en su casilla (texto, máximo 16
+  caracteres para admitir emojis compuestos: tonos de piel, banderas,
+  secuencias con ZWJ). Obligatorio si está anclada. Al desanclar se
+  conserva, por si se vuelve a anclar.
+
+REGLAS:
+- Máximo 4 ancladas por negocio: lo garantiza un trigger (además del
+  formulario). No hay un check de "exactamente 2 o 4" porque no se puede
+  cumplir fila por fila: para llegar a 2 hay que pasar por 1. Esa regla
+  la aplica la carta: con 1 o 3 ancladas la sección no se muestra, y el
+  panel lo avisa.
+- Anclada exige emoji: check chk_categoria_inicio_emoji.
+- RLS: no cambia; las columnas heredan las políticas de categorias.
+
+SCRIPT SQL (correrlo ANTES de desplegar el código nuevo: el formulario
+del panel guarda estas columnas y sin ellas falla al guardar):
+
+    begin;
+
+    alter table categorias
+      add column en_inicio boolean not null default false,
+      add column emoji_inicio text
+        check (emoji_inicio is null or char_length(emoji_inicio) between 1 and 16);
+
+    alter table categorias
+      add constraint chk_categoria_inicio_emoji
+        check (not en_inicio or emoji_inicio is not null);
+
+    create or replace function limitar_categorias_inicio()
+    returns trigger
+    language plpgsql
+    set search_path = public
+    as $
+    begin
+      if new.en_inicio and (tg_op = 'INSERT' or not old.en_inicio) then
+        if (
+          select count(*) from categorias
+          where negocio_id = new.negocio_id and en_inicio and id <> new.id
+        ) >= 4 then
+          raise exception 'Ya hay 4 categorías en el inicio de la carta. Desancla una para anclar esta.';
+        end if;
+      end if;
+      return new;
+    end;
+    $;
+
+    create trigger trg_limitar_categorias_inicio
+    before insert or update of en_inicio on categorias
+    for each row execute function limitar_categorias_inicio();
+
+    commit;
+
+ESTADO: PENDIENTE — entregado al dueño el 2026-10-21, todavía no se ha
+corrido.
+
+CONSECUENCIA EN EL CÓDIGO:
+- Formulario de categoría: bloque "Inicio de la carta" con la casilla
+  "Anclar en el inicio de la carta de domicilios" y, al marcarla, un
+  selector de emojis (30 sugeridos + campo para pegar otro). Deshabilitada
+  si ya hay 4 ancladas. El mensaje del trigger se muestra tal cual.
+- Lista de categorías del panel: insignia "<emoji> Inicio" en las
+  ancladas y un aviso arriba con cuántas hay (verde con 2 o 4).
+- Carta (lib/categoriasInicio.js): de las categorías que ya se ven en
+  domicilios (activas, visibles y con productos), toma las ancladas con
+  emoji; si no son exactamente 2 o 4, la sección no se muestra. Antes la
+  cuadrícula mostraba todas las categorías con un ícono elegido por el
+  nombre.
 
 
 5. TABLA productos

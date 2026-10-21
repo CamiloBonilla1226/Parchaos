@@ -1,27 +1,6 @@
-import { normalizarTexto } from '../../lib/texto'
-import { IconoBotella, IconoCombo, IconoCopa, IconoHielo, IconoJarra, IconoSnack, IconoVaso } from './iconos'
-
-// La tabla categorias no guarda ícono: se elige uno según palabras del nombre, y si ninguna
-// coincide se usa el vaso (el producto principal del negocio).
-const ICONOS_POR_PALABRA = [
-  [/cervez|michelad/, IconoJarra],
-  [/licor|aguardient|ron\b|whisk|vodka|tequila|botell/, IconoBotella],
-  [/coctel|vino|trago|shot/, IconoCopa],
-  [/combo|promo|paquete|kit/, IconoCombo],
-  [/hielo/, IconoHielo],
-  [/snack|pasaboc|mecato|comida|papa|picad/, IconoSnack],
-]
-
-const COLORES = ['magenta', 'amarillo', 'menta', 'naranja']
-
-function iconoCategoria(nombre) {
-  const texto = normalizarTexto(nombre)
-  return ICONOS_POR_PALABRA.find(([patron]) => patron.test(texto))?.[1] ?? IconoVaso
-}
-
-// "Explora por categoría": cuadrícula de 2 columnas con las categorías que tienen productos
-// visibles en domicilios (las mismas del filtro del Menú). Tocar una abre el Menú filtrado
-// por ella. Sin categorías la sección no se muestra.
+// "Explora por categoría": cuadrícula de 2 columnas con las categorías que el admin ancló al
+// inicio, cada una con el emoji que eligió (ver lib/categoriasInicio.js: solo llegan aquí si
+// son 2 o 4). Tocar una abre el Menú filtrado por ella. Sin categorías la sección no se muestra.
 export function CategoriasInicio({ categorias, cargando, error, onReintentar, onSeleccionar }) {
   if (!cargando && !error && categorias.length === 0) return null
 
@@ -46,25 +25,22 @@ export function CategoriasInicio({ categorias, cargando, error, onReintentar, on
             ? [0, 1, 2, 3].map((indice) => (
                 <span key={indice} className="categorias-inicio__casilla categorias-inicio__casilla--cargando" aria-hidden="true" />
               ))
-            : categorias.map((categoria, indice) => {
-                const Icono = iconoCategoria(categoria.nombre)
-                return (
-                  <button
-                    key={categoria.id}
-                    type="button"
-                    className="categorias-inicio__casilla"
-                    onClick={() => onSeleccionar(categoria.id)}
-                  >
-                    <span className={`categorias-inicio__icono categorias-inicio__icono--${COLORES[indice % COLORES.length]}`}>
-                      <Icono tamano={26} />
-                    </span>
-                    <span className="categorias-inicio__numero" aria-hidden="true">
-                      {String(indice + 1).padStart(2, '0')}
-                    </span>
-                    <span className="categorias-inicio__nombre">{categoria.nombre}</span>
-                  </button>
-                )
-              })}
+            : categorias.map((categoria, indice) => (
+                <button
+                  key={categoria.id}
+                  type="button"
+                  className="categorias-inicio__casilla"
+                  onClick={() => onSeleccionar(categoria.id)}
+                >
+                  <span className="categorias-inicio__emoji" aria-hidden="true">
+                    {categoria.emoji_inicio}
+                  </span>
+                  <span className="categorias-inicio__numero" aria-hidden="true">
+                    {String(indice + 1).padStart(2, '0')}
+                  </span>
+                  <span className="categorias-inicio__nombre">{categoria.nombre}</span>
+                </button>
+              ))}
         </div>
       )}
     </section>

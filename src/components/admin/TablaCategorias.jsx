@@ -13,7 +13,14 @@ export function TablaCategorias({ categorias, onEditar, onEliminar, onToggleActi
           className="tarjeta categoria-admin-item categoria-admin-item--clicable"
           onClick={() => onEditar(categoria)}
         >
-          <span>{categoria.nombre}</span>
+          <span className="categoria-admin-item__nombre">
+            {categoria.nombre}
+            {categoria.en_inicio && (
+              <span className="categoria-admin-item__inicio" title="Anclada al inicio de la carta">
+                {categoria.emoji_inicio} Inicio
+              </span>
+            )}
+          </span>
           <div className="categoria-admin-item__acciones" onClick={(evento) => evento.stopPropagation()}>
             <Interruptor
               activo={categoria.activo}

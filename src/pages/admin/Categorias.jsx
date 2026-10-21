@@ -8,6 +8,7 @@ import { alSoltarFondo } from '../../lib/superposicion'
 import { useToast } from '../../hooks/useToast'
 import { useConfirmacion } from '../../hooks/useConfirmacion'
 import { mensajeAmigablePostgres } from '../../lib/erroresAmigables'
+import { cantidadValida, estadoAncladas } from '../../lib/categoriasInicio'
 
 export function Categorias() {
   const { categorias, cargando, error, crearCategoria, actualizarCategoria, eliminarCategoria, toggleActivo } =
@@ -18,6 +19,10 @@ export function Categorias() {
   const swipe = useSwipeParaCerrar(cerrarModal)
   const mostrarToast = useToast()
   const confirmar = useConfirmacion()
+
+  // Ancladas al inicio de la carta (deben ser 2 o 4 para mostrarse, ver lib/categoriasInicio.js).
+  const ancladas = categorias.filter((categoria) => categoria.en_inicio)
+  const ancladasOtras = ancladas.filter((categoria) => categoria.id !== categoriaEnEdicion?.id).length
 
   const guardarCategoria = async (datos) => {
     const esNueva = categoriaEnEdicion === 'nuevo'
@@ -70,6 +75,11 @@ export function Categorias() {
 
         {cargando && <p className="texto-suave">Cargando categorías…</p>}
         {error && <p className="campo__error">No se pudieron cargar las categorías.</p>}
+        {!cargando && !error && categorias.length > 0 && (
+          <p className={`estado-inicio-categorias${cantidadValida(ancladas.length) ? ' estado-inicio-categorias--ok' : ''}`}>
+            <strong>Inicio de la carta:</strong> {estadoAncladas(ancladas.length)}
+          </p>
+        )}
         {!cargando && !error && (
           <TablaCategorias
             categorias={categorias}
@@ -95,6 +105,7 @@ export function Categorias() {
             <h2>{categoriaEnEdicion === 'nuevo' ? 'Nueva categoría' : 'Editar categoría'}</h2>
             <FormularioCategoria
               categoriaInicial={categoriaEnEdicion === 'nuevo' ? null : categoriaEnEdicion}
+              ancladasOtras={ancladasOtras}
               onGuardar={guardarCategoria}
               onCancelar={() => setCategoriaEnEdicion(null)}
             />

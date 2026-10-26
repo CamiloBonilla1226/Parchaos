@@ -349,19 +349,32 @@ p {
 
 .carta-fisica__titulo {
   margin: 0;
-  font-size: 1.45rem;
-  font-weight: 700;
+  font-family: var(--fuente-titulos);
+  font-weight: 400;
+  font-size: 1.75rem;
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
+/* "Carta" con el rótulo de tubo de la carta de domicilios. */
 .carta-fisica__subtitulo {
-  margin: 2px 0 0;
-  font-size: 0.75rem;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-texto-suave);
+  color: var(--color-primario);
+}
+
+.carta-fisica__subtitulo::before {
+  content: '';
+  flex: 0 0 18px;
+  height: 3px;
+  background: currentColor;
+  box-shadow: var(--neon-magenta);
 }
 
 /* Barra fija: buscador y pestañas de secciones. */
@@ -379,10 +392,19 @@ p {
   align-items: center;
   gap: var(--espacio-2);
   padding: 0 var(--espacio-3);
-  height: 42px;
-  margin-bottom: var(--espacio-1);
-  background: var(--color-secundario);
-  color: var(--color-texto-suave);
+  height: 46px;
+  margin-bottom: var(--espacio-2);
+  background: color-mix(in srgb, #000 30%, var(--color-bg));
+  border: 1px solid var(--color-borde);
+  color: var(--pc-texto-3);
+  transition:
+    border-color 150ms ease,
+    box-shadow 200ms var(--curva-salida);
+}
+
+.carta-fisica__buscador:focus-within {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 1px var(--color-primario);
 }
 
 .carta-fisica__buscador input {
@@ -412,8 +434,8 @@ p {
 }
 
 /* Pestañas de categorías: chips rectos que ocupan el ancho con scroll horizontal (de borde a
-   borde, sin cortarse en el margen). La activa va rellena en negro; cada una muestra cuántos
-   productos tiene. */
+   borde, sin cortarse en el margen). La activa se enciende con el tubo magenta al pie, igual
+   que en el Menú de domicilios; cada una muestra cuántos productos tiene. */
 .carta-fisica__pestanas {
   display: flex;
   gap: var(--espacio-2);
@@ -433,14 +455,15 @@ p {
   display: inline-flex;
   align-items: center;
   gap: var(--espacio-2);
-  height: 38px;
+  position: relative;
+  height: 44px;
   padding: 0 14px;
   border: 1px solid var(--color-borde);
   background: var(--color-fondo);
-  color: var(--color-texto);
+  color: var(--color-texto-suave);
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -448,10 +471,19 @@ p {
 }
 
 .carta-fisica__pestana--activa {
-  border-color: var(--color-primario);
+  border-color: color-mix(in srgb, var(--color-primario) 55%, var(--color-borde));
+  color: var(--color-texto);
+}
+
+.carta-fisica__pestana--activa::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  height: 3px;
   background: var(--color-primario);
-  color: var(--color-fondo);
-  font-weight: 600;
+  box-shadow: var(--neon-magenta);
 }
 
 .carta-fisica__contenido {
@@ -486,14 +518,28 @@ p {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--espacio-3);
-  padding-bottom: var(--espacio-2);
-  border-bottom: 1px solid var(--color-texto);
+  position: relative;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Tubo corto sobre la línea, al inicio del título de la categoría. */
+.carta-fisica__seccion-encabezado::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 40px;
+  height: 3px;
+  background: var(--color-primario);
+  box-shadow: var(--neon-magenta);
 }
 
 .carta-fisica__seccion-titulo {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-family: var(--fuente-titulos);
+  font-weight: 400;
+  font-size: 1.5rem;
   letter-spacing: -0.01em;
 }
 
@@ -599,8 +645,8 @@ p {
 
 .producto-fisica__precio {
   margin-top: 2px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 /* --- Detalle de producto de la carta física --- */
@@ -2731,8 +2777,26 @@ body.body--con-nav-inferior .toast-contenedor {
   color: var(--pc-texto-2);
 }
 
+.nav-inferior__item {
+  position: relative;
+}
+
 .nav-inferior__item[aria-current='page'] {
   color: var(--pc-magenta);
+}
+
+/* La pestaña activa se enciende con un tubo de neón en el borde de arriba (la firma de la
+   carta, ver Inicio). En computador el tubo pasa abajo (ver ::after en 1024px). */
+.nav-inferior__item[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 32px;
+  height: 3px;
+  margin-left: -16px;
+  background: var(--pc-magenta);
+  box-shadow: var(--neon-magenta);
 }
 
 .nav-inferior__icono {
@@ -5817,10 +5881,15 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     left: 16px;
     right: 16px;
     bottom: -1px;
-    height: 2px;
+    height: 3px;
     background: var(--pc-magenta);
+    box-shadow: var(--neon-magenta);
     transform: scaleX(0);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s var(--curva-salida);
+  }
+
+  .nav-inferior__item[aria-current='page']::before {
+    display: none;
   }
 
   .nav-inferior__item[aria-current='page']::after {

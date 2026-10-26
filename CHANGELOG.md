@@ -802,3 +802,12 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 - **Carrito**: "Tu pedido" y el total con Archivo Black; botón "Continuar" de 52px. "¿Algo más?" lleva el rótulo con tubo de Inicio, con tarjetas de máximo 180px en pantallas anchas (antes la foto ocupaba media pantalla) y el "+" en magenta.
 - **Detalle de producto**: nombre con Archivo Black. El botón "Agregar · $precio" ocupa más que "Cancelar" y ya no se parte en dos líneas.
 - El contador del carrito en la navegación pasa del rojo de error al amarillo de la marca.
+
+## 2026-10-26 (4)
+- **Carta física (QR en mesa) con el mismo lenguaje que la carta de domicilios**:
+  - Nombre y títulos de categoría con Archivo Black.
+  - "Carta" con el rótulo de tubo.
+  - Buscador hundido que se enciende al enfocarlo.
+  - Pestañas de 44px: la activa se enciende con el tubo magenta al pie, en vez de ir rellena.
+  - Bajo el título de cada categoría, un tubo corto sobre la línea, en vez de la raya blanca de todo el ancho.
+- **Navegación de la carta**: en el celular, la pestaña activa lleva el tubo de neón en el borde de arriba. En computador, la raya de abajo pasa a ser un tubo con halo de 3px.

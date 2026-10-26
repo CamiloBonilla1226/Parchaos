@@ -5,6 +5,7 @@ import { CONSULTA_ESCRITORIO, useMediaQuery } from '../../hooks/useMediaQuery'
 import { negocioConfig } from '../../config/negocio.config'
 import { seccionesAdminVisibles } from '../../lib/seccionesAdmin'
 import { BotonTema } from './BotonTema'
+import { BotonSonido } from './BotonSonido'
 
 // Ícono de línea por sección (mismo trazo en el menú del celular y en la barra lateral).
 const ICONOS_SECCION = {
@@ -86,6 +87,7 @@ export function AdminNav() {
           <span />
         </button>
         <span className="admin-header__titulo">Administrador</span>
+        {auth.puedePedidos && <BotonSonido />}
         <BotonTema />
       </header>
 

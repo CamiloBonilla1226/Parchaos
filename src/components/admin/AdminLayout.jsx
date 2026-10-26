@@ -4,6 +4,11 @@ import { useAuth } from '../../hooks/useAuth'
 import { useSwipeNavegacion } from '../../hooks/useSwipeNavegacion'
 import { seccionesAdminVisibles } from '../../lib/seccionesAdmin'
 import { useTemaAdmin } from '../../hooks/useTemaAdmin'
+import { useAvisoPedidos } from '../../hooks/useAvisoPedidos'
+import { negocioConfig } from '../../config/negocio.config'
+import { AvisoPedido } from './AvisoPedido'
+
+const TITULO_PANEL = `${negocioConfig.nombre} — Panel admin`
 
 // Donde un swipe horizontal no debe cambiar de sección: modales y confirmaciones (ahí
 // deslizar ya sirve para cerrarlos, ver useSwipeParaCerrar), el menú lateral abierto,
@@ -32,11 +37,31 @@ export function AdminLayout() {
   const navigate = useNavigate()
   // Tema claro/oscuro del panel: las páginas lo leen con useOutletContext (ver BotonTema.jsx).
   const temaAdmin = useTemaAdmin()
+  // Aviso de pedido nuevo en cualquier sección (sonido + aviso visual). Solo con sesión válida
+  // y permiso de Pedidos: sin ese permiso RLS no le deja ver los pedidos de todas formas.
+  const avisoPedidos = useAvisoPedidos({
+    activo: auth.cuentaValida && auth.puedePedidos,
+    enPedidos: pathname === '/admin/pedidos',
+  })
+  const { sinVer } = avisoPedidos
 
   useEffect(() => {
     document.body.classList.add('admin')
     return () => document.body.classList.remove('admin')
   }, [])
+
+  // Título de la pestaña con los pedidos nuevos sin ver: "(2) PAR CHAOS — Panel admin". Se
+  // pone a cero al abrir Pedidos (useAvisoPedidos). Al salir del panel vuelve el de la carta.
+  useEffect(() => {
+    const anterior = document.title
+    return () => {
+      document.title = anterior
+    }
+  }, [])
+
+  useEffect(() => {
+    document.title = sinVer > 0 ? `(${sinVer}) ${TITULO_PANEL}` : TITULO_PANEL
+  }, [sinVer])
 
   // Cada sección arranca desde arriba, venga del menú lateral o de un swipe.
   useLayoutEffect(() => {
@@ -63,7 +88,8 @@ export function AdminLayout() {
 
   return (
     <div className="admin-zona-swipe" onTouchStart={swipe.onTouchStart} onTouchEnd={swipe.onTouchEnd}>
-      <Outlet context={temaAdmin} />
+      <Outlet context={{ ...temaAdmin, avisoPedidos }} />
+      <AvisoPedido aviso={avisoPedidos.aviso} onCerrar={avisoPedidos.cerrarAviso} />
     </div>
   )
 }

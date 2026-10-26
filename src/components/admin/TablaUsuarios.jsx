@@ -56,7 +56,7 @@ function TarjetaUsuario({ usuario, onEliminar, onToggleActivo, onTogglePermiso }
 
 export function TablaUsuarios({ usuarios, onEliminar, onToggleActivo, onTogglePermiso }) {
   if (usuarios.length === 0) {
-    return <p className="texto-suave">Todavía no hay usuarios. Crea el primero.</p>
+    return <p className="texto-suave admin-vacio">Todavía no hay usuarios. Crea el primero.</p>
   }
 
   return (

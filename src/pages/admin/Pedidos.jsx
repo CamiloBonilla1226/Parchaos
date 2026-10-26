@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina } from '../../components/admin/EncabezadoPagina'
 import {
   FiltrosPedidos,
   aplicarFiltrosPedidos,
@@ -29,7 +30,10 @@ export function Pedidos() {
     <>
       <AdminNav />
       <main className="contenedor admin-pedidos">
-        <h1>Pedidos</h1>
+        <EncabezadoPagina
+          titulo="Pedidos"
+          descripcion="Llegan en tiempo real. Cambia el estado de cada uno a medida que lo atiendes."
+        />
         {cargando && <p className="texto-suave">Cargando pedidos…</p>}
         {error && <p className="campo__error">No se pudieron cargar los pedidos.</p>}
         {!cargando && !error && (

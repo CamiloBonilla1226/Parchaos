@@ -24,7 +24,7 @@ const ETIQUETA_ESTADO = {
 
 export function TablaPedidos({ pedidos, onActualizarEstado }) {
   if (pedidos.length === 0) {
-    return <p className="texto-suave">No hay pedidos en este periodo.</p>
+    return <p className="texto-suave admin-vacio">No hay pedidos en este periodo.</p>
   }
 
   return (
@@ -32,15 +32,20 @@ export function TablaPedidos({ pedidos, onActualizarEstado }) {
       {pedidos.map((pedido) => (
         <li key={pedido.id} className="tarjeta pedido-item">
           <div className="pedido-item__encabezado">
-            <strong>{pedido.cliente_nombre}</strong>
+            <strong className="pedido-item__cliente" title={pedido.cliente_nombre}>
+              {pedido.cliente_nombre}
+            </strong>
             <span className={`pedido-item__estado pedido-item__estado--${pedido.estado}`}>
               {ETIQUETA_ESTADO[pedido.estado] ?? pedido.estado}
             </span>
           </div>
-          <span className="texto-suave">{formatoFecha.format(new Date(pedido.creado_en))}</span>
-          <span className="texto-suave">{pedido.cliente_telefono}</span>
-          {pedido.direccion && <span className="texto-suave">{pedido.direccion}</span>}
-          {pedido.atendido_por && <span className="texto-suave">Atendido por {pedido.atendido_por}</span>}
+          <div className="pedido-item__meta texto-suave">
+            <span>
+              {formatoFecha.format(new Date(pedido.creado_en))} · {pedido.cliente_telefono}
+            </span>
+            {pedido.direccion && <span>{pedido.direccion}</span>}
+            {pedido.atendido_por && <span>Atendido por {pedido.atendido_por}</span>}
+          </div>
 
           <ul className="pedido-item__detalle">
             {pedido.productos_detalle.map((item, indice) => {

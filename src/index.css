@@ -5613,6 +5613,385 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
   box-shadow: inset 0 0 0 1px var(--admin-acento);
 }
 
+/* =====================================================================================
+   Panel admin: estructura común (2026-10-26). Mismos colores del tema; lo que cambia es
+   el orden. Cada sección arranca con el mismo encabezado (título, para qué sirve, acción
+   principal) y todas las listas usan la misma tarjeta: alto fijo, cada línea en un solo
+   renglón y una fila de etiquetas que siempre existe aunque esté vacía. Así ninguna
+   tarjeta queda más alta ni corrida porque un nombre o una etiqueta sea más largo.
+   ===================================================================================== */
+body.admin {
+  --admin-alto-ficha: 112px;
+}
+
+/* Encabezado de sección: textos a la izquierda y el botón de crear a la derecha; si no
+   cabe (celular angosto), el botón baja debajo de la descripción. */
+body.admin .admin-pagina__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+body.admin .admin-pagina__textos {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+body.admin .admin-pagina__encabezado h1 {
+  margin: 0;
+  text-wrap: balance;
+}
+
+body.admin .admin-pagina__descripcion {
+  margin: 4px 0 0;
+  max-width: 62ch;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--admin-suave);
+  text-wrap: pretty;
+}
+
+body.admin .admin-pagina__encabezado .admin-crear--boton,
+body.admin .admin-ofertas__cabecera .admin-crear--boton {
+  flex-shrink: 0;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* Lista vacía: un recuadro punteado en vez de un texto suelto. */
+body.admin .admin-vacio {
+  margin: 0;
+  padding: 28px 16px;
+  border: 1px dashed var(--admin-borde-fuerte);
+  border-radius: var(--admin-radio);
+  background: var(--admin-superficie);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Títulos de grupo dentro de una sección (Ofertas). */
+body.admin .admin-ofertas__grupo {
+  margin-top: 28px;
+}
+
+body.admin .admin-ofertas__grupo:first-of-type {
+  margin-top: 0;
+}
+
+body.admin .admin-ofertas__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body.admin .admin-ofertas__titulo {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+body.admin .filtros-admin {
+  margin-bottom: 16px;
+}
+
+/* --- La tarjeta común (productos, adiciones, ofertas y categorías) --- */
+body.admin .producto-admin-item,
+body.admin .adicion-admin-item,
+body.admin .oferta-admin-item {
+  height: var(--admin-alto-ficha);
+  min-height: 0;
+  padding: 12px 16px;
+  gap: 14px;
+  align-items: center;
+}
+
+body.admin .producto-admin-item {
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  padding-left: 12px;
+}
+
+body.admin .producto-admin-item__info {
+  min-width: 0;
+  gap: 3px;
+}
+
+body.admin .producto-admin-item__nombre,
+body.admin .categoria-ficha__nombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+body.admin .producto-admin-item__categoria,
+body.admin .categoria-ficha__detalle {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--admin-suave);
+}
+
+body.admin .producto-admin-item__precio {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fila de etiquetas: siempre del mismo alto, en un solo renglón (lo que no cabe se corta). */
+body.admin .producto-admin-item__etiquetas {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  min-height: 22px;
+  overflow: hidden;
+}
+
+body.admin .producto-admin-item__etiqueta {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+body.admin .producto-admin-item__etiqueta--resaltada {
+  background: var(--admin-acento);
+  color: var(--admin-acento-texto);
+}
+
+body.admin .oferta-admin-item__tipo {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--admin-suave);
+}
+
+/* Acciones: el interruptor arriba y "Eliminar" abajo, pegados al borde derecho, en todas
+   las tarjetas por igual. La etiqueta del interruptor tiene ancho fijo para que "Activa" e
+   "Inactiva" no muevan el interruptor de una tarjeta a otra. */
+body.admin .producto-admin-item__acciones {
+  align-self: stretch;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+body.admin .producto-admin-item__acciones:has(> :only-child) {
+  justify-content: center;
+}
+
+body.admin .producto-admin-item__acciones .interruptor,
+body.admin .categoria-ficha__estado .interruptor {
+  flex-direction: row-reverse;
+}
+
+body.admin .producto-admin-item__acciones .interruptor__etiqueta,
+body.admin .categoria-ficha__estado .interruptor__etiqueta {
+  min-width: 4.6rem;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--admin-suave);
+}
+
+body.admin .producto-admin-item__acciones .carrito__quitar {
+  padding: 4px 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Categoría: misma tarjeta, con el ícono en lugar de la foto. */
+body.admin .categoria-ficha {
+  height: var(--admin-alto-ficha);
+  padding: 0 16px 0 0;
+  gap: 12px;
+}
+
+body.admin .categoria-ficha__abrir {
+  align-self: stretch;
+  min-height: 0;
+  gap: 14px;
+  padding: 12px 0 12px 12px;
+}
+
+body.admin .categoria-ficha__icono {
+  width: 72px;
+  height: 72px;
+  border: none;
+  background: var(--admin-superficie-2);
+  font-size: 1.4rem;
+}
+
+body.admin .categoria-ficha__texto {
+  flex: 1;
+  gap: 3px;
+}
+
+body.admin .categoria-ficha__nombre {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+}
+
+body.admin .categoria-ficha--inactiva .producto-admin-item__etiquetas {
+  opacity: 0.55;
+}
+
+/* Aviso de las categorías ancladas a Inicio, alineado con las tarjetas. */
+body.admin .estado-inicio-categorias {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
+  border-left-width: 3px;
+}
+
+/* Ajuste "Mostrar adiciones en el menú": mismo aire que las tarjetas. */
+body.admin .ajuste-adiciones-menu {
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+/* --- Pedidos: encabezado, datos del cliente, productos y, siempre al pie, total y estado --- */
+body.admin .lista-pedidos {
+  gap: 12px;
+}
+
+body.admin .pedido-item {
+  padding: 16px;
+  gap: 10px;
+}
+
+body.admin .pedido-item__encabezado {
+  align-items: center;
+  gap: 12px;
+}
+
+body.admin .pedido-item__cliente {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+}
+
+body.admin .pedido-item__estado {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+body.admin .pedido-item__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+body.admin .pedido-item__detalle {
+  margin: 0;
+  padding: 10px 12px 10px 28px;
+  border-radius: 8px;
+  background: var(--admin-superficie-2);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+body.admin .pedido-item__pie {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--admin-borde);
+}
+
+body.admin .pedido-item__pie > strong {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+body.admin .pedido-item__selector-estado select {
+  min-height: 38px;
+  padding: 6px 10px;
+}
+
+/* --- Usuarios --- */
+body.admin .usuario-admin-item__encabezado {
+  min-height: 64px;
+  padding: 12px 16px;
+}
+
+body.admin .usuario-admin-item__detalle {
+  padding: 16px;
+}
+
+body.admin .usuario-admin-item__flecha {
+  font-size: 1.1rem;
+}
+
+/* --- Inicio del panel: rótulos de las métricas más discretos y números parejos --- */
+body.admin .admin-dashboard__metrica > .texto-suave,
+body.admin .asistente__dinero > .texto-suave {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+body.admin .admin-dashboard__metrica strong,
+body.admin .asistente__dinero strong,
+body.admin .asistente__barra-valor {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Celular: el nombre necesita el ancho. La palabra junto al interruptor ("Disponible",
+   "Activa") se oculta a la vista (el color del interruptor ya dice el estado) pero sigue
+   ahí para lectores de pantalla, y el ícono de la categoría se achica. */
+@media (max-width: 599px) {
+  body.admin .producto-admin-item__acciones .interruptor__etiqueta,
+  body.admin .categoria-ficha__estado .interruptor__etiqueta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-width: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  body.admin .categoria-ficha__icono {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* En cuadrícula (tableta y computador) las tarjetas de una misma fila miden lo mismo. */
+@media (min-width: 768px) {
+  body.admin .lista-pedidos {
+    align-items: stretch;
+  }
+
+  body.admin .admin-pagina__encabezado h1 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  body.admin .lista-productos-admin,
+  body.admin .lista-categorias-admin {
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
 /* --- Sin zoom automático al escribir en el celular ---
    Safari de iPhone acerca la página cuando se enfoca un campo con letra menor a 16px (y los
    formularios del panel enfocan el nombre al abrirse), y la deja acercada al cerrar. En

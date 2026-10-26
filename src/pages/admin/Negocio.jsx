@@ -1,4 +1,5 @@
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina } from '../../components/admin/EncabezadoPagina'
 import { FormularioNegocio } from '../../components/admin/FormularioNegocio'
 import { useNegocioConfig } from '../../hooks/useNegocioConfig'
 import { useToast } from '../../hooks/useToast'
@@ -19,7 +20,10 @@ export function Negocio() {
     <>
       <AdminNav />
       <main className="contenedor admin-negocio">
-        <h1>Negocio</h1>
+        <EncabezadoPagina
+          titulo="Negocio"
+          descripcion="Datos, redes y horario que ven tus clientes en la carta."
+        />
 
         {cargando && <p className="texto-suave">Cargando…</p>}
         {error && <p className="campo__error">No se pudo cargar la configuración del negocio.</p>}

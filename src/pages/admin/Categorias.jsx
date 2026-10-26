@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina, BotonCrear } from '../../components/admin/EncabezadoPagina'
 import { TablaCategorias } from '../../components/admin/TablaCategorias'
 import { FormularioCategoria } from '../../components/admin/FormularioCategoria'
 import { useCategorias } from '../../hooks/useCategorias'
@@ -123,14 +124,11 @@ export function Categorias() {
     <>
       <AdminNav />
       <main className="contenedor admin-categorias">
-        <h1>Categorías</h1>
-
-        <button type="button" className="admin-crear admin-crear--boton" onClick={() => setCategoriaEnEdicion('nuevo')}>
-          <span className="admin-crear__icono" aria-hidden="true">
-            +
-          </span>
-          Nueva categoría
-        </button>
+        <EncabezadoPagina
+          titulo="Categorías"
+          descripcion="Ordenan la carta. Toca una para editarla y elegir sus productos."
+          accion={<BotonCrear onClick={() => setCategoriaEnEdicion('nuevo')}>Nueva categoría</BotonCrear>}
+        />
 
         {cargando && <p className="texto-suave">Cargando categorías…</p>}
         {error && <p className="campo__error">No se pudieron cargar las categorías.</p>}

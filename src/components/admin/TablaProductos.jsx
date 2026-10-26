@@ -26,7 +26,7 @@ export function TablaProductos({
   const presion = useMantenerPresionado(onMantenerPresionado, { ignorar: '.producto-admin-item__acciones' })
 
   if (productos.length === 0) {
-    return <p className="texto-suave">No hay productos para mostrar.</p>
+    return <p className="texto-suave admin-vacio">No hay productos para mostrar.</p>
   }
 
   const modoSeleccion = seleccionados.size > 0

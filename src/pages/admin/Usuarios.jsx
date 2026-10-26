@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina, BotonCrear } from '../../components/admin/EncabezadoPagina'
 import { TablaUsuarios } from '../../components/admin/TablaUsuarios'
 import { FormularioEmpleado } from '../../components/admin/FormularioEmpleado'
 import { useUsuariosAdmin } from '../../hooks/useUsuariosAdmin'
@@ -61,14 +62,11 @@ export function Usuarios() {
     <>
       <AdminNav />
       <main className="contenedor admin-usuarios">
-        <h1>Usuarios</h1>
-
-        <button type="button" className="admin-crear admin-crear--boton" onClick={() => setCreando(true)}>
-          <span className="admin-crear__icono" aria-hidden="true">
-            +
-          </span>
-          Crear empleado
-        </button>
+        <EncabezadoPagina
+          titulo="Usuarios"
+          descripcion="Cuentas de tus empleados y las secciones del panel que pueden ver."
+          accion={<BotonCrear onClick={() => setCreando(true)}>Crear empleado</BotonCrear>}
+        />
 
         {cargando && <p className="texto-suave">Cargando usuarios…</p>}
         {error && <p className="campo__error">No se pudieron cargar los usuarios.</p>}

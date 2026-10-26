@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina, BotonCrear } from '../../components/admin/EncabezadoPagina'
 import { TablaProductos } from '../../components/admin/TablaProductos'
 import {
   FiltrosProductos,
@@ -136,14 +137,11 @@ export function Productos() {
     <>
       <AdminNav />
       <main className={`contenedor admin-productos${cantidad > 0 ? ' admin-productos--seleccionando' : ''}`}>
-        <h1>Productos</h1>
-
-        <button type="button" className="admin-crear admin-crear--boton" onClick={() => setModal('nuevo')}>
-          <span className="admin-crear__icono" aria-hidden="true">
-            +
-          </span>
-          Nuevo producto
-        </button>
+        <EncabezadoPagina
+          titulo="Productos"
+          descripcion="Toca un producto para editarlo. Mantén presionado uno para seleccionar varios."
+          accion={<BotonCrear onClick={() => setModal('nuevo')}>Nuevo producto</BotonCrear>}
+        />
 
         {cargando && <p className="texto-suave">Cargando productos…</p>}
         {error && <p className="campo__error">No se pudieron cargar los productos.</p>}

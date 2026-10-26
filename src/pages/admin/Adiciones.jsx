@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina, BotonCrear } from '../../components/admin/EncabezadoPagina'
 import { TablaAdiciones } from '../../components/admin/TablaAdiciones'
 import {
   FiltrosAdiciones,
@@ -70,14 +71,11 @@ export function Adiciones() {
     <>
       <AdminNav />
       <main className="contenedor admin-adiciones">
-        <h1>Adiciones</h1>
-
-        <button type="button" className="admin-crear admin-crear--boton" onClick={() => setAdicionEnEdicion('nuevo')}>
-          <span className="admin-crear__icono" aria-hidden="true">
-            +
-          </span>
-          Nueva adición
-        </button>
+        <EncabezadoPagina
+          titulo="Adiciones"
+          descripcion="Extras que el cliente puede sumar a sus productos."
+          accion={<BotonCrear onClick={() => setAdicionEnEdicion('nuevo')}>Nueva adición</BotonCrear>}
+        />
 
         {!cargandoConfig && config && (
           <section className="tarjeta ajuste-adiciones-menu" aria-busy={guardandoAjuste}>

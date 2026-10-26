@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AdminNav } from '../../components/admin/AdminNav'
+import { EncabezadoPagina, BotonCrear } from '../../components/admin/EncabezadoPagina'
 import { TablaOfertas } from '../../components/admin/TablaOfertas'
 import { FormularioOferta } from '../../components/admin/FormularioOferta'
 import { FormularioDomicilioGratis } from '../../components/admin/FormularioDomicilioGratis'
@@ -87,11 +88,10 @@ export function Ofertas() {
     <>
       <AdminNav />
       <main className="contenedor admin-ofertas">
-        <h1>Ofertas</h1>
-        <p className="texto-suave admin-ofertas__ayuda">
-          Solo una oferta puede estar activa: es la que se muestra en Inicio y la única que se aplica a los
-          pedidos. Al activar otra, la anterior se desactiva sola.
-        </p>
+        <EncabezadoPagina
+          titulo="Ofertas"
+          descripcion="Solo una oferta puede estar activa: es la que se muestra en Inicio y la única que se aplica a los pedidos. Al activar otra, la anterior se desactiva sola."
+        />
 
         {cargando && <p className="texto-suave">Cargando ofertas…</p>}
         {error && <p className="campo__error">No se pudieron cargar las ofertas.</p>}
@@ -110,13 +110,10 @@ export function Ofertas() {
             </section>
 
             <section className="admin-ofertas__grupo">
-              <h2 className="admin-ofertas__titulo">Tus ofertas</h2>
-              <button type="button" className="admin-crear admin-crear--boton" onClick={() => setModal('nueva')}>
-                <span className="admin-crear__icono" aria-hidden="true">
-                  +
-                </span>
-                Nueva oferta
-              </button>
+              <div className="admin-ofertas__cabecera">
+                <h2 className="admin-ofertas__titulo">Tus ofertas</h2>
+                <BotonCrear onClick={() => setModal('nueva')}>Nueva oferta</BotonCrear>
+              </div>
               <TablaOfertas
                 ofertas={otrasOfertas}
                 vacio="Todavía no has creado ofertas. Solo necesitan un título y una descripción."

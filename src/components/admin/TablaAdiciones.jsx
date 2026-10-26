@@ -8,7 +8,7 @@ const formatoPrecio = new Intl.NumberFormat('es-CO', {
 
 export function TablaAdiciones({ adiciones, onEditar, onEliminar, onToggleDisponible }) {
   if (adiciones.length === 0) {
-    return <p className="texto-suave">No hay adiciones para mostrar.</p>
+    return <p className="texto-suave admin-vacio">No hay adiciones para mostrar.</p>
   }
 
   return (

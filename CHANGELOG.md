@@ -837,3 +837,14 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - El tubo amarillo del borde izquierdo ahora tiene halo y "respira" (sube y baja de intensidad cada 2,6s), como un neón encendido.
   - Cada 6 segundos, un reflejo de luz diagonal cruza la franja de izquierda a derecha y luego descansa, para que se note sin cansar.
   - Ambos se animan solo con `opacity`/`transform` (sin costo de repintado) y se apagan con `prefers-reduced-motion`. La vista previa de `/admin/ofertas` también los muestra.
+
+## 2026-10-26 (9)
+- **Panel admin más ordenado y con tarjetas simétricas** (pedido del dueño: diseño profesional, fácil de entender y tarjetas parejas; los colores del panel no cambian).
+  - **Encabezado igual en todas las secciones** (`EncabezadoPagina.jsx`, nuevo): título, una línea que explica para qué sirve la sección y, a la derecha, el botón de crear. En el celular el botón baja bajo la descripción si no cabe.
+  - **Una sola tarjeta para todas las listas** (productos, categorías, adiciones y ofertas): 112px de alto fijo, cada línea en un renglón (lo largo se corta con "…") y una fila de etiquetas que siempre está, aunque vaya vacía. Antes, en Categorías la etiqueta "Inicio" iba pegada al nombre y lo partía en dos líneas, y la oferta de domicilio gratis tenía una línea de más. Por eso unas tarjetas quedaban más altas que otras.
+  - **Categorías**: "★ Inicio" y dónde se muestra ("Domicilios", "Carta física" u "Oculta en las cartas") pasan a la fila de etiquetas. El ícono tiene el mismo tamaño que la foto de los productos.
+  - **Acciones alineadas**: el interruptor queda arriba y "Eliminar" abajo, siempre contra el borde derecho. La palabra del interruptor ("Activa"/"Inactiva") tiene ancho fijo para que no lo corra. En el celular esa palabra se oculta a la vista (el color del interruptor ya dice el estado; el lector de pantalla la sigue leyendo) para dejarle el ancho al nombre.
+  - **Ofertas**: se quitó la etiqueta "Inactiva", que repetía lo que ya dice el interruptor. "Nueva oferta" va en la misma línea que el título "Tus ofertas".
+  - **Pedidos**: el nombre del cliente va en una línea con el estado al lado. La fecha y el teléfono van juntos, los productos en un recuadro, y el total con el selector de estado siempre al pie. En cuadrícula, las tarjetas de una fila miden lo mismo.
+  - Las listas vacías se muestran en un recuadro punteado. Los números (precios, totales, métricas) usan cifras de ancho fijo.
+- Verificación con Playwright (390 y 1366px, temas claro y oscuro) contra un Supabase simulado: todas las tarjetas miden 112px en las cuatro listas, sin scroll horizontal en ninguna sección. Capturas revisadas. `npm run build` y `oxlint` sin errores nuevos.

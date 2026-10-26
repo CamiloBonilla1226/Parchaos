@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { usePedidos } from '../../hooks/usePedidos'
 import { negocioConfig } from '../../config/negocio.config'
 import { construirLinkWhatsApp, construirMensajePedido } from '../../lib/whatsapp'
+import { formatoPrecio } from '../../lib/tiposOferta'
 
 function validar({ nombre, telefono, direccion }) {
   const errores = {}
@@ -66,31 +67,69 @@ export function Checkout({ items, total, ofertas = [], onPedidoConfirmado }) {
     onPedidoConfirmado()
   }
 
+  const cantidad = items.reduce((suma, item) => suma + item.cantidad, 0)
+
+  // Encabezado con el resumen (cantidad y total) para que quien llena sus datos no pierda de
+  // vista qué está pidiendo. Los campos llevan autocomplete para que el celular los sugiera.
   return (
     <form className="checkout" onSubmit={enviarPedido} noValidate>
+      <div className="checkout__encabezado">
+        <p className="checkout__rotulo">Último paso</p>
+        <h2 className="checkout__titulo">¿A dónde te lo llevamos?</h2>
+        <p className="checkout__resumen">
+          <span>
+            {cantidad} {cantidad === 1 ? 'producto' : 'productos'}
+          </span>
+          <strong>{formatoPrecio.format(total).replace(/\s/g, '')}</strong>
+        </p>
+      </div>
+
       <label className="campo">
         <span>Nombre</span>
-        <input type="text" value={datos.nombre} onChange={actualizarCampo('nombre')} maxLength={80} />
+        <input
+          type="text"
+          value={datos.nombre}
+          onChange={actualizarCampo('nombre')}
+          maxLength={80}
+          autoComplete="name"
+          placeholder="¿Cómo te llamas?"
+        />
         {errores.nombre && <span className="campo__error">{errores.nombre}</span>}
       </label>
 
       <label className="campo">
         <span>Teléfono</span>
-        <input type="tel" value={datos.telefono} onChange={actualizarCampo('telefono')} maxLength={15} />
+        <input
+          type="tel"
+          value={datos.telefono}
+          onChange={actualizarCampo('telefono')}
+          maxLength={15}
+          autoComplete="tel"
+          inputMode="tel"
+          placeholder="300 123 4567"
+        />
         {errores.telefono && <span className="campo__error">{errores.telefono}</span>}
       </label>
 
       <label className="campo">
         <span>Dirección de entrega</span>
-        <input type="text" value={datos.direccion} onChange={actualizarCampo('direccion')} maxLength={160} />
+        <input
+          type="text"
+          value={datos.direccion}
+          onChange={actualizarCampo('direccion')}
+          maxLength={160}
+          autoComplete="street-address"
+          placeholder="Calle, número y barrio"
+        />
         {errores.direccion && <span className="campo__error">{errores.direccion}</span>}
       </label>
 
       {errorEnvio && <p className="campo__error">{errorEnvio}</p>}
 
-      <button type="submit" className="boton" disabled={enviando}>
+      <button type="submit" className="boton checkout__enviar" disabled={enviando}>
         {enviando ? 'Enviando…' : 'Enviar pedido por WhatsApp'}
       </button>
+      <p className="checkout__nota">Se abre WhatsApp con tu pedido listo; allá confirmas el pago y la entrega.</p>
     </form>
   )
 }

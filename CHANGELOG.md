@@ -794,3 +794,11 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 - El **precio rebajado** pasa de rojo a amarillo, el color de la oferta: el rojo se lee como error.
 - Botón principal de la carta (`.boton`): al pasar el mouse se enciende con halo de neón en vez de cambiar a violeta, y se encoge levemente al presionarlo. Sin el brillo fijo (`--glow-primary`).
 - En computador, los productos del Menú quedan en 2 columnas también desde 1280px: con 3 se cortaban los nombres.
+
+## 2026-10-26 (3)
+- **Checkout más claro**: encabezado "Último paso · ¿A dónde te lo llevamos?" con una línea de resumen (cantidad de productos y total) entre rayas punteadas, como la línea de total de un tiquete. Así quien llena sus datos no pierde de vista qué está pidiendo. Los campos llevan `autocomplete` (nombre, teléfono, dirección), `inputMode="tel"` y textos de ejemplo. Debajo del botón, una nota explica que se abre WhatsApp para confirmar el pago y la entrega.
+- **Campos de la carta hundidos y oscuros**: antes eran grises claros, sin estilo propio. Miden 48px y el borde se enciende en magenta al enfocarlos. El panel admin conserva los suyos (`body.admin .campo`).
+- **Aviso (toast) de la carta**: tarjeta oscura con un tubo menta a la izquierda (rojo si es error), en vez del bloque blanco. En el admin se ve igual que antes (`body.admin .toast`).
+- **Carrito**: "Tu pedido" y el total con Archivo Black; botón "Continuar" de 52px. "¿Algo más?" lleva el rótulo con tubo de Inicio, con tarjetas de máximo 180px en pantallas anchas (antes la foto ocupaba media pantalla) y el "+" en magenta.
+- **Detalle de producto**: nombre con Archivo Black. El botón "Agregar · $precio" ocupa más que "Cancelar" y ya no se parte en dos líneas.
+- El contador del carrito en la navegación pasa del rojo de error al amarillo de la marca.

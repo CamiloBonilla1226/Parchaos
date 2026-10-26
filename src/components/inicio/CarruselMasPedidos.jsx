@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { precioMinimo, variantesDisponibles } from '../../lib/variantes'
 import { formatoPrecio } from '../../lib/tiposOferta'
 import { IconoVaso } from './iconos'
+import { EncabezadoSeccion } from './EncabezadoSeccion'
 
 // Etiqueta opcional de la tarjeta (columna productos.etiqueta, ver explicacion-script-bd.txt
 // sección 19). Mientras la columna no exista ningún producto la trae y no se muestra nada.
@@ -35,7 +36,8 @@ function TarjetaEsqueleto() {
 }
 
 // "Los más pedidos" de Inicio: los productos marcados como destacados en el admin (columna
-// productos.destacado, máximo 5). Carrusel con scroll-snap nativo, sin barra de scroll, y
+// productos.destacado, máximo 5), numerados como un top (01, 02...) en el orden en que
+// llegan. Carrusel con scroll-snap nativo, sin barra de scroll, y
 // rayitas de posición debajo (decorativas: el carrusel se recorre deslizando). Tocar la
 // tarjeta abre el detalle; el "+" agrega directo, salvo que el producto tenga variantes
 // obligatorias, en cuyo caso `onAgregar` abre el detalle (ver agregarRapido en Carta.jsx).
@@ -62,14 +64,16 @@ export function CarruselMasPedidos({ productos, cargando, error, onReintentar, o
 
   return (
     <section className="inicio-seccion" aria-labelledby="titulo-mas-pedidos">
-      <div className="inicio-seccion__encabezado">
-        <h2 id="titulo-mas-pedidos" className="inicio-seccion__titulo">
-          Los más pedidos
-        </h2>
-        <button type="button" className="inicio-seccion__enlace" onClick={onVerTodo}>
-          Ver todo
-        </button>
-      </div>
+      <EncabezadoSeccion
+        id="titulo-mas-pedidos"
+        rotulo="Top de la casa"
+        titulo="Los más pedidos"
+        accion={
+          <button type="button" className="inicio-seccion__enlace" onClick={onVerTodo}>
+            Ver todo
+          </button>
+        }
+      />
 
       {error ? (
         <div className="inicio-error" role="alert">
@@ -99,6 +103,9 @@ export function CarruselMasPedidos({ productos, cargando, error, onReintentar, o
                         ) : (
                           <IconoVaso tamano={32} />
                         )}
+                        <span className="tarjeta-pedido__puesto" aria-hidden="true">
+                          {String(indice + 1).padStart(2, '0')}
+                        </span>
                         {etiqueta && (
                           <span className={`tarjeta-pedido__etiqueta tarjeta-pedido__etiqueta--${etiqueta.variante}`}>
                             {etiqueta.texto}
@@ -124,7 +131,7 @@ export function CarruselMasPedidos({ productos, cargando, error, onReintentar, o
                         aria-label={`Agregar ${producto.nombre} al carrito`}
                         onClick={() => onAgregar(producto)}
                       >
-                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                           <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" fill="none" />
                         </svg>
                       </button>

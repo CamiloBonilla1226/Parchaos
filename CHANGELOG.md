@@ -769,3 +769,18 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - **Listas en cuadrícula**: pedidos en 2 columnas desde tableta (3 desde 1440px); productos y categorías en 2 columnas desde 1280px, porque con menos ancho el interruptor y las acciones cortaban los nombres.
   - **Inicio del panel**: el negocio y las métricas van en una misma fila, y el asistente en dos columnas.
 - Verificado con capturas en 390, 768, 1024, 1280 y 1440px (sin scroll horizontal en ninguna pantalla) y con las pruebas funcionales de categorías, adiciones en el menú, permisos y navegación en computador.
+
+## 2026-10-26
+- **Rediseño del Inicio de la carta** (pedido del dueño: "quedó muy común y genérico"). Mismos colores (paleta `--pc-*`); cambia la composición, la tipografía y los detalles. La idea guía es el letrero de neón del local: su firma es el **"tubo"**, una línea de 3px con halo como las que van bajo el nombre en el letrero. Aparece bajo la frase, junto al rótulo de cada sección, al pie de las categorías y en el riel de los pasos.
+  - **Portada** (`Portada.jsx`, nueva): reemplaza el logo centrado con la frase. El logo encendido va junto a un rótulo (`rubro` en `negocio.config.js`, "Granizados · Popayán") y al estado como letrerito (menta encendido si está abierto, apagado si no), con el detalle de horario: "Hoy hasta las 10:00pm" o "Abrimos mañana a las 2:00pm" (`detalleEstado` en `lib/horario.js`). Debajo van la frase en grande, los dos tubos y **un botón para ir al Menú**, que antes no existía: "Pedir ahora" si está abierto y "Ver el menú" si está cerrado. En computador, la frase queda a la izquierda y el logo grande a la derecha.
+  - Como la portada ya muestra el estado, el header no lo repite en Inicio (`HeaderNegocio` recibe `mostrarEstado`). El reloj que se renueva cada minuto pasó a un hook compartido, `useAhora`.
+  - **Oferta como tiquete**: talón amarillo con el ícono, línea troquelada y dos muescas cuadradas. Se quitaron el brillo que "respiraba" y el destello en bucle (movimiento constante que distraía). La vista previa de `/admin/ofertas` pinta las muescas con su propio fondo (`--tiquete-fondo`).
+  - **Los más pedidos** con rótulo "Top de la casa" y el puesto (01, 02…) en una pestaña sobre la foto. Las tarjetas pasan a 164px y el botón "+" a 36px.
+  - **Categorías** en casillas sueltas, cada una con su color de acento (magenta, menta, amarillo, naranja). El tubo de su color al pie se alarga al tocarla o al pasar el mouse.
+  - **Pasos** unidos por un riel de neón: vertical en el celular y en computador, horizontal en tableta.
+  - **Cierre**: "Sobre nosotros" y el botón de WhatsApp en un mismo bloque.
+  - Encabezado común de sección (`EncabezadoSeccion.jsx`): rótulo corto con tubo + título.
+- **Tipografía**: Archivo (la misma familia de los títulos, Archivo Black) reemplaza a Inter como letra de interfaz (`--fuente-ui`), para que todo hable un solo idioma.
+- Tokens nuevos en `:root`: `--neon-magenta`, `--neon-menta`, `--neon-amarillo` (halo de los tubos) y `--curva-salida` (transiciones que arrancan rápido y frenan suave). Las transiciones respetan `prefers-reduced-motion`.
+- **Corrección**: con 3 o más destacados, la página entera se podía desplazar de lado en el celular. El texto oculto "Antes" del precio tachado (`.visualmente-oculto`, posicionado en absoluto) se escapaba del carrusel porque la tarjeta no tenía `position: relative`.
+- Verificación con Playwright (Edge) en 360, 390, 768, 1024 y 1280px, con datos reales y con datos simulados (5 destacados, 2 categorías ancladas, abierto/cerrado): sin scroll horizontal y todo lo tocable de al menos 44px. Capturas revisadas. `npm run build` y `oxlint` sin errores ni advertencias nuevas.

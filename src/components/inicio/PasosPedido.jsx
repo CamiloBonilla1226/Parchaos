@@ -1,6 +1,8 @@
 import { formatoPrecio } from '../../lib/tiposOferta'
+import { EncabezadoSeccion } from './EncabezadoSeccion'
 
-// "Así de fácil pides": tres pasos fijos. El tercero menciona el domicilio gratis solo si
+// "Así de fácil pides": tres pasos fijos unidos por un riel de neón (vertical en el celular,
+// horizontal desde tableta). El tercero menciona el domicilio gratis solo si
 // esa oferta está activa, con su monto real (tabla ofertas); si no, un texto neutro.
 export function PasosPedido({ montoDomicilioGratis }) {
   const pasos = [
@@ -16,16 +18,12 @@ export function PasosPedido({ montoDomicilioGratis }) {
 
   return (
     <section className="inicio-seccion" aria-labelledby="titulo-pasos">
-      <div className="inicio-seccion__encabezado">
-        <h2 id="titulo-pasos" className="inicio-seccion__titulo">
-          Así de fácil pides
-        </h2>
-      </div>
+      <EncabezadoSeccion id="titulo-pasos" rotulo="Cómo pedir" titulo="Así de fácil pides" />
       <ol className="pasos-pedido">
         {pasos.map(([titulo, descripcion], indice) => (
           <li key={titulo} className="pasos-pedido__paso">
             <span className="pasos-pedido__numero" aria-hidden="true">
-              {indice + 1}
+              {String(indice + 1).padStart(2, '0')}
             </span>
             <span>
               <strong className="pasos-pedido__titulo">{titulo}</strong>

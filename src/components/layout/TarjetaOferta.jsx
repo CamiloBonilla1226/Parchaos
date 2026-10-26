@@ -23,9 +23,9 @@ function IconoOferta({ tipo }) {
   )
 }
 
-// Tarjeta de la oferta activa en Inicio (solo puede haber una, ver useOfertas.js): bloque
-// amarillo con el ícono a la izquierda (moto para domicilio gratis, regalo para las demás),
-// rótulo "Oferta", título, descripción en amarillo y una flecha. Para domicilio gratis el
+// Tarjeta de la oferta activa en Inicio (solo puede haber una, ver useOfertas.js), con forma de
+// tiquete: talón amarillo con el ícono (moto para domicilio gratis, regalo para las demás),
+// línea troquelada y, en el cuerpo, rótulo "Oferta", título, descripción y una flecha. Para domicilio gratis el
 // texto se arma siempre con el monto configurado, así no queda desactualizado si el dueño lo
 // cambia. Sin oferta (o sin título) no se renderiza nada. Al tocarla lleva al Menú
 // (`onClick`, ver Carta.jsx). El formulario de ofertas la reutiliza como vista previa.

@@ -16,6 +16,8 @@ export const negocioConfig = {
   // Frase bajo el logo en Inicio. Solo se usa si el dueño no escribió una en /admin/negocio
   // ("Frase de inicio", columna negocio_config.descripcion).
   lema: '¿Un granizado o miedo?',
+  // Rótulo corto sobre la frase de Inicio: qué vende el negocio y dónde.
+  rubro: 'Granizados · Popayán',
 
   // Número de WhatsApp del negocio, en formato internacional sin signos (ej. 573001234567).
   // Se usa para armar el link wa.me del checkout.

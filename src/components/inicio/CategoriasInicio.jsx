@@ -1,18 +1,18 @@
 import { IconoCategoria } from './IconoCategoria'
+import { EncabezadoSeccion } from './EncabezadoSeccion'
+
+// Cada casilla toma un color de la marca, en el mismo orden que las tarjetas sin foto.
+const ACENTOS = ['magenta', 'menta', 'amarillo', 'naranja']
 
 // "Explora por categoría": cuadrícula de 2 columnas con las categorías que el admin ancló al
-// inicio, cada una con el ícono de línea que eligió (ver lib/categoriasInicio.js: solo llegan
+// inicio, cada una con el ícono de línea que eligió y un tubo de neón de su color al pie (ver lib/categoriasInicio.js: solo llegan
 // aquí si son 2 o 4). Tocar una abre el Menú filtrado por ella. Sin categorías no se muestra.
 export function CategoriasInicio({ categorias, cargando, error, onReintentar, onSeleccionar }) {
   if (!cargando && !error && categorias.length === 0) return null
 
   return (
     <section className="inicio-seccion" aria-labelledby="titulo-categorias">
-      <div className="inicio-seccion__encabezado">
-        <h2 id="titulo-categorias" className="inicio-seccion__titulo">
-          Explora por categoría
-        </h2>
-      </div>
+      <EncabezadoSeccion id="titulo-categorias" rotulo="Antojos" titulo="Explora por categoría" />
 
       {error ? (
         <div className="inicio-error" role="alert">
@@ -31,7 +31,7 @@ export function CategoriasInicio({ categorias, cargando, error, onReintentar, on
                 <button
                   key={categoria.id}
                   type="button"
-                  className="categorias-inicio__casilla"
+                  className={`categorias-inicio__casilla categorias-inicio__casilla--${ACENTOS[indice % ACENTOS.length]}`}
                   onClick={() => onSeleccionar(categoria.id)}
                 >
                   <span className="categorias-inicio__icono">

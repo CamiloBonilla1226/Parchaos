@@ -5,6 +5,7 @@ import { CarruselMasPedidos } from '../components/inicio/CarruselMasPedidos'
 import { CategoriasInicio } from '../components/inicio/CategoriasInicio'
 import { PasosPedido } from '../components/inicio/PasosPedido'
 import { BotonWhatsapp } from '../components/inicio/BotonWhatsapp'
+import { Portada } from '../components/inicio/Portada'
 import { montoDomicilioGratis } from '../lib/tiposOferta'
 import { useNegocioConfig } from '../hooks/useNegocioConfig'
 
@@ -26,20 +27,15 @@ export function Inicio({
   onAbrirDetalle,
   onAgregar,
 }) {
-  // Frase bajo el logo: la que el dueño escribe en /admin/negocio ("Frase de inicio", columna
-  // negocio_config.descripcion). Sin frase guardada (o si falla la carga) se usa la de
+  // Frase grande de la portada: la que el dueño escribe en /admin/negocio ("Frase de inicio",
+  // columna negocio_config.descripcion). Sin frase guardada (o si falla la carga) se usa la de
   // negocio.config.js. Mientras carga el espacio queda reservado para que nada salte.
   const { config, cargando: cargandoConfig } = useNegocioConfig()
   const lema = config?.descripcion?.trim() || negocioConfig.lema
 
   return (
     <div className="inicio">
-      <div className="inicio-hero">
-        <div className="inicio-hero__logo">
-          <img src="/logo.webp" alt={negocioConfig.nombre} width="640" height="628" fetchPriority="high" />
-        </div>
-        <h1 className={`inicio-hero__lema${cargandoConfig ? ' inicio-hero__lema--cargando' : ''}`}>{lema}</h1>
-      </div>
+      <Portada lema={lema} cargandoLema={cargandoConfig} horario={config?.horario} onIrAlMenu={onIrAlMenu} />
 
       <TarjetaOferta oferta={ofertaActiva} onClick={() => onIrAlMenu()} />
 
@@ -66,9 +62,11 @@ export function Inicio({
 
       <PasosPedido montoDomicilioGratis={montoDomicilioGratis(ofertaActiva)} />
 
-      <SobreNosotros />
-
-      <BotonWhatsapp />
+      {/* Cierre de la página: datos del local y el contacto directo, en un mismo bloque. */}
+      <div className="inicio-cierre">
+        <SobreNosotros />
+        <BotonWhatsapp />
+      </div>
     </div>
   )
 }

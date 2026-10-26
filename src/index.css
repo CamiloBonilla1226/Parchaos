@@ -61,7 +61,19 @@
   --pc-menta-tinta: #002219;
   --pc-naranja: #ff8a5c;
   --fuente-titulos: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
-  --fuente-ui: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* Archivo: la misma familia de los títulos en pesos de texto, para que la carta hable un
+     solo idioma tipográfico (antes Inter). */
+  --fuente-ui: 'Archivo', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Halo de los "tubos de neón" (firma visual de la carta, ver Inicio) y curva de salida
+     de las transiciones: arranca rápido y frena suave. */
+  --neon-magenta: 0 0 6px color-mix(in srgb, var(--pc-magenta) 70%, transparent),
+    0 0 18px color-mix(in srgb, var(--pc-magenta) 35%, transparent);
+  --neon-menta: 0 0 6px color-mix(in srgb, var(--pc-menta) 65%, transparent),
+    0 0 18px color-mix(in srgb, var(--pc-menta) 30%, transparent);
+  --neon-amarillo: 0 0 6px color-mix(in srgb, var(--pc-amarillo) 65%, transparent),
+    0 0 18px color-mix(in srgb, var(--pc-amarillo) 30%, transparent);
+  --curva-salida: cubic-bezier(0.23, 1, 0.32, 1);
 
   color-scheme: dark;
 }
@@ -2587,9 +2599,12 @@ body.body--con-nav-inferior .toast-contenedor {
   font-weight: 600;
 }
 
-/* --- Inicio de la carta (rediseño 2026-10-21) ---
-   Usa la paleta --pc-* (ver :root). Esquinas rectas en todo; los únicos círculos son el
-   logo y el punto de "Abierto" del header. Todo lo tocable mide al menos 44px. */
+/* --- Inicio de la carta (rediseño 2026-10-26) ---
+   Lenguaje de letrero de neón, con la paleta --pc-* (ver :root). La firma es el "tubo": una
+   línea de 3px con halo, como las que van bajo el nombre en el letrero del local. Aparece
+   bajo la frase de la portada, junto al rótulo de cada sección, al pie de las categorías, en
+   el riel de los pasos y en la pestaña activa. Esquinas rectas en todo; los únicos círculos
+   son el logo y el punto de "Abierto" del header. Todo lo tocable mide al menos 44px. */
 .carta-zona-swipe--inicio {
   background: var(--pc-fondo);
 }
@@ -2597,7 +2612,7 @@ body.body--con-nav-inferior .toast-contenedor {
 .inicio {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 48px;
   font-family: var(--fuente-ui);
   color: var(--pc-texto);
 }
@@ -2607,54 +2622,179 @@ body.body--con-nav-inferior .toast-contenedor {
   outline-offset: 2px;
 }
 
-.inicio-hero {
-  display: flex;
-  flex-direction: column;
+/* --- Inicio: portada ---
+   Celular: logo y ficha (rubro + estado) en una fila; debajo la frase grande, los tubos y
+   el botón a todo el ancho. */
+.portada {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'logo ficha'
+    'lema lema'
+    'tubos tubos'
+    'cta cta';
   align-items: center;
-  gap: 18px;
-  margin-bottom: -16px;
-  text-align: center;
+  column-gap: 16px;
+  padding-top: 8px;
 }
 
-.inicio-hero__logo {
-  width: 168px;
+.portada__logo {
+  grid-area: logo;
+  width: 96px;
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--pc-magenta) 60%, transparent);
+  /* Anillo, brillo cercano y la luz del letrero sobre la pared (una sombra amplia y tenue,
+     que a diferencia de un pseudo-elemento nunca genera scroll horizontal). */
   box-shadow:
-    0 0 18px color-mix(in srgb, var(--pc-magenta) 35%, transparent),
-    0 0 48px color-mix(in srgb, var(--pc-magenta) 15%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--pc-magenta) 55%, transparent),
+    0 0 28px color-mix(in srgb, var(--pc-magenta) 30%, transparent),
+    0 0 96px 32px color-mix(in srgb, var(--pc-magenta) 12%, transparent);
 }
 
-.inicio-hero__logo img {
+.portada__logo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.inicio-hero__lema--cargando {
+.portada__ficha {
+  grid-area: ficha;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.portada__rubro {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pc-texto-2);
+}
+
+.portada__estado {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--pc-texto-2);
+}
+
+/* El estado como un letrerito: encendido en menta si está abierto, apagado (solo el
+   contorno gris) si está cerrado. */
+.portada__estado-letrero {
+  padding: 4px 8px;
+  border: 1px solid currentColor;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.portada__estado--abierto .portada__estado-letrero {
+  color: var(--pc-menta);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--pc-menta) 60%, transparent);
+  box-shadow: var(--neon-menta);
+}
+
+.portada__estado--cerrado .portada__estado-letrero {
+  color: var(--pc-texto-3);
+}
+
+.portada__lema {
+  grid-area: lema;
+  margin: 28px 0 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 400;
+  font-size: 2.5rem;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.portada__lema--cargando {
   visibility: hidden;
 }
 
-.inicio-hero__lema {
-  max-width: 300px;
-  margin: 0;
-  font-family: var(--fuente-titulos);
-  font-weight: 400;
-  font-size: 1.625rem;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
+.portada__tubos {
+  grid-area: tubos;
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
 }
 
-/* --- Inicio: tarjeta de oferta (también la vista previa de /admin/ofertas) --- */
-/* Efecto: el borde y el bloque amarillo "respiran" con un halo suave, y un destello de luz
-   cruza la tarjeta cada pocos segundos. Sin movimiento si el sistema pide reducirlo. */
-.tarjeta-oferta {
-  position: relative;
-  overflow: hidden;
+.portada__tubos span {
+  height: 3px;
+}
+
+.portada__tubos span:first-child {
+  width: 72px;
+  background: var(--pc-magenta);
+  box-shadow: var(--neon-magenta);
+}
+
+.portada__tubos span:last-child {
+  width: 28px;
+  background: var(--pc-menta);
+  box-shadow: var(--neon-menta);
+}
+
+.portada__cta {
+  grid-area: cta;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  min-height: 76px;
+  min-height: 56px;
+  margin-top: 28px;
+  padding: 0 20px;
+  border: none;
+  background: var(--pc-magenta);
+  color: var(--pc-fondo);
+  font-family: var(--fuente-titulos);
+  font-size: 1.0625rem;
+  letter-spacing: 0.01em;
+  transition:
+    transform 160ms var(--curva-salida),
+    box-shadow 200ms var(--curva-salida);
+}
+
+.portada__cta svg {
+  transition: transform 200ms var(--curva-salida);
+}
+
+.portada__cta:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .portada__cta:hover {
+    box-shadow: var(--neon-magenta);
+  }
+
+  .portada__cta:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+/* --- Inicio: tarjeta de oferta (también la vista previa de /admin/ofertas) ---
+   Un tiquete: talón amarillo con el ícono, línea troquelada y una muesca cuadrada arriba y
+   abajo. Las muescas se pintan con --tiquete-fondo (el color de lo que hay detrás), que la
+   vista previa del panel cambia por el suyo. */
+.tarjeta-oferta {
+  --tiquete-fondo: var(--pc-fondo);
+  --tiquete-talon: 76px;
+  position: relative;
+  width: 100%;
+  min-height: 84px;
   display: flex;
   align-items: stretch;
   padding: 0;
@@ -2663,78 +2803,58 @@ body.body--con-nav-inferior .toast-contenedor {
   font-family: var(--fuente-ui);
   color: var(--pc-texto);
   background: var(--pc-superficie);
-  border: 1px solid color-mix(in srgb, var(--pc-amarillo) 45%, var(--pc-linea));
+  border: 1px solid color-mix(in srgb, var(--pc-amarillo) 40%, var(--pc-linea));
   border-radius: 0;
   cursor: pointer;
-  animation: oferta-respira 2.8s ease-in-out infinite;
+  transition:
+    transform 160ms var(--curva-salida),
+    border-color 200ms var(--curva-salida);
 }
 
+.tarjeta-oferta::before,
 .tarjeta-oferta::after {
   content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -45%;
-  width: 35%;
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.16), transparent);
-  transform: skewX(-12deg);
-  pointer-events: none;
-  animation: oferta-destello 4.5s ease-in-out infinite;
+  z-index: 1;
+  left: calc(var(--tiquete-talon) - 7px);
+  width: 14px;
+  height: 8px;
+  background: var(--tiquete-fondo);
+  border: 1px solid color-mix(in srgb, var(--pc-amarillo) 40%, var(--pc-linea));
 }
 
-@keyframes oferta-respira {
-  0%,
-  100% {
-    box-shadow: 0 0 6px rgba(255, 210, 63, 0.12);
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(255, 210, 63, 0.38);
-  }
+.tarjeta-oferta::before {
+  top: -1px;
+  border-top: none;
 }
 
-@keyframes oferta-destello {
-  0% {
-    left: -45%;
-  }
-  30%,
-  100% {
-    left: 125%;
-  }
+.tarjeta-oferta::after {
+  bottom: -1px;
+  border-bottom: none;
 }
 
 .tarjeta-oferta:active {
-  background: color-mix(in srgb, var(--pc-amarillo) 6%, var(--pc-superficie));
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .tarjeta-oferta:hover {
+    border-color: var(--pc-amarillo);
+  }
+
+  .tarjeta-oferta:hover .tarjeta-oferta__flecha {
+    color: var(--pc-amarillo);
+    transform: translateX(3px);
+  }
 }
 
 .tarjeta-oferta__icono {
-  flex: 0 0 72px;
+  flex: 0 0 var(--tiquete-talon);
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--pc-amarillo);
   color: var(--pc-fondo);
-  animation: oferta-icono 2.8s ease-in-out infinite;
-}
-
-@keyframes oferta-icono {
-  0%,
-  100% {
-    box-shadow: 0 0 8px rgba(255, 210, 63, 0.35);
-  }
-  50% {
-    box-shadow: 0 0 26px rgba(255, 210, 63, 0.75);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tarjeta-oferta,
-  .tarjeta-oferta__icono {
-    animation: none;
-  }
-
-  .tarjeta-oferta::after {
-    display: none;
-  }
 }
 
 .tarjeta-oferta__texto {
@@ -2743,17 +2863,18 @@ body.body--con-nav-inferior .toast-contenedor {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
-  padding: 12px 14px;
+  gap: 3px;
+  padding: 14px 12px 14px 18px;
+  border-left: 2px dashed color-mix(in srgb, var(--pc-amarillo) 60%, transparent);
   line-height: 1.25;
 }
 
 .tarjeta-oferta__rotulo {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--pc-texto-3);
+  color: var(--pc-amarillo);
 }
 
 .tarjeta-oferta__titulo,
@@ -2765,14 +2886,16 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 .tarjeta-oferta__titulo {
-  font-size: 1.0625rem;
-  font-weight: 700;
+  font-family: var(--fuente-titulos);
+  font-weight: 400;
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
 }
 
 .tarjeta-oferta__subtitulo {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--pc-amarillo);
+  font-weight: 500;
+  color: var(--pc-texto-2);
 }
 
 .tarjeta-oferta__flecha {
@@ -2781,23 +2904,51 @@ body.body--con-nav-inferior .toast-contenedor {
   align-items: center;
   padding-right: 16px;
   color: var(--pc-texto-2);
+  transition:
+    transform 200ms var(--curva-salida),
+    color 200ms var(--curva-salida);
 }
 
 /* --- Inicio: encabezado común de cada sección y estado de error --- */
 .inicio-seccion__encabezado {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.inicio-seccion__textos {
+  min-width: 0;
+}
+
+.inicio-seccion__rotulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pc-magenta);
+}
+
+.inicio-seccion__rotulo::before {
+  content: '';
+  flex: 0 0 18px;
+  height: 3px;
+  background: currentColor;
+  box-shadow: var(--neon-magenta);
 }
 
 .inicio-seccion__titulo {
   margin: 0;
   font-family: var(--fuente-titulos);
   font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 1.15;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .inicio-seccion__enlace {
@@ -2811,8 +2962,8 @@ body.body--con-nav-inferior .toast-contenedor {
   font-weight: 600;
   text-decoration: underline;
   text-decoration-color: var(--pc-magenta);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 
 .inicio-error {
@@ -2897,16 +3048,22 @@ body.body--con-nav-inferior .toast-contenedor {
   display: none;
 }
 
-/* Tarjeta fina: 150px de ancho (se ven ~2,5 a la vez en un celular) e imagen 4:3 completa
-   (contain, sin recorte) sobre un fondo neutro. */
+/* Tarjeta de 164px (se ven ~2 a la vez en un celular) con imagen 4:3 completa (contain, sin
+   recorte) sobre un fondo neutro, y el puesto del top como una pestaña en la esquina. */
+/* position: relative contiene al texto oculto de "Antes" (.visualmente-oculto, absoluto):
+   sin él se escapaba del carrusel y la página entera se podía desplazar de lado. */
 .tarjeta-pedido {
-  flex: 0 0 150px;
-  width: 150px;
+  position: relative;
+  flex: 0 0 164px;
+  width: 164px;
   display: flex;
   flex-direction: column;
   scroll-snap-align: start;
   background: var(--pc-superficie);
   border: 1px solid var(--pc-linea);
+  transition:
+    border-color 200ms var(--curva-salida),
+    transform 200ms var(--curva-salida);
 }
 
 .tarjeta-pedido__abrir {
@@ -2957,6 +3114,21 @@ body.body--con-nav-inferior .toast-contenedor {
   color: var(--pc-naranja);
 }
 
+.tarjeta-pedido__puesto {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 5px 8px 4px;
+  background: var(--pc-fondo);
+  color: var(--pc-magenta);
+  font-family: var(--fuente-titulos);
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
 .tarjeta-pedido__etiqueta {
   position: absolute;
   top: 0;
@@ -2979,8 +3151,8 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 .tarjeta-pedido__nombre {
-  padding: 9px 10px 0;
-  font-size: 0.8125rem;
+  padding: 12px 12px 0;
+  font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.3;
   white-space: nowrap;
@@ -2989,8 +3161,8 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 .tarjeta-pedido__descripcion {
-  padding: 2px 10px 0;
-  font-size: 0.75rem;
+  padding: 2px 12px 0;
+  font-size: 0.8125rem;
   line-height: 1.35;
   color: var(--pc-texto-2);
   white-space: nowrap;
@@ -3000,11 +3172,11 @@ body.body--con-nav-inferior .toast-contenedor {
 
 .tarjeta-pedido__pie {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 6px;
-  margin-top: 8px;
-  padding: 0 6px 6px 10px;
+  margin-top: 12px;
+  padding: 0 8px 8px 12px;
 }
 
 .tarjeta-pedido__precio {
@@ -3015,23 +3187,25 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 .tarjeta-pedido__precio strong {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--pc-texto);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .tarjeta-pedido__precio-anterior {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--pc-texto-3);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Botón visual de 32px; el área tocable se amplía a 44px con un pseudo-elemento. */
+/* Botón visual de 36px; el área tocable se amplía a 44px con un pseudo-elemento. */
 .tarjeta-pedido__agregar {
   position: relative;
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3039,36 +3213,42 @@ body.body--con-nav-inferior .toast-contenedor {
   border: none;
   background: var(--pc-magenta);
   color: var(--pc-fondo);
-  transition: transform 0.1s ease;
+  transition:
+    transform 140ms var(--curva-salida),
+    box-shadow 200ms var(--curva-salida);
 }
 
 .tarjeta-pedido__agregar::before {
   content: '';
   position: absolute;
-  inset: -6px;
+  inset: -4px;
 }
 
 .tarjeta-pedido__agregar:active {
-  transform: scale(0.92);
+  transform: scale(0.94);
+  box-shadow: var(--neon-magenta);
 }
 
 .carrusel-pedidos__rayitas {
   display: flex;
   justify-content: center;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .carrusel-pedidos__rayita {
   width: 8px;
   height: 3px;
   background: var(--pc-linea);
-  transition: width 0.2s ease, background-color 0.2s ease;
+  transition:
+    width 200ms var(--curva-salida),
+    background-color 200ms var(--curva-salida);
 }
 
 .carrusel-pedidos__rayita--activa {
   width: 22px;
   background: var(--pc-magenta);
+  box-shadow: var(--neon-magenta);
 }
 
 /* --- Carrusel de recomendaciones del Carrito (CarruselDestacados) --- */
@@ -3162,56 +3342,98 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 /* --- Inicio: "Explora por categoría" ---
-   El fondo de la cuadrícula es el color de línea y el gap de 1px deja ver las divisiones;
-   el borde exterior es del mismo color. Con un número impar, la última ocupa las dos
-   columnas para no dejar un hueco. */
+   Casillas sueltas sobre la superficie, cada una con su color de acento (--acento): el ícono
+   arriba, el número a la derecha, el nombre abajo y un tubo corto al pie que se alarga al
+   tocar o pasar el mouse. Con un número impar, la última ocupa las dos columnas. */
 .categorias-inicio {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--pc-linea);
-  border: 1px solid var(--pc-linea);
+  gap: 8px;
 }
 
 .categorias-inicio__casilla {
+  --acento: var(--pc-magenta);
   position: relative;
   min-width: 0;
-  min-height: 112px;
+  min-height: 124px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 18px 14px 14px;
-  text-align: center;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 16px 20px;
+  overflow: hidden;
+  text-align: left;
   font: inherit;
   color: var(--pc-texto);
-  background: var(--pc-fondo);
-  border: none;
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linea);
+  transition:
+    transform 160ms var(--curva-salida),
+    border-color 200ms var(--curva-salida);
+}
+
+.categorias-inicio__casilla::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  height: 3px;
+  background: var(--acento);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--acento) 60%, transparent);
+  transform: scaleX(0.18);
+  transform-origin: left;
+  transition: transform 260ms var(--curva-salida);
 }
 
 .categorias-inicio__casilla:active {
-  background: var(--pc-superficie);
+  transform: scale(0.97);
+}
+
+.categorias-inicio__casilla:active::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .categorias-inicio__casilla:hover {
+    border-color: color-mix(in srgb, var(--acento) 45%, var(--pc-linea));
+  }
+
+  .categorias-inicio__casilla:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.categorias-inicio__casilla--menta {
+  --acento: var(--pc-menta);
+}
+
+.categorias-inicio__casilla--amarillo {
+  --acento: var(--pc-amarillo);
+}
+
+.categorias-inicio__casilla--naranja {
+  --acento: var(--pc-naranja);
 }
 
 .categorias-inicio__casilla:last-child:nth-child(odd) {
   grid-column: span 2;
 }
 
-.categorias-inicio__casilla--cargando {
-  background: var(--pc-superficie);
+.categorias-inicio__casilla--cargando::after {
+  display: none;
 }
 
-/* Ícono de línea (trazo 1.9) en menta, centrado en la casilla, sin recuadro ni brillo. */
 .categorias-inicio__icono {
   display: flex;
-  color: var(--pc-menta);
+  color: var(--acento);
 }
 
 .categorias-inicio__numero {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 16px;
+  right: 16px;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -3220,45 +3442,64 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 .categorias-inicio__nombre {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
-/* --- Inicio: "Así de fácil pides" --- */
+/* --- Inicio: "Así de fácil pides" ---
+   Riel de neón vertical que une los tres números (horizontal desde tableta, ver abajo). */
 .pasos-pedido {
+  position: relative;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.pasos-pedido__paso {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px 0;
+.pasos-pedido::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 17px;
+  width: 2px;
+  background: color-mix(in srgb, var(--pc-magenta) 70%, transparent);
+  box-shadow: var(--neon-magenta);
 }
 
-.pasos-pedido__paso + .pasos-pedido__paso {
-  border-top: 1px solid var(--pc-linea);
+.pasos-pedido__paso {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: start;
+  align-content: start;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.pasos-pedido__paso:last-child {
+  padding-bottom: 0;
 }
 
 .pasos-pedido__numero {
-  flex: 0 0 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--pc-fondo);
   border: 1px solid var(--pc-magenta);
   color: var(--pc-magenta);
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-family: var(--fuente-titulos);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .pasos-pedido__titulo {
   display: block;
-  font-size: 0.9375rem;
+  padding-top: 7px;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -3271,12 +3512,22 @@ body.body--con-nav-inferior .toast-contenedor {
   color: var(--pc-texto-2);
 }
 
-/* --- Inicio: Sobre nosotros (minimalista) --- */
+/* --- Inicio: cierre (Sobre nosotros + WhatsApp) ---
+   Un solo bloque sobre la superficie: los datos del local y, al final, el contacto. */
+.inicio-cierre {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 20px 20px;
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linea);
+}
+
 .sobre-nosotros__rotulo {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--pc-magenta);
 }
@@ -3285,16 +3536,18 @@ body.body--con-nav-inferior .toast-contenedor {
   margin: 0;
   font-family: var(--fuente-titulos);
   font-weight: 400;
-  font-size: 1.625rem;
-  line-height: 1.1;
+  font-size: 1.75rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
 }
 
 .sobre-nosotros__raya {
   display: block;
   width: 36px;
-  height: 2px;
-  margin: 14px 0 6px;
+  height: 3px;
+  margin: 16px 0 8px;
   background: var(--pc-amarillo);
+  box-shadow: var(--neon-amarillo);
 }
 
 .sobre-nosotros__filas {
@@ -3347,7 +3600,7 @@ body.body--con-nav-inferior .toast-contenedor {
 .sobre-nosotros__flecha {
   flex-shrink: 0;
   color: var(--pc-texto-2);
-  transition: transform 0.15s ease;
+  transition: transform 200ms var(--curva-salida);
 }
 
 .sobre-nosotros__horario summary {
@@ -3426,17 +3679,39 @@ body.body--con-nav-inferior .toast-contenedor {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  height: 52px;
-  margin-top: -16px;
+  min-height: 52px;
   background: var(--pc-menta);
   color: var(--pc-menta-tinta);
   font-size: 0.9375rem;
   font-weight: 700;
   text-decoration: none;
+  transition:
+    transform 160ms var(--curva-salida),
+    box-shadow 200ms var(--curva-salida);
 }
 
 .boton-whatsapp:active {
-  filter: brightness(0.92);
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .boton-whatsapp:hover {
+    box-shadow: var(--neon-menta);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portada__cta,
+  .portada__cta svg,
+  .tarjeta-oferta,
+  .tarjeta-oferta__flecha,
+  .tarjeta-pedido,
+  .tarjeta-pedido__agregar,
+  .categorias-inicio__casilla,
+  .categorias-inicio__casilla::after,
+  .boton-whatsapp {
+    transition: none;
+  }
 }
 
 /* --- Menú: buscador --- */
@@ -4353,6 +4628,7 @@ body.admin .admin-login__boton {
 /* La vista previa muestra la tarjeta tal como sale en la carta: esquinas rectas, aunque el
    tema del admin redondee los botones. */
 body.admin .formulario-oferta__vista-previa .tarjeta-oferta {
+  --tiquete-fondo: var(--color-surface-2);
   border-radius: 0;
 }
 
@@ -5085,17 +5361,27 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
 
   /* Carta de domicilios: Inicio */
   .inicio {
-    gap: 56px;
+    gap: 64px;
     padding-top: var(--espacio-3);
   }
 
-  .inicio-hero__logo {
-    width: 196px;
+  .portada {
+    column-gap: 24px;
   }
 
-  .inicio-hero__lema {
-    max-width: 440px;
-    font-size: 2.25rem;
+  .portada__logo {
+    width: 120px;
+  }
+
+  .portada__lema {
+    margin-top: 36px;
+    font-size: 3.25rem;
+  }
+
+  .portada__cta {
+    justify-self: start;
+    width: auto;
+    min-width: 320px;
   }
 
   .carrusel-pedidos__pista {
@@ -5105,8 +5391,8 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
   }
 
   .tarjeta-pedido {
-    flex-basis: 176px;
-    width: 176px;
+    flex-basis: 184px;
+    width: 184px;
   }
 
   /* 2 o 4 categorías en una sola fila. */
@@ -5115,39 +5401,47 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
   }
 
   .categorias-inicio__casilla {
-    min-height: 136px;
+    min-height: 148px;
   }
 
   .categorias-inicio__casilla:last-child:nth-child(odd) {
     grid-column: auto;
   }
 
-  /* Pasos en tres columnas, separadas por una línea vertical. */
+  /* Pasos en tres columnas con el riel horizontal: va del centro del primer número al
+     centro del último (columnas de (100% - 2 gaps) / 3). */
   .pasos-pedido {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-block: 1px solid var(--pc-linea);
+    gap: 24px;
+  }
+
+  .pasos-pedido::before {
+    top: 17px;
+    bottom: auto;
+    left: 18px;
+    right: calc((100% - 48px) / 3 - 18px);
+    width: auto;
+    height: 2px;
   }
 
   .pasos-pedido__paso {
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px 20px 22px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding-bottom: 0;
   }
 
-  .pasos-pedido__paso:first-child {
-    padding-left: 0;
+  .pasos-pedido__titulo {
+    padding-top: 0;
   }
 
-  .pasos-pedido__paso + .pasos-pedido__paso {
-    border-top: none;
-    border-left: 1px solid var(--pc-linea);
+  .inicio-cierre {
+    padding: 32px;
   }
 
   .boton-whatsapp {
     width: auto;
-    max-width: 420px;
-    align-self: center;
+    align-self: flex-start;
     padding-inline: var(--espacio-5);
   }
 
@@ -5310,51 +5604,86 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     padding-bottom: var(--espacio-6);
   }
 
-  /* Inicio: composición en dos columnas. Arriba, logo + frase a la izquierda y la oferta a
-     la derecha; luego los más pedidos y las categorías a todo el ancho; abajo, los pasos y
-     "Sobre nosotros" lado a lado. */
+  /* Inicio: la portada ocupa todo el ancho, con la frase grande a la izquierda y el logo
+     encendido a la derecha; debajo la oferta, los más pedidos y las categorías, también a
+     todo el ancho; al final, los pasos y el cierre lado a lado. */
   .inicio {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: 64px;
-    row-gap: 72px;
+    row-gap: 80px;
     padding-top: var(--espacio-5);
   }
 
-  .inicio-hero {
-    flex-direction: row;
-    align-items: center;
-    gap: 36px;
-    margin-bottom: 0;
-    text-align: left;
-  }
-
-  .inicio-hero__logo {
-    flex-shrink: 0;
-    width: 208px;
-  }
-
-  .inicio-hero__lema {
-    max-width: 13ch;
-    font-size: clamp(2.5rem, 3.6vw, 3.4rem);
-    line-height: 1.04;
-  }
-
-  .inicio > .tarjeta-oferta {
-    align-self: center;
-    min-height: 120px;
-  }
-
+  .inicio > .portada,
+  .inicio > .tarjeta-oferta,
   .inicio > section[aria-labelledby='titulo-mas-pedidos'],
-  .inicio > section[aria-labelledby='titulo-categorias'],
-  .inicio > .boton-whatsapp {
+  .inicio > section[aria-labelledby='titulo-categorias'] {
     grid-column: 1 / -1;
   }
 
-  .inicio > .boton-whatsapp {
-    justify-self: center;
-    min-width: 360px;
+  .inicio > .tarjeta-oferta {
+    --tiquete-talon: 112px;
+    min-height: 112px;
     margin-top: -32px;
+  }
+
+  .inicio > .tarjeta-oferta .tarjeta-oferta__texto {
+    padding-left: 28px;
+  }
+
+  .inicio > .tarjeta-oferta .tarjeta-oferta__titulo {
+    font-size: 1.5rem;
+  }
+
+  .inicio > .tarjeta-oferta .tarjeta-oferta__subtitulo {
+    font-size: 1rem;
+  }
+
+  .portada {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'ficha logo'
+      'lema logo'
+      'tubos logo'
+      'cta logo';
+    align-items: start;
+    column-gap: 64px;
+    padding-top: 16px;
+  }
+
+  .portada__logo {
+    align-self: center;
+    width: 280px;
+    margin-right: 24px;
+  }
+
+  .portada__ficha {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+  }
+
+  .portada__lema {
+    max-width: 14ch;
+    margin-top: 28px;
+    font-size: clamp(3.5rem, 5.4vw, 4.75rem);
+    line-height: 0.98;
+  }
+
+  .portada__tubos span:first-child {
+    width: 120px;
+  }
+
+  .portada__tubos span:last-child {
+    width: 44px;
+  }
+
+  .portada__cta {
+    min-width: 280px;
+    margin-top: 36px;
+    cursor: pointer;
   }
 
   /* Los más pedidos (hasta 5): con mouse no hay deslizamiento cómodo, así que en vez de
@@ -5370,7 +5699,6 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
 
   .tarjeta-pedido {
     width: auto;
-    transition: border-color 0.15s ease, transform 0.15s ease;
   }
 
   .tarjeta-pedido:hover {
@@ -5378,36 +5706,48 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     transform: translateY(-2px);
   }
 
+  .tarjeta-pedido__abrir,
+  .tarjeta-pedido__agregar,
+  .categorias-inicio__casilla {
+    cursor: pointer;
+  }
+
   .carrusel-pedidos__rayitas {
     display: none;
   }
 
   .categorias-inicio__casilla {
-    min-height: 156px;
-    cursor: pointer;
-    transition: background 0.15s ease;
+    min-height: 168px;
+    padding: 20px 20px 24px;
   }
 
-  .categorias-inicio__casilla:hover {
-    background: var(--pc-superficie);
+  .categorias-inicio__casilla::after {
+    left: 20px;
+    right: 20px;
   }
 
-  /* Pasos en lista vertical otra vez: comparten fila con "Sobre nosotros". */
+  /* Pasos en lista vertical otra vez: comparten fila con el cierre. */
   .pasos-pedido {
     display: block;
-    border-block: none;
   }
 
-  .pasos-pedido__paso,
-  .pasos-pedido__paso:first-child {
-    flex-direction: row;
-    gap: 14px;
-    padding: 16px 0;
+  .pasos-pedido::before {
+    top: 18px;
+    bottom: 18px;
+    left: 17px;
+    right: auto;
+    width: 2px;
+    height: auto;
   }
 
-  .pasos-pedido__paso + .pasos-pedido__paso {
-    border-left: none;
-    border-top: 1px solid var(--pc-linea);
+  .pasos-pedido__paso {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 16px;
+    padding-bottom: 28px;
+  }
+
+  .pasos-pedido__titulo {
+    padding-top: 7px;
   }
 
   /* Menú: las categorías pasan a una barra lateral fija y los productos a una cuadrícula. */

@@ -237,7 +237,8 @@ export function Carta() {
         onTouchStart={swipe.onTouchStart}
         onTouchEnd={swipe.onTouchEnd}
       >
-      <HeaderNegocio />
+      {/* En Inicio el estado ya lo muestra la portada, con más detalle. */}
+      <HeaderNegocio mostrarEstado={seccion !== 'inicio'} />
 
       <main className="contenedor pagina-carta pagina-carta--tabs">
         <section hidden={seccion !== 'inicio'} className="seccion-inicio">

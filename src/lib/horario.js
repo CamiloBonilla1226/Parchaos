@@ -76,4 +76,30 @@ export function agruparHorario(horario) {
   })
 }
 
+// Línea de la portada de Inicio que acompaña al estado: hasta qué hora se atiende hoy si está
+// abierto, o cuándo vuelve a abrir si está cerrado ("Abrimos mañana a las 2:00pm"). Devuelve
+// null sin horario configurado, igual que calcularEstadoAbierto.
+export function detalleEstado(horario, ahora = new Date()) {
+  const estado = calcularEstadoAbierto(horario, ahora)
+  if (!estado) return null
+
+  const indiceHoy = ahora.getDay()
+  const hoy = horario[DIAS[indiceHoy]]
+  if (estado === 'abierto') return { estado, texto: `Hoy hasta las ${formatearHora12(hoy.cierra)}` }
+
+  const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes()
+  if (hoy?.abre && hoy?.cierra && minutosAhora < minutosDesdeMedianoche(hoy.abre)) {
+    return { estado, texto: `Abrimos hoy a las ${formatearHora12(hoy.abre)}` }
+  }
+
+  for (let dias = 1; dias <= 7; dias++) {
+    const clave = DIAS[(indiceHoy + dias) % 7]
+    const siguiente = horario[clave]
+    if (!siguiente?.abre || !siguiente?.cierra) continue
+    const cuando = dias === 1 ? 'mañana' : `el ${ETIQUETA_DIA[clave].toLowerCase()}`
+    return { estado, texto: `Abrimos ${cuando} a las ${formatearHora12(siguiente.abre)}` }
+  }
+  return { estado, texto: 'Por ahora no recibimos pedidos' }
+}
+
 export { DIAS }

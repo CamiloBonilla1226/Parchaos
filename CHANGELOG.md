@@ -784,3 +784,13 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 - Tokens nuevos en `:root`: `--neon-magenta`, `--neon-menta`, `--neon-amarillo` (halo de los tubos) y `--curva-salida` (transiciones que arrancan rápido y frenan suave). Las transiciones respetan `prefers-reduced-motion`.
 - **Corrección**: con 3 o más destacados, la página entera se podía desplazar de lado en el celular. El texto oculto "Antes" del precio tachado (`.visualmente-oculto`, posicionado en absoluto) se escapaba del carrusel porque la tarjeta no tenía `position: relative`.
 - Verificación con Playwright (Edge) en 360, 390, 768, 1024 y 1280px, con datos reales y con datos simulados (5 destacados, 2 categorías ancladas, abierto/cerrado): sin scroll horizontal y todo lo tocable de al menos 44px. Capturas revisadas. `npm run build` y `oxlint` sin errores ni advertencias nuevas.
+
+## 2026-10-26 (2)
+- **Una sola paleta en toda la carta pública.** Menú, Carrito y la carta física usaban una segunda paleta parecida a la de Inicio, pero distinta (fondo `#030617`, magenta `#f000ff`, letra del sistema). Ahora las variables `--color-*` de `:root` apuntan a la paleta `--pc-*` de Inicio, y la letra base (`--fuente` y `marca.fuente` en `negocio.config.js`) pasa a Archivo. El panel admin no cambia, porque redefine esas variables con las suyas bajo `body.admin`.
+- **Menú rediseñado** con el lenguaje de Inicio:
+  - Buscador hundido (más oscuro que el fondo) que se enciende en magenta al enfocarlo.
+  - Pestañas de categoría que salen hasta el borde de la pantalla. La activa se "enciende" con el tubo magenta al pie, en vez del bloque magenta relleno.
+  - Tarjetas de producto sobre la superficie, con foto de 84px, nombre más grande, categorías en hasta 2 líneas y botón "+" de 44px. Las adiciones llevan el rótulo con tubo de las secciones de Inicio.
+- El **precio rebajado** pasa de rojo a amarillo, el color de la oferta: el rojo se lee como error.
+- Botón principal de la carta (`.boton`): al pasar el mouse se enciende con halo de neón en vez de cambiar a violeta, y se encoge levemente al presionarlo. Sin el brillo fijo (`--glow-primary`).
+- En computador, los productos del Menú quedan en 2 columnas también desde 1280px: con 3 se cortaban los nombres.

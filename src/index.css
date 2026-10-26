@@ -2,26 +2,29 @@
    Los valores de --color-* son el punto de partida; App.jsx los sobreescribe en
    tiempo de ejecución con los datos de negocio.config.js (marca por negocio). */
 :root {
-  /* Paleta PAR CHAOS (tema oscuro neón). Fuente de verdad de la marca. */
-  --color-bg: #030617;
-  --color-surface: #080b24;
-  --color-primary: #f000ff;
+  /* Paleta PAR CHAOS (tema oscuro neón). Desde el 2026-10-26 apunta a la paleta --pc-* de
+     más abajo (la del rediseño de Inicio), para que Menú, Carrito y la carta física usen
+     exactamente los mismos colores que Inicio en vez de una segunda paleta parecida
+     (#030617 / #f000ff). El panel admin redefine estas variables con la suya. */
+  --color-bg: var(--pc-fondo);
+  --color-surface: var(--pc-superficie);
+  --color-primary: var(--pc-magenta);
   --color-secondary: #7800ff;
   --color-violet: #7b2cff;
   --color-accent-cyan: #00e5ff;
-  --color-accent-yellow: #f5ff00;
-  --color-text: #ffffff;
-  --color-success: #00f5a0;
+  --color-accent-yellow: var(--pc-amarillo);
+  --color-text: var(--pc-texto);
+  --color-success: var(--pc-menta);
 
   /* Derivados (no son parte de la paleta base) */
-  --color-surface-2: #0f1336;
-  --color-text-soft: rgba(255, 255, 255, 0.7);
-  --color-border: rgba(255, 255, 255, 0.14);
-  --color-border-strong: rgba(255, 255, 255, 0.3);
+  --color-surface-2: #1b1b29;
+  --color-text-soft: var(--pc-texto-2);
+  --color-border: var(--pc-linea);
+  --color-border-strong: #3a3a55;
   --color-danger: #ff6b81;
   --color-closed: #9aa0b8;
   --gradient-brand: linear-gradient(90deg, #f000ff 0%, #7b2cff 50%, #7800ff 100%);
-  --glow-primary: 0 0 16px rgba(240, 0, 255, 0.35);
+  --glow-primary: none;
 
   /* Nombres históricos del proyecto, apuntan a la paleta de arriba */
   --color-fondo: var(--color-surface);
@@ -33,7 +36,7 @@
   --color-borde: var(--color-border);
   --color-error: var(--color-danger);
   --color-exito: var(--color-success);
-  --fuente: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --fuente: 'Archivo', system-ui, 'Segoe UI', Roboto, sans-serif;
 
   --espacio-1: 4px;
   --espacio-2: 8px;
@@ -173,13 +176,22 @@ p {
   font-weight: 600;
   letter-spacing: 0.02em;
   box-shadow: var(--glow-primary);
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 200ms var(--curva-salida),
+    transform 140ms var(--curva-salida);
 }
 
+.boton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* En la carta el botón principal se "enciende" al pasar el mouse (halo de neón) en vez de
+   cambiar de color; el panel admin tiene su propio hover (body.admin .boton). */
 .boton:hover:not(:disabled) {
-  background: var(--color-secondary);
-  border-color: var(--color-secondary);
-  color: var(--color-text);
+  box-shadow: var(--neon-magenta);
 }
 
 .boton:disabled {
@@ -225,7 +237,8 @@ p {
   display: inline-flex;
   align-items: baseline;
   gap: var(--espacio-2);
-  font-weight: 600;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .precio-producto__tachado {
@@ -235,8 +248,9 @@ p {
   font-size: 0.85em;
 }
 
+/* Precio rebajado en amarillo: el mismo color de la oferta (tiquete de Inicio). */
 .precio-producto__oferta {
-  color: var(--color-error);
+  color: var(--color-accent-yellow);
   font-weight: 700;
 }
 
@@ -259,13 +273,15 @@ p {
   margin-bottom: var(--espacio-4);
 }
 
+/* Pestañas que salen hasta el borde de la pantalla (como el carrusel de Inicio), para que
+   se note que siguen de lado. */
 .filtro-categorias {
   display: flex;
   gap: var(--espacio-2);
   overflow-x: auto;
-  padding-bottom: var(--espacio-3);
-  margin-bottom: var(--espacio-3);
-  border-bottom: 1px solid var(--color-borde);
+  margin: 0 calc(-1 * var(--espacio-3)) var(--espacio-4);
+  padding: 0 var(--espacio-3);
+  scroll-padding-inline: var(--espacio-3);
   scrollbar-width: none;
 }
 
@@ -273,19 +289,38 @@ p {
   display: none;
 }
 
+/* La pestaña activa se "enciende" con un tubo magenta al pie (la firma de la carta, ver
+   Inicio); las demás quedan apagadas en gris. */
 .filtro-categorias__item {
+  position: relative;
   flex: 0 0 auto;
-  background: transparent;
+  min-height: 44px;
+  padding: 0 var(--espacio-3);
+  background: var(--color-surface);
   border: 1px solid var(--color-borde);
-  padding: var(--espacio-1) var(--espacio-3);
-  font-weight: 500;
+  color: var(--color-texto-suave);
+  font-size: 0.875rem;
+  font-weight: 600;
   white-space: nowrap;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease;
 }
 
 .filtro-categorias__item--activo {
+  border-color: color-mix(in srgb, var(--color-primario) 55%, var(--color-borde));
+  color: var(--color-texto);
+}
+
+.filtro-categorias__item--activo::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  height: 3px;
   background: var(--color-primario);
-  border-color: var(--color-primario);
-  color: var(--color-fondo);
+  box-shadow: var(--neon-magenta);
 }
 
 /* --- Carta física (QR en mesa): solo lectura, sin carrito. Una sola página por secciones
@@ -3714,66 +3749,114 @@ body.body--con-nav-inferior .toast-contenedor {
   }
 }
 
-/* --- Menú: buscador --- */
+/* --- Menú: buscador ---
+   El campo va hundido (un poco más oscuro que el fondo): recibe texto. Al enfocarlo, el
+   borde se enciende en magenta. */
 .buscador-productos {
   display: flex;
   align-items: center;
-  gap: var(--espacio-2);
-  border: 1px solid var(--color-borde);
-  padding: var(--espacio-2) var(--espacio-3);
+  gap: 10px;
+  min-height: 48px;
   margin-bottom: var(--espacio-3);
+  padding: 0 14px;
+  background: color-mix(in srgb, #000 30%, var(--pc-fondo));
+  border: 1px solid var(--pc-linea);
+  transition:
+    border-color 150ms ease,
+    box-shadow 200ms var(--curva-salida);
+}
+
+.buscador-productos:focus-within {
+  border-color: var(--pc-magenta);
+  box-shadow: 0 0 0 1px var(--pc-magenta), 0 0 16px color-mix(in srgb, var(--pc-magenta) 25%, transparent);
 }
 
 .buscador-productos__icono {
   flex: 0 0 auto;
-  color: var(--color-texto-suave);
+  color: var(--pc-texto-3);
 }
 
 .buscador-productos input {
   flex: 1;
+  min-width: 0;
+  min-height: 46px;
   border: none;
   outline: none;
   background: transparent;
+  color: var(--pc-texto);
+}
+
+.buscador-productos input::placeholder {
+  color: var(--pc-texto-3);
 }
 
 /* --- Menú: lista de productos (tarjeta horizontal) --- */
 .lista-productos-menu {
   display: flex;
   flex-direction: column;
-  gap: var(--espacio-2);
+  gap: 10px;
 }
 
-/* Adiciones pedidas solas, siempre al final del Menú (ver Carta.jsx). */
+/* Adiciones pedidas solas, siempre al final del Menú (ver Carta.jsx). Mismo rótulo con tubo
+   que las secciones de Inicio. */
 .menu-adiciones {
-  margin-top: var(--espacio-4);
+  margin-top: var(--espacio-5);
 }
 
 .menu-adiciones__titulo {
-  margin: 0 0 var(--espacio-2);
-  font-size: 1rem;
-  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 var(--espacio-3);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pc-magenta);
+}
+
+.menu-adiciones__titulo::before {
+  content: '';
+  flex: 0 0 18px;
+  height: 3px;
+  background: currentColor;
+  box-shadow: var(--neon-magenta);
 }
 
 .lista-productos-menu:empty + .menu-adiciones {
   margin-top: 0;
 }
 
+/* Tarjeta: foto cuadrada | nombre, categorías y precio | botón "+". */
 .producto-lista-item {
   display: flex;
   align-items: center;
-  gap: var(--espacio-3);
-  border: 1px solid var(--color-borde);
-  padding: var(--espacio-2);
+  gap: 14px;
+  padding: 10px 10px 10px 10px;
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linea);
   cursor: pointer;
+  transition:
+    border-color 200ms var(--curva-salida),
+    transform 160ms var(--curva-salida);
+}
+
+.producto-lista-item:active {
+  transform: scale(0.985);
+}
+
+.producto-lista-item:focus-visible {
+  outline: 2px solid var(--pc-amarillo);
+  outline-offset: 2px;
 }
 
 .producto-lista-item--agotado {
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .producto-lista-item__imagen {
   flex: 0 0 auto;
-  width: 64px;
+  width: 84px;
 }
 
 .producto-lista-item__info {
@@ -3781,44 +3864,60 @@ body.body--con-nav-inferior .toast-contenedor {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .producto-lista-item__nombre {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .producto-lista-item__categoria {
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--pc-texto-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .producto-lista-item__pie {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--espacio-2);
-  margin-top: var(--espacio-1);
+  flex-wrap: wrap;
+  gap: 4px var(--espacio-2);
+  margin-top: 6px;
+  font-size: 1rem;
 }
 
 .producto-lista-item__estado {
-  font-size: 0.7rem;
-  font-weight: 700;
+  padding: 3px 6px;
+  border: 1px solid currentColor;
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-exito);
+  color: var(--pc-menta);
 }
 
 .producto-lista-item__estado--agotado {
-  color: var(--color-error);
+  color: var(--color-danger);
 }
 
 .producto-lista-item__agregar {
   flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
+  align-self: center;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  font-size: 1.2rem;
+  font-size: 1.375rem;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -5788,7 +5887,9 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
   }
 
   .seccion-menu > .filtro-categorias .filtro-categorias__item {
+    min-height: 0;
     padding: 11px 14px;
+    background: transparent;
     border: none;
     border-left: 2px solid transparent;
     color: var(--pc-texto-2);
@@ -5807,16 +5908,15 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     border-left-color: var(--pc-magenta);
     background: var(--pc-superficie);
     color: var(--pc-texto);
-    font-weight: 600;
   }
 
-  .producto-lista-item {
-    cursor: pointer;
-    transition: border-color 0.15s ease;
+  /* En la barra lateral el tubo de la activa va a la izquierda (el borde de arriba). */
+  .seccion-menu > .filtro-categorias .filtro-categorias__item--activo::after {
+    display: none;
   }
 
   .producto-lista-item:hover {
-    border-color: var(--color-border-strong);
+    border-color: color-mix(in srgb, var(--pc-magenta) 45%, var(--pc-linea));
   }
 
   /* Carrito: productos a la izquierda y el resumen (total + continuar) fijo a la derecha. */
@@ -5962,10 +6062,6 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
 
 /* --------------------------------- Pantalla amplia ------------------------------------- */
 @media (min-width: 1280px) {
-  .lista-productos-menu {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .lista-productos-admin,
   .lista-categorias-admin {
     display: grid;

@@ -26,6 +26,6 @@ export const negocioConfig = {
   // Los colores de la marca viven en :root de src/index.css (--color-bg, --color-primary...).
   // Aquí solo queda la tipografía, que App.jsx aplica como variable CSS.
   marca: {
-    fuente: 'system-ui, sans-serif',
+    fuente: "'Archivo', system-ui, sans-serif",
   },
 }

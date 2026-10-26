@@ -35,7 +35,7 @@ export function Inicio({
 
   return (
     <div className="inicio">
-      <Portada lema={lema} cargandoLema={cargandoConfig} horario={config?.horario} onIrAlMenu={onIrAlMenu} />
+      <Portada lema={lema} cargandoLema={cargandoConfig} horario={config?.horario} />
 
       <TarjetaOferta oferta={ofertaActiva} onClick={() => onIrAlMenu()} />
 

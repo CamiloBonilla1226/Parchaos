@@ -2867,16 +2867,14 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 /* --- Inicio: portada ---
-   Celular: logo y ficha (rubro + estado) en una fila; debajo la frase grande, los tubos y
-   el botón a todo el ancho. */
+   Celular: logo y ficha (rubro + estado) en una fila; debajo la frase grande y los tubos. */
 .portada {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas:
     'logo ficha'
     'lema lema'
-    'tubos tubos'
-    'cta cta';
+    'tubos tubos';
   align-items: center;
   column-gap: 16px;
   padding-top: 8px;
@@ -2990,221 +2988,51 @@ body.body--con-nav-inferior .toast-contenedor {
   box-shadow: var(--neon-menta);
 }
 
-/* Botón de la portada como un letrero de neón: contorno de tubo magenta con halo por dentro y
-   por fuera, la acción en blanco con halo magenta (así se ve un neón encendido: el centro
-   casi blanco), una línea que dice qué pasa al tocarlo y un bloque magenta sólido con la
-   flecha. Al cargar la página "se prende" parpadeando una sola vez, como un letrero. */
-.portada__cta {
-  grid-area: cta;
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  min-height: 72px;
-  margin-top: 28px;
-  padding: 0;
-  text-align: left;
-  border: 2px solid var(--pc-magenta);
-  background: color-mix(in srgb, var(--pc-magenta) 7%, var(--pc-fondo));
-  color: var(--pc-texto);
-  box-shadow:
-    var(--neon-magenta),
-    inset 0 0 18px color-mix(in srgb, var(--pc-magenta) 22%, transparent);
-  animation: cta-se-prende 1.1s steps(1, end) 0.25s both;
-  transition:
-    transform 160ms var(--curva-salida),
-    background-color 200ms var(--curva-salida);
-}
-
-.portada__cta-texto {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  padding: 12px 18px;
-}
-
-.portada__cta-titulo {
-  font-family: var(--fuente-titulos);
-  font-size: 1.25rem;
-  line-height: 1;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow:
-    0 0 4px color-mix(in srgb, var(--pc-magenta) 90%, transparent),
-    0 0 14px color-mix(in srgb, var(--pc-magenta) 70%, transparent),
-    0 0 28px color-mix(in srgb, var(--pc-magenta) 40%, transparent);
-}
-
-.portada__cta-detalle {
-  font-size: 0.8125rem;
-  line-height: 1.3;
-  color: var(--pc-texto-2);
-}
-
-.portada__cta-flecha {
-  flex: 0 0 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--pc-magenta);
-  color: var(--pc-fondo);
-}
-
-.portada__cta-flecha svg {
-  transition: transform 200ms var(--curva-salida);
-}
-
-.portada__cta:active {
-  transform: scale(0.98);
-}
-
-.portada__cta:active .portada__cta-flecha svg {
-  transform: translateX(4px);
-}
-
-@media (hover: hover) {
-  .portada__cta:hover {
-    background-color: color-mix(in srgb, var(--pc-magenta) 14%, var(--pc-fondo));
-  }
-
-  .portada__cta:hover .portada__cta-flecha svg {
-    transform: translateX(4px);
-  }
-}
-
-/* Encendido: el tubo y el texto parpadean apagados unas veces antes de quedarse prendidos. */
-@keyframes cta-se-prende {
-  0%,
-  12%,
-  26%,
-  34% {
-    border-color: color-mix(in srgb, var(--pc-magenta) 30%, var(--pc-linea));
-    box-shadow: none;
-  }
-  8%,
-  20%,
-  30%,
-  100% {
-    border-color: var(--pc-magenta);
-    box-shadow:
-      var(--neon-magenta),
-      inset 0 0 18px color-mix(in srgb, var(--pc-magenta) 22%, transparent);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .portada__cta {
-    animation: none;
-  }
-}
-
 /* --- Inicio: tarjeta de oferta (también la vista previa de /admin/ofertas) ---
-   Un cupón que se roba la mirada: cinta oscura arriba con la oferta corriendo como un aviso
-   luminoso (amarillo con halo) y cuerpo amarillo, separado por una línea troquelada, con el
-   título en grande y el ícono como sello. */
+   Franja sobria: superficie oscura con línea fina, un tubo amarillo al borde izquierdo (la
+   firma de la carta, en el color de las ofertas), el ícono de línea, el texto y una flecha.
+   El amarillo se usa poco y a propósito: tubo, ícono y rótulo. */
 .tarjeta-oferta {
-  --alto-cinta: 34px;
   position: relative;
   width: 100%;
+  min-height: 64px;
   display: flex;
-  flex-direction: column;
-  padding: 0;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px 12px 18px;
   text-align: left;
   font: inherit;
   font-family: var(--fuente-ui);
-  color: var(--pc-fondo);
-  background: var(--pc-amarillo);
-  border: none;
+  color: var(--pc-texto);
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linea);
   border-radius: 0;
+  box-shadow: inset 3px 0 0 var(--pc-amarillo);
   cursor: pointer;
-  box-shadow: 0 0 32px color-mix(in srgb, var(--pc-amarillo) 18%, transparent);
   transition:
-    transform 160ms var(--curva-salida),
-    box-shadow 240ms var(--curva-salida);
+    border-color 200ms var(--curva-salida),
+    transform 160ms var(--curva-salida);
 }
 
 .tarjeta-oferta:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 }
 
 @media (hover: hover) {
   .tarjeta-oferta:hover {
-    box-shadow: 0 0 40px color-mix(in srgb, var(--pc-amarillo) 32%, transparent);
+    border-color: color-mix(in srgb, var(--pc-amarillo) 45%, var(--pc-linea));
   }
 
-  .tarjeta-oferta:hover .tarjeta-oferta__accion svg {
-    transform: translateX(4px);
+  .tarjeta-oferta:hover .tarjeta-oferta__flecha {
+    color: var(--pc-amarillo);
+    transform: translateX(3px);
   }
 }
 
-.tarjeta-oferta:focus-visible {
-  outline: 2px solid var(--pc-texto);
-  outline-offset: 3px;
-}
-
-/* Cinta: el texto corre de derecha a izquierda sin fin (dos mitades iguales; al correr una
-   mitad vuelve al inicio sin salto). */
-.tarjeta-oferta__cinta {
+.tarjeta-oferta__icono {
+  flex: 0 0 auto;
   display: flex;
-  height: var(--alto-cinta);
-  overflow: hidden;
-  background: var(--pc-fondo);
-  border: 1px solid var(--pc-amarillo);
-  border-bottom: none;
-}
-
-.tarjeta-oferta__cinta-pista {
-  display: flex;
-  flex-shrink: 0;
-  animation: oferta-cinta 18s linear infinite;
-}
-
-.tarjeta-oferta__cinta-mitad {
-  display: flex;
-  flex-shrink: 0;
-}
-
-.tarjeta-oferta__cinta-mitad > span {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-right: 12px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  white-space: nowrap;
   color: var(--pc-amarillo);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--pc-amarillo) 55%, transparent);
-}
-
-.tarjeta-oferta__estrella {
-  color: var(--pc-magenta);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--pc-magenta) 70%, transparent);
-}
-
-@keyframes oferta-cinta {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Troquel: rayitas oscuras al borde de arriba del cuerpo, como un cupón para recortar. */
-.tarjeta-oferta__cuerpo {
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--pc-fondo) 0 8px,
-    transparent 8px 14px
-  );
-  background-size: 100% 3px;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 16px 18px 20px;
 }
 
 .tarjeta-oferta__texto {
@@ -3212,62 +3040,43 @@ body.body--con-nav-inferior .toast-contenedor {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.tarjeta-oferta__titulo {
-  font-family: var(--fuente-titulos);
-  font-weight: 400;
-  font-size: 1.875rem;
-  line-height: 0.98;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  text-wrap: balance;
-  overflow-wrap: anywhere;
-}
-
-.tarjeta-oferta__subtitulo {
-  font-size: 0.9375rem;
-  font-weight: 600;
+  gap: 2px;
   line-height: 1.3;
 }
 
-.tarjeta-oferta__accion {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  margin-top: 6px;
-  padding-bottom: 2px;
-  border-bottom: 2px solid currentColor;
-  font-size: 0.8125rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+.tarjeta-oferta__rotulo {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-.tarjeta-oferta__accion svg {
-  transition: transform 200ms var(--curva-salida);
-}
-
-/* El ícono como un sello oscuro, ladeado como si lo hubieran estampado a mano. */
-.tarjeta-oferta__sello {
-  flex: 0 0 auto;
-  width: 68px;
-  height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--pc-fondo);
   color: var(--pc-amarillo);
-  transform: rotate(-6deg);
-  box-shadow: 3px 3px 0 color-mix(in srgb, var(--pc-fondo) 25%, transparent);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tarjeta-oferta__cinta-pista {
-    animation: none;
-  }
+.tarjeta-oferta__titulo,
+.tarjeta-oferta__subtitulo {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tarjeta-oferta__titulo {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.tarjeta-oferta__subtitulo {
+  font-size: 0.8125rem;
+  color: var(--pc-texto-2);
+}
+
+.tarjeta-oferta__flecha {
+  flex: 0 0 auto;
+  display: flex;
+  color: var(--pc-texto-3);
+  transition:
+    transform 200ms var(--curva-salida),
+    color 200ms var(--curva-salida);
 }
 
 /* --- Inicio: encabezado común de cada sección y estado de error --- */
@@ -4062,10 +3871,8 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portada__cta,
-  .portada__cta-flecha svg,
   .tarjeta-oferta,
-  .tarjeta-oferta__accion svg,
+  .tarjeta-oferta__flecha,
   .tarjeta-pedido,
   .tarjeta-pedido__agregar,
   .categorias-inicio__casilla,
@@ -5802,12 +5609,6 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     font-size: 3.25rem;
   }
 
-  .portada__cta {
-    justify-self: start;
-    width: auto;
-    min-width: 320px;
-  }
-
   .carrusel-pedidos__pista {
     margin-inline: calc(-1 * var(--espacio-5));
     padding-inline: var(--espacio-5);
@@ -6051,36 +5852,16 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     grid-column: 1 / -1;
   }
 
+  /* En computador la oferta va en una sola línea: rótulo, título y descripción seguidos. */
   .inicio > .tarjeta-oferta {
-    --alto-cinta: 40px;
-    margin-top: -24px;
+    min-height: 60px;
+    padding-inline: 24px 20px;
   }
 
-  .inicio > .tarjeta-oferta .tarjeta-oferta__cinta-mitad > span {
-    font-size: 0.8125rem;
-  }
-
-  .inicio > .tarjeta-oferta .tarjeta-oferta__cuerpo {
-    gap: 32px;
-    padding: 32px 40px 32px 40px;
-  }
-
-  .inicio > .tarjeta-oferta .tarjeta-oferta__titulo {
-    font-size: 3rem;
-  }
-
-  .inicio > .tarjeta-oferta .tarjeta-oferta__subtitulo {
-    font-size: 1.125rem;
-  }
-
-  .inicio > .tarjeta-oferta .tarjeta-oferta__sello {
-    width: 104px;
-    height: 104px;
-  }
-
-  .inicio > .tarjeta-oferta .tarjeta-oferta__sello svg {
-    width: 48px;
-    height: 48px;
+  .inicio > .tarjeta-oferta .tarjeta-oferta__texto {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 16px;
   }
 
   .portada {
@@ -6088,9 +5869,9 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
     grid-template-areas:
       'ficha logo'
       'lema logo'
-      'tubos logo'
-      'cta logo';
+      'tubos logo';
     align-items: start;
+    align-content: center;
     column-gap: 64px;
     padding-top: 16px;
   }
@@ -6121,12 +5902,6 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
 
   .portada__tubos span:last-child {
     width: 44px;
-  }
-
-  .portada__cta {
-    min-width: 400px;
-    margin-top: 36px;
-    cursor: pointer;
   }
 
   /* Los más pedidos (hasta 5): con mouse no hay deslizamiento cómodo, así que en vez de

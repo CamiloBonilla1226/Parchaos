@@ -827,3 +827,7 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - La flecha va en un bloque magenta sólido.
   - Al cargar la página, el letrero "se prende" parpadeando una sola vez. No pasa con `prefers-reduced-motion`.
   - Mide 72px de alto en celular y 400px de ancho mínimo en computador.
+
+## 2026-10-26 (7)
+- **Sin botón en la portada de Inicio** (pedido del dueño). Se eliminó "Pedir ahora / Ver el menú" con su animación de encendido: la portada queda en logo, rubro, estado, frase y tubos. Al Menú se sigue llegando desde la navegación, la oferta, "Ver todo" y las categorías.
+- **Oferta minimalista** (pedido del dueño: el cupón amarillo "quedó muy grande" y ordinario). Ahora es una franja sobria de 64px sobre la superficie oscura, con línea fina. El amarillo se usa poco y a propósito: un tubo de 3px al borde izquierdo, el ícono de línea y el rótulo "Oferta". Debajo van el título, la descripción en gris y una flecha. En computador todo va en una sola línea. Se quitaron la cinta animada, el cuerpo amarillo y el sello. La vista previa de `/admin/ofertas` muestra la misma franja.

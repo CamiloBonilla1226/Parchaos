@@ -4,11 +4,13 @@ import { detalleEstado } from '../../lib/horario'
 
 // Primera pantalla de Inicio, armada como el letrero del local: el logo encendido, qué vende
 // y si está atendiendo (con la hora de cierre o de la próxima apertura), la frase grande con
-// los dos tubos de neón debajo y un solo botón para ir al Menú. Abierto dice "Pedir ahora";
-// cerrado, "Ver el menú", porque igual se puede mirar la carta.
+// los dos tubos de neón debajo y un solo botón para ir al Menú, hecho como un letrero de neón
+// que se prende al cargar (ver index.css). Abierto dice "Pedir ahora"; cerrado, "Ver el
+// menú", porque igual se puede mirar la carta.
 export function Portada({ lema, cargandoLema, horario, onIrAlMenu }) {
   const ahora = useAhora()
   const detalle = detalleEstado(horario, ahora)
+  const cerrado = detalle?.estado === 'cerrado'
 
   return (
     <section className="portada" aria-labelledby="portada-lema">
@@ -36,10 +38,17 @@ export function Portada({ lema, cargandoLema, horario, onIrAlMenu }) {
       </span>
 
       <button type="button" className="portada__cta" onClick={() => onIrAlMenu()}>
-        {detalle?.estado === 'cerrado' ? 'Ver el menú' : 'Pedir ahora'}
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.2" />
-        </svg>
+        <span className="portada__cta-texto">
+          <span className="portada__cta-titulo">{cerrado ? 'Ver el menú' : 'Pedir ahora'}</span>
+          <span className="portada__cta-detalle">
+            {cerrado ? 'Mira la carta mientras abrimos' : 'Arma tu pedido y te lo llevamos'}
+          </span>
+        </span>
+        <span className="portada__cta-flecha" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.4" />
+          </svg>
+        </span>
       </button>
     </section>
   )

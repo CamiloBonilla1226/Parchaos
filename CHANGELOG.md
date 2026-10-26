@@ -818,3 +818,12 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - El cuerpo es amarillo, con línea troquelada arriba como un cupón para recortar. Lleva el título en mayúsculas con Archivo Black (30px en celular, 48px en computador), la descripción y "Pide ya →".
   - El ícono va como un sello oscuro ladeado. Toda la tarjeta tiene un halo amarillo suave que crece al pasar el mouse.
   - La vista previa de `/admin/ofertas` muestra el mismo cupón.
+
+## 2026-10-26 (6)
+- **Botón de la portada como letrero de neón** (pedido del dueño: "se ve muy ordinario"). Antes era un bloque magenta plano; ahora:
+  - El borde es un tubo magenta con halo por dentro y por fuera.
+  - La acción va en mayúsculas blancas con halo magenta, como se ve un neón encendido.
+  - Una segunda línea dice qué pasa al tocarlo: "Arma tu pedido y te lo llevamos", o con el local cerrado "Mira la carta mientras abrimos".
+  - La flecha va en un bloque magenta sólido.
+  - Al cargar la página, el letrero "se prende" parpadeando una sola vez. No pasa con `prefers-reduced-motion`.
+  - Mide 72px de alto en celular y 400px de ancho mínimo en computador.

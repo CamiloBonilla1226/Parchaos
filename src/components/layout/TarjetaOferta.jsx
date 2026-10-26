@@ -4,7 +4,7 @@ function IconoOferta({ tipo }) {
   if (tipo === TIPO_DOMICILIO_GRATIS) {
     // Moto de domicilio.
     return (
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" strokeWidth="1.8">
         <circle cx="5.5" cy="17" r="2.5" />
         <circle cx="18.5" cy="17" r="2.5" />
         <path d="M8 17h6l3-6h-4l-2 3H7.5M15 6h2l1.5 5" />
@@ -14,7 +14,7 @@ function IconoOferta({ tipo }) {
   }
   // Regalo.
   return (
-    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" strokeWidth="1.8">
       <rect x="3" y="8" width="18" height="12" />
       <line x1="3" y1="12" x2="21" y2="12" />
       <line x1="12" y1="8" x2="12" y2="20" />
@@ -23,32 +23,58 @@ function IconoOferta({ tipo }) {
   )
 }
 
-// Tarjeta de la oferta activa en Inicio (solo puede haber una, ver useOfertas.js), con forma de
-// tiquete: talón amarillo con el ícono (moto para domicilio gratis, regalo para las demás),
-// línea troquelada y, en el cuerpo, rótulo "Oferta", título, descripción y una flecha. Para domicilio gratis el
-// texto se arma siempre con el monto configurado, así no queda desactualizado si el dueño lo
-// cambia. Sin oferta (o sin título) no se renderiza nada. Al tocarla lleva al Menú
-// (`onClick`, ver Carta.jsx). El formulario de ofertas la reutiliza como vista previa.
+// Veces que se repite el texto en cada mitad de la cinta: suficientes para cubrir el ancho de
+// la tarjeta en computador mientras la cinta corre.
+const REPETICIONES_CINTA = 4
+
+// Tarjeta de la oferta activa en Inicio (solo puede haber una, ver useOfertas.js), como un
+// cupón: arriba una cinta oscura donde corre "Oferta ✦ título" como un aviso luminoso; debajo,
+// el cuerpo amarillo con el título en grande, la descripción, "Pide ya" y el ícono como un
+// sello oscuro (moto para domicilio gratis, regalo para las demás). Dos muescas cuadradas
+// marcan la unión entre cinta y cuerpo. Para domicilio gratis el texto se arma siempre con el
+// monto configurado, así no queda desactualizado si el dueño lo cambia. Sin oferta (o sin
+// título) no se renderiza nada. Al tocarla lleva al Menú (`onClick`, ver Carta.jsx). El
+// formulario de ofertas la reutiliza como vista previa.
 export function TarjetaOferta({ oferta, onClick }) {
   if (!oferta?.titulo?.trim()) return null
 
   const monto = montoDomicilioGratis(oferta)
   const { titulo, subtitulo } = monto ? textoDomicilioGratis(monto) : oferta
 
+  // La cinta tiene dos mitades idénticas: al correr una mitad completa vuelve al inicio sin
+  // que se note el salto. Es decorativa (el título real va en el cuerpo).
+  const mitadCinta = (clave) => (
+    <span key={clave} className="tarjeta-oferta__cinta-mitad">
+      {Array.from({ length: REPETICIONES_CINTA }, (_, indice) => (
+        <span key={indice}>
+          Oferta <span className="tarjeta-oferta__estrella">✦</span> {titulo}{' '}
+          <span className="tarjeta-oferta__estrella">✦</span>
+        </span>
+      ))}
+    </span>
+  )
+
   return (
     <button type="button" className="tarjeta-oferta" onClick={onClick}>
-      <span className="tarjeta-oferta__icono" aria-hidden="true">
-        <IconoOferta tipo={oferta.tipo} />
+      <span className="tarjeta-oferta__cinta" aria-hidden="true">
+        <span className="tarjeta-oferta__cinta-pista">{[mitadCinta('a'), mitadCinta('b')]}</span>
       </span>
-      <span className="tarjeta-oferta__texto">
-        <span className="tarjeta-oferta__rotulo">Oferta</span>
-        <strong className="tarjeta-oferta__titulo">{titulo}</strong>
-        {subtitulo?.trim() && <span className="tarjeta-oferta__subtitulo">{subtitulo}</span>}
-      </span>
-      <span className="tarjeta-oferta__flecha" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
+
+      <span className="tarjeta-oferta__cuerpo">
+        <span className="tarjeta-oferta__texto">
+          <span className="visualmente-oculto">Oferta: </span>
+          <strong className="tarjeta-oferta__titulo">{titulo}</strong>
+          {subtitulo?.trim() && <span className="tarjeta-oferta__subtitulo">{subtitulo}</span>}
+          <span className="tarjeta-oferta__accion" aria-hidden="true">
+            Pide ya
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </span>
+        </span>
+        <span className="tarjeta-oferta__sello" aria-hidden="true">
+          <IconoOferta tipo={oferta.tipo} />
+        </span>
       </span>
     </button>
   )

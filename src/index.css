@@ -3030,51 +3030,28 @@ body.body--con-nav-inferior .toast-contenedor {
 }
 
 /* --- Inicio: tarjeta de oferta (también la vista previa de /admin/ofertas) ---
-   Un tiquete: talón amarillo con el ícono, línea troquelada y una muesca cuadrada arriba y
-   abajo. Las muescas se pintan con --tiquete-fondo (el color de lo que hay detrás), que la
-   vista previa del panel cambia por el suyo. */
+   Un cupón que se roba la mirada: cinta oscura arriba con la oferta corriendo como un aviso
+   luminoso (amarillo con halo) y cuerpo amarillo, separado por una línea troquelada, con el
+   título en grande y el ícono como sello. */
 .tarjeta-oferta {
-  --tiquete-fondo: var(--pc-fondo);
-  --tiquete-talon: 76px;
+  --alto-cinta: 34px;
   position: relative;
   width: 100%;
-  min-height: 84px;
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
   padding: 0;
   text-align: left;
   font: inherit;
   font-family: var(--fuente-ui);
-  color: var(--pc-texto);
-  background: var(--pc-superficie);
-  border: 1px solid color-mix(in srgb, var(--pc-amarillo) 40%, var(--pc-linea));
+  color: var(--pc-fondo);
+  background: var(--pc-amarillo);
+  border: none;
   border-radius: 0;
   cursor: pointer;
+  box-shadow: 0 0 32px color-mix(in srgb, var(--pc-amarillo) 18%, transparent);
   transition:
     transform 160ms var(--curva-salida),
-    border-color 200ms var(--curva-salida);
-}
-
-.tarjeta-oferta::before,
-.tarjeta-oferta::after {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  left: calc(var(--tiquete-talon) - 7px);
-  width: 14px;
-  height: 8px;
-  background: var(--tiquete-fondo);
-  border: 1px solid color-mix(in srgb, var(--pc-amarillo) 40%, var(--pc-linea));
-}
-
-.tarjeta-oferta::before {
-  top: -1px;
-  border-top: none;
-}
-
-.tarjeta-oferta::after {
-  bottom: -1px;
-  border-bottom: none;
+    box-shadow 240ms var(--curva-salida);
 }
 
 .tarjeta-oferta:active {
@@ -3083,22 +3060,79 @@ body.body--con-nav-inferior .toast-contenedor {
 
 @media (hover: hover) {
   .tarjeta-oferta:hover {
-    border-color: var(--pc-amarillo);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--pc-amarillo) 32%, transparent);
   }
 
-  .tarjeta-oferta:hover .tarjeta-oferta__flecha {
-    color: var(--pc-amarillo);
-    transform: translateX(3px);
+  .tarjeta-oferta:hover .tarjeta-oferta__accion svg {
+    transform: translateX(4px);
   }
 }
 
-.tarjeta-oferta__icono {
-  flex: 0 0 var(--tiquete-talon);
+.tarjeta-oferta:focus-visible {
+  outline: 2px solid var(--pc-texto);
+  outline-offset: 3px;
+}
+
+/* Cinta: el texto corre de derecha a izquierda sin fin (dos mitades iguales; al correr una
+   mitad vuelve al inicio sin salto). */
+.tarjeta-oferta__cinta {
+  display: flex;
+  height: var(--alto-cinta);
+  overflow: hidden;
+  background: var(--pc-fondo);
+  border: 1px solid var(--pc-amarillo);
+  border-bottom: none;
+}
+
+.tarjeta-oferta__cinta-pista {
+  display: flex;
+  flex-shrink: 0;
+  animation: oferta-cinta 18s linear infinite;
+}
+
+.tarjeta-oferta__cinta-mitad {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.tarjeta-oferta__cinta-mitad > span {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--pc-amarillo);
-  color: var(--pc-fondo);
+  gap: 12px;
+  padding-right: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--pc-amarillo);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--pc-amarillo) 55%, transparent);
+}
+
+.tarjeta-oferta__estrella {
+  color: var(--pc-magenta);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--pc-magenta) 70%, transparent);
+}
+
+@keyframes oferta-cinta {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Troquel: rayitas oscuras al borde de arriba del cuerpo, como un cupón para recortar. */
+.tarjeta-oferta__cuerpo {
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--pc-fondo) 0 8px,
+    transparent 8px 14px
+  );
+  background-size: 100% 3px;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 16px 18px 20px;
 }
 
 .tarjeta-oferta__texto {
@@ -3106,51 +3140,62 @@ body.body--con-nav-inferior .toast-contenedor {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-  padding: 14px 12px 14px 18px;
-  border-left: 2px dashed color-mix(in srgb, var(--pc-amarillo) 60%, transparent);
-  line-height: 1.25;
-}
-
-.tarjeta-oferta__rotulo {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pc-amarillo);
-}
-
-.tarjeta-oferta__titulo,
-.tarjeta-oferta__subtitulo {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  gap: 6px;
 }
 
 .tarjeta-oferta__titulo {
   font-family: var(--fuente-titulos);
   font-weight: 400;
-  font-size: 1.125rem;
-  letter-spacing: -0.01em;
+  font-size: 1.875rem;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .tarjeta-oferta__subtitulo {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--pc-texto-2);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.tarjeta-oferta__flecha {
+.tarjeta-oferta__accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding-bottom: 2px;
+  border-bottom: 2px solid currentColor;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tarjeta-oferta__accion svg {
+  transition: transform 200ms var(--curva-salida);
+}
+
+/* El ícono como un sello oscuro, ladeado como si lo hubieran estampado a mano. */
+.tarjeta-oferta__sello {
   flex: 0 0 auto;
+  width: 68px;
+  height: 68px;
   display: flex;
   align-items: center;
-  padding-right: 16px;
-  color: var(--pc-texto-2);
-  transition:
-    transform 200ms var(--curva-salida),
-    color 200ms var(--curva-salida);
+  justify-content: center;
+  background: var(--pc-fondo);
+  color: var(--pc-amarillo);
+  transform: rotate(-6deg);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--pc-fondo) 25%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-oferta__cinta-pista {
+    animation: none;
+  }
 }
 
 /* --- Inicio: encabezado común de cada sección y estado de error --- */
@@ -3948,7 +3993,7 @@ body.body--con-nav-inferior .toast-contenedor {
   .portada__cta,
   .portada__cta svg,
   .tarjeta-oferta,
-  .tarjeta-oferta__flecha,
+  .tarjeta-oferta__accion svg,
   .tarjeta-pedido,
   .tarjeta-pedido__agregar,
   .categorias-inicio__casilla,
@@ -4936,7 +4981,6 @@ body.admin .admin-login__boton {
 /* La vista previa muestra la tarjeta tal como sale en la carta: esquinas rectas, aunque el
    tema del admin redondee los botones. */
 body.admin .formulario-oferta__vista-previa .tarjeta-oferta {
-  --tiquete-fondo: var(--color-surface-2);
   border-radius: 0;
 }
 
@@ -5936,21 +5980,35 @@ body.admin .selector-emoji__opcion[aria-pressed='true'] {
   }
 
   .inicio > .tarjeta-oferta {
-    --tiquete-talon: 112px;
-    min-height: 112px;
-    margin-top: -32px;
+    --alto-cinta: 40px;
+    margin-top: -24px;
   }
 
-  .inicio > .tarjeta-oferta .tarjeta-oferta__texto {
-    padding-left: 28px;
+  .inicio > .tarjeta-oferta .tarjeta-oferta__cinta-mitad > span {
+    font-size: 0.8125rem;
+  }
+
+  .inicio > .tarjeta-oferta .tarjeta-oferta__cuerpo {
+    gap: 32px;
+    padding: 32px 40px 32px 40px;
   }
 
   .inicio > .tarjeta-oferta .tarjeta-oferta__titulo {
-    font-size: 1.5rem;
+    font-size: 3rem;
   }
 
   .inicio > .tarjeta-oferta .tarjeta-oferta__subtitulo {
-    font-size: 1rem;
+    font-size: 1.125rem;
+  }
+
+  .inicio > .tarjeta-oferta .tarjeta-oferta__sello {
+    width: 104px;
+    height: 104px;
+  }
+
+  .inicio > .tarjeta-oferta .tarjeta-oferta__sello svg {
+    width: 48px;
+    height: 48px;
   }
 
   .portada {

@@ -811,3 +811,10 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - Pestañas de 44px: la activa se enciende con el tubo magenta al pie, en vez de ir rellena.
   - Bajo el título de cada categoría, un tubo corto sobre la línea, en vez de la raya blanca de todo el ancho.
 - **Navegación de la carta**: en el celular, la pestaña activa lleva el tubo de neón en el borde de arriba. En computador, la raya de abajo pasa a ser un tubo con halo de 3px.
+
+## 2026-10-26 (5)
+- **Tarjeta de oferta más llamativa** (pedido del dueño: el tiquete oscuro "se ve muy poco llamativo, muy superficial"). Ahora es un cupón amarillo que se roba la mirada:
+  - Arriba, una cinta oscura donde corre "OFERTA ✦ título" sin fin, como un aviso luminoso (amarillo con halo y estrellas magenta). Es decorativa: el texto real va en el cuerpo, y se detiene con `prefers-reduced-motion`.
+  - El cuerpo es amarillo, con línea troquelada arriba como un cupón para recortar. Lleva el título en mayúsculas con Archivo Black (30px en celular, 48px en computador), la descripción y "Pide ya →".
+  - El ícono va como un sello oscuro ladeado. Toda la tarjeta tiene un halo amarillo suave que crece al pasar el mouse.
+  - La vista previa de `/admin/ofertas` muestra el mismo cupón.

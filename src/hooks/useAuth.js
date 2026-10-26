@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { correoInternoANumero, numeroACorreoInterno } from '../lib/phoneAuth'
 import { negocioConfig } from '../config/negocio.config'
 import { PERMISOS_EMPLEADO } from '../lib/seccionesAdmin'
+import { desuscribirAlCerrarSesion } from '../lib/notificacionesPush'
 
 const AuthContext = createContext(null)
 
@@ -240,6 +241,8 @@ function useAuthInterno() {
   }, [])
 
   const cerrarSesion = useCallback(async () => {
+    // Antes del signOut: borrar la fila de suscripciones_push necesita la sesión (RLS).
+    await desuscribirAlCerrarSesion()
     await supabase.auth.signOut()
   }, [])
 

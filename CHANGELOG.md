@@ -869,3 +869,41 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - **Botón de sonido** (`BotonSonido.jsx`, junto al del tema): silencia o activa el sonido solo en este dispositivo (`localStorage`, clave `admin-aviso-silenciado`), no en la base de datos. Silenciado, el aviso visual sigue saliendo.
   - Sin cambios en el esquema ni en las políticas RLS.
 - Verificación con Playwright contra un Supabase simulado (REST y WebSocket de Realtime, protocolo Phoenix 2.0.0), inyectando INSERT y UPDATE: 24/24. Probado: aviso desde Productos con nombre y total; dos notas de sonido tras el primer toque; título (1) y (2); el mismo id no se repite; UPDATE no avisa; "y 1 más"; "Ver pedido" navega y borra el contador; en Pedidos no suma; la × cierra; el silencio se guarda, se recuerda al recargar y no suena; se cierra solo entre los 9 y 10,6 s; sin toque previo hay aviso sin sonido; con la suscripción rechazada hay warning y el panel sigue en pie; con movimiento reducido no hay animación; las esquinas miden 0px. Capturas a 390px (claro) y 1366px (oscuro) revisadas. `npm run build` y `oxlint` sin errores ni advertencias nuevas.
+
+## 2026-10-26 (12)
+- **Notificaciones push de pedidos nuevos en el panel (PWA)** (pedido del dueño): el aviso llega aunque el panel esté cerrado o el celular bloqueado. Hasta ahora el aviso de la entrada (11) solo funcionaba con el panel abierto en pantalla.
+  - **Tabla `suscripciones_push`**: la creó el dueño en Supabase, con RLS para que cada usuario vea y maneje solo las suyas. Está documentada en `explicacion-script-bd.txt`, sección 21. Antes de subir el código se verificó con una consulta de solo lectura que la tabla y sus columnas existen.
+  - **Edge Function `notificar-pedido-nuevo`** (nueva). La llama un Database Webhook en INSERT de `pedidos` y se despliega con `--no-verify-jwt`, así que exige el header `x-webhook-secret` igual al secreto `PUSH_WEBHOOK_SECRET` (si no coincide, responde 401; la comparación es en tiempo constante). Ignora lo que no sea un INSERT de `pedidos` y toma el `negocio_id` del pedido insertado.
+    - **A quién avisa**: con service_role lee las suscripciones del negocio y deja solo las de usuarios activos en `usuarios_admin` que sean dueño o tengan `puede_pedidos`. Decisión: el usuario no se busca por `usuarios_admin.id = usuario_id`, porque el dueño se creó a mano y su id en `usuarios_admin` no tiene por qué coincidir con su uid de Auth. Se busca como en toda la RLS del proyecto: uid → usuario de Auth (que además debe ser de este negocio según su `app_metadata`) → número del correo interno → fila de `usuarios_admin`.
+    - **Envío**: usa `npm:web-push` con VAPID. El mensaje lleva título "Pedido nuevo", el cliente con el total en pesos (ej. "Laura Gómez · $ 33.000"), la url `/admin/pedidos` y el id del pedido. No lleva dirección ni teléfono, porque se ven en la pantalla bloqueada.
+    - **Fallos**: si el servicio push responde 404 o 410, se borra esa suscripción. Los envíos van con `Promise.allSettled`: si uno falla, los demás salen igual. Si no se puede leer un usuario (por ejemplo, porque ya fue borrado), se salta sin tumbar a los demás.
+  - **Service worker**: `vite.config.js` agrega `workbox.importScripts: ['/push-handler.js']`. `public/push-handler.js` muestra la notificación con icono `/icon-192.png` y `tag` por pedido. Siempre muestra una, porque iPhone retira el permiso si llega un push sin notificación. Al tocarla, trae al frente el panel si ya está abierto; si no, abre `/admin/pedidos`. Se mantienen el scope `/admin` y la regla de no guardar en caché nada de Supabase. `vercel.json` sirve `push-handler.js` sin caché, igual que `sw.js`, para que una versión nueva llegue al service worker.
+  - **Panel** (`Notificaciones.jsx`, en el Inicio, solo para quien tiene permiso de Pedidos):
+    - **Activar**: el botón "Activar notificaciones" llama a `Notification.requestPermission()` antes que nada, directo en el toque, como exige iPhone. Luego se suscribe con `pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })` y guarda `endpoint`, `p256dh`, `auth` y `user_agent` con upsert por `endpoint`, con `usuario_id` y `negocio_id` de la sesión.
+    - **Estados en español**: no disponibles en este navegador; "Instala primero la app" en iPhone sin instalar (con los pasos de Safari); bloqueadas (con cómo habilitarlas en los ajustes de Android o de iPhone); activas, con "Desactivar", que borra la fila y cancela la suscripción.
+    - **Al abrir**: si el dispositivo ya estaba suscrito, la fila se vuelve a guardar en silencio, por si la función la había borrado.
+    - **Estilo**: esquinas rectas (pedido explícito), tema claro y oscuro. En el celular el botón va a todo el ancho y en computador a la derecha.
+  - **Cerrar sesión** (`useAuth.cerrarSesion`): antes del `signOut` borra la fila de este dispositivo (la RLS necesita la sesión) y cancela la suscripción. Así otra persona que entre en el mismo celular no recibe avisos de la cuenta anterior. Nunca demora el cierre de sesión más de 3 s.
+  - `.env.example` documenta `VITE_VAPID_PUBLIC_KEY`. No se tocó la RLS de otras tablas.
+  - **Despliegue de la función** (con la CLI de Supabase, autenticada contra el proyecto):
+    ```bash
+    supabase functions deploy notificar-pedido-nuevo --no-verify-jwt --project-ref <ref-del-proyecto>
+    ```
+    Los secretos ya están cargados. Si algún día hay que regenerarlos:
+    ```bash
+    npx web-push generate-vapid-keys
+    supabase secrets set VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:correo@dominio PUSH_WEBHOOK_SECRET=... --project-ref <ref-del-proyecto>
+    ```
+    Si cambia la clave pública, hay que actualizar también `VITE_VAPID_PUBLIC_KEY` en Vercel y volver a desplegar. Las suscripciones viejas dejan de servir y cada dispositivo debe activar de nuevo.
+  - **Configuración del Database Webhook**, en el panel de Supabase → Database → Webhooks → Create a new hook:
+    - Name: `notificar-pedido-nuevo`.
+    - Table: `public.pedidos`. Events: solo **Insert**.
+    - Type: **Supabase Edge Functions** → función `notificar-pedido-nuevo`, método POST, timeout 5000 ms.
+    - HTTP Headers: agregar `x-webhook-secret` con el mismo valor del secreto `PUSH_WEBHOOK_SECRET`. El header `Authorization` que el panel ofrece agregar no hace falta (la función va con `--no-verify-jwt`), pero tampoco estorba.
+    - Prueba: con un celular suscrito, hacer un pedido desde la carta. Si no llega, revisar en Supabase → Edge Functions → `notificar-pedido-nuevo` → Logs. La función responde `{ enviadas, fallidas, borradas }`, o un 401 si el header del webhook no coincide con el secreto.
+  - **Verificación**:
+    - **Edge Function** corrida en Deno 2.9 contra un Supabase y un servicio push simulados (HTTPS), con suscripciones de prueba de claves reales: 18/18. Rechaza sin secreto o con secreto incorrecto (401) e ignora UPDATE. Envía al dueño aunque su id en `usuarios_admin` sea distinto de su uid. No envía a empleados sin `puede_pedidos`, a inactivos, a usuarios de otro negocio ni a usuarios borrados. Un 500 no frena las demás, un 410 borra solo esa fila, y un pedido sin `negocio_id` da 400. Se descifró el mensaje recibido: lleva título, nombre, total y url, sin teléfono ni dirección.
+    - **`push-handler.js`** en un service worker simulado: 7/7. Muestra la notificación con icono y tag, también si llega sin JSON o vacía. Al tocarla abre `/admin/pedidos` o enfoca el panel ya abierto.
+    - **Panel** sobre la build de producción, con el service worker real registrado en `/admin`, y `PushManager` y `Notification` simulados (Chromium sin interfaz no tiene servicio push): 22/22. Probado: el permiso se pide dentro del toque; se suscribe con `userVisibleOnly` y la clave de 65 bytes; el upsert va por endpoint con uid y negocio de la sesión; Desactivar borra la fila y cancela; al cerrar sesión se borra antes del logout; los estados bloqueado, iPhone sin instalar y sin soporte se muestran bien; un empleado sin Pedidos no ve la tarjeta; las esquinas miden 0px. Capturas a 390px (claro y oscuro) y 1366px revisadas.
+    - `npm run build` y `oxlint` sin errores nuevos.
+    - **Pendiente**: probar con dispositivos reales (Android con Chrome y iPhone con la app instalada, iOS 16.4 o superior) después de desplegar la función y crear el webhook.

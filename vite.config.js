@@ -37,6 +37,8 @@ export default defineConfig({
         navigateFallback: '/admin.html',
         navigateFallbackAllowlist: [/^\/admin(\/|$)/],
         globPatterns: ['**/*.{js,css,html,svg,webp,png,webmanifest}'],
+        // Notificaciones push de pedidos nuevos (eventos push y notificationclick).
+        importScripts: ['/push-handler.js'],
         // No se define runtimeCaching: las llamadas a Supabase (API, Auth, Realtime y
         // Storage) siempre van a la red, nunca a la caché.
       },

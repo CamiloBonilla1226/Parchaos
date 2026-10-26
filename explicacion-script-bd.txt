@@ -1589,6 +1589,115 @@ CONSECUENCIA EN EL CÓDIGO:
   cantidad, precio_base y subtotal como cualquier línea). El panel de
   pedidos y el mensaje de WhatsApp la muestran como una línea más.
 
+21. TABLA suscripciones_push (notificaciones push de pedidos nuevos)
+--------------------------------------------------------------------
+TABLA AFECTADA: suscripciones_push (tabla nueva). No cambia ninguna otra
+tabla ni la RLS de otras tablas.
+
+QUÉ ES (2026-10-26, pedido del dueño): guarda, por cada celular o
+computador donde alguien del panel activó "Notificaciones", la
+suscripción push de ese navegador. Con ella la Edge Function
+notificar-pedido-nuevo puede avisar de un pedido nuevo aunque el panel
+esté cerrado o el celular bloqueado. El aviso dentro del panel
+(useAvisoPedidos) solo funciona con el panel abierto en pantalla.
+
+CÓMO FUNCIONA CADA CAMPO:
+- id: identificador de la fila.
+- negocio_id: el negocio de la sesión que activó las notificaciones.
+- usuario_id: el uid del usuario en Auth (auth.users.id). OJO: no es
+  usuarios_admin.id. El dueño se crea a mano y su fila en usuarios_admin
+  puede tener otro id. Por eso la Edge Function no cruza por id: va de
+  usuario_id → usuario de Auth → número del correo interno → fila de
+  usuarios_admin (negocio_id + numero), el mismo criterio que toda la RLS
+  del proyecto (ver sección 3).
+- endpoint (unique): la dirección del servicio push de ese navegador. Es
+  única porque identifica al dispositivo: el panel guarda con upsert por
+  endpoint, así que reactivar no duplica filas.
+- p256dh, auth: las claves públicas del navegador con las que se cifra
+  el mensaje. No son secretas para el servidor, pero nadie más que el
+  dueño de la suscripción debe poder leerlas (de ahí la RLS).
+- user_agent: el navegador y dispositivo, solo para reconocer la fila
+  si hay que revisarla a mano.
+- creado_en: fecha de creación.
+
+RLS: cada usuario solo ve, crea, actualiza y borra sus propias filas
+(usuario_id = auth.uid()). Las políticas se crearon junto con la tabla,
+como exige la regla de la sección 11. Desde el navegador nadie puede
+leer las suscripciones de otro usuario ni las de todo el negocio. Eso
+solo lo hace la Edge Function, con service_role.
+
+SCRIPT SQL: lo corrió el dueño directamente en Supabase. El texto exacto
+no está en el repositorio; lo siguiente es la estructura equivalente
+según lo que describió (columnas verificadas el 2026-10-26 con una
+consulta de solo lectura: la tabla responde con todas ellas y, sin
+sesión, devuelve vacío por la RLS). Si el script real difiere en algún
+detalle (nombres de las políticas, por ejemplo), conviene reemplazar
+este bloque por el original:
+
+    create table suscripciones_push (
+      id uuid primary key default gen_random_uuid(),
+      negocio_id uuid not null references negocios(id) on delete cascade,
+      usuario_id uuid not null references auth.users(id) on delete cascade,
+      endpoint text not null unique,
+      p256dh text not null,
+      auth text not null,
+      user_agent text,
+      creado_en timestamptz not null default now()
+    );
+
+    alter table suscripciones_push enable row level security;
+
+    create policy "Cada usuario ve sus suscripciones push"
+    on suscripciones_push for select to authenticated
+    using (usuario_id = auth.uid());
+
+    create policy "Cada usuario crea sus suscripciones push"
+    on suscripciones_push for insert to authenticated
+    with check (
+      usuario_id = auth.uid()
+      and negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+    );
+
+    create policy "Cada usuario actualiza sus suscripciones push"
+    on suscripciones_push for update to authenticated
+    using (usuario_id = auth.uid())
+    with check (usuario_id = auth.uid());
+
+    create policy "Cada usuario borra sus suscripciones push"
+    on suscripciones_push for delete to authenticated
+    using (usuario_id = auth.uid());
+
+ESTADO: YA SE CORRIÓ — el dueño lo ejecutó el 2026-10-26; verificado con
+una consulta de solo lectura (la tabla y sus columnas responden).
+
+LO QUE NO ES SQL PERO HACE FALTA (configurado por el dueño):
+- Secretos de la Edge Function: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY,
+  VAPID_SUBJECT y PUSH_WEBHOOK_SECRET (ya cargados).
+- VITE_VAPID_PUBLIC_KEY en Vercel (ya cargada): la misma clave pública.
+- Un Database Webhook en INSERT de pedidos que llame a la función con el
+  header x-webhook-secret (pasos en CHANGELOG.md, 2026-10-26 (12)).
+
+CONSECUENCIA EN EL CÓDIGO:
+- supabase/functions/notificar-pedido-nuevo/index.ts: la llama el
+  webhook. Valida x-webhook-secret (401 si no coincide) y toma el
+  negocio_id del pedido insertado. Con service_role lee las suscripciones
+  del negocio y deja solo las de usuarios activos que sean dueño o tengan
+  puede_pedidos. Envía con web-push (VAPID) y borra la fila si el
+  servicio push responde 404 o 410.
+- src/lib/notificacionesPush.js: suscribir (upsert por endpoint con
+  usuario_id y negocio_id de la sesión), desuscribir (borra la fila por
+  endpoint y cancela en el navegador) y desuscribirAlCerrarSesion.
+- src/components/admin/Notificaciones.jsx (Inicio del panel, solo con
+  permiso de Pedidos): activar y desactivar en este dispositivo.
+- src/hooks/useAuth.js (cerrarSesion): antes del signOut borra la
+  suscripción de este dispositivo. El borrado necesita la sesión por la
+  RLS, y así otra persona que entre en el mismo celular no recibe avisos
+  de la cuenta anterior.
+- public/push-handler.js + vite.config.js (workbox.importScripts): el
+  service worker del panel muestra la notificación y, al tocarla, enfoca
+  el panel o abre /admin/pedidos.
+
+
 RESUMEN GENERAL
 --------------------------------------------------------------------
 La base de datos completa (negocios, usuarios_admin, categorias,

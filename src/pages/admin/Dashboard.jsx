@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { aplicarFiltrosPedidos, FILTROS_PEDIDOS_INICIALES } from '../../components/admin/FiltrosPedidos'
 import { AdminNav } from '../../components/admin/AdminNav'
 import { AsistenteNegocio } from '../../components/admin/AsistenteNegocio'
+import { Notificaciones } from '../../components/admin/Notificaciones'
 import { useAuth } from '../../hooks/useAuth'
 import { usePedidos } from '../../hooks/usePedidos'
 import { useProductos } from '../../hooks/useProductos'
@@ -75,6 +76,9 @@ export function Dashboard() {
             cargando={cargandoProductos}
           />
         </div>
+
+        {/* Avisos push de pedidos nuevos en este dispositivo: solo para quien ve Pedidos. */}
+        {puedePedidos && <Notificaciones />}
 
         {/* Las ventas y recomendaciones salen de los pedidos: solo con ese permiso. */}
         {puedePedidos && (

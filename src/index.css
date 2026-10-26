@@ -6142,6 +6142,115 @@ body.admin .aviso-pedido__cerrar:hover {
   }
 }
 
+/* --- Panel admin: tarjeta "Notificaciones" del Inicio (Notificaciones.jsx) ---
+   Esquinas rectas (pedido explícito). El punto junto al título dice el estado de un
+   vistazo: verde si están activas, ámbar si están bloqueadas o falta instalar, gris si no.
+   En el celular el botón va a todo el ancho debajo del texto; desde 640px, a la derecha. */
+body.admin .notificaciones-push {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: var(--espacio-3);
+  padding: 16px;
+  border-radius: 0;
+}
+
+.notificaciones-push__textos {
+  min-width: 0;
+}
+
+.notificaciones-push__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.notificaciones-push__punto {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--admin-borde-fuerte);
+}
+
+.notificaciones-push--activas .notificaciones-push__punto {
+  background: var(--admin-exito);
+}
+
+.notificaciones-push--bloqueado .notificaciones-push__punto,
+.notificaciones-push--instalar-iphone .notificaciones-push__punto {
+  background: var(--admin-aviso);
+}
+
+.notificaciones-push__texto {
+  margin: 6px 0 0 18px;
+  max-width: 60ch;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--admin-suave);
+  text-wrap: pretty;
+}
+
+.notificaciones-push__error {
+  margin: 6px 0 0 18px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--admin-error);
+}
+
+body.admin .notificaciones-push__boton {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--admin-acento);
+  border-radius: 0;
+  background: var(--admin-acento);
+  color: var(--admin-acento-texto);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+body.admin .notificaciones-push__boton:hover:not(:disabled) {
+  background: var(--admin-acento-hover);
+  border-color: var(--admin-acento-hover);
+}
+
+body.admin .notificaciones-push__boton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+body.admin .notificaciones-push__boton--secundario {
+  background: transparent;
+  border-color: var(--admin-borde-fuerte);
+  color: var(--admin-texto);
+}
+
+body.admin .notificaciones-push__boton--secundario:hover:not(:disabled) {
+  background: var(--admin-superficie-2);
+  border-color: var(--admin-borde-fuerte);
+}
+
+@media (min-width: 640px) {
+  body.admin .notificaciones-push {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  body.admin .notificaciones-push__boton {
+    width: auto;
+    flex-shrink: 0;
+  }
+}
+
 /* --- Sin zoom automático al escribir en el celular ---
    Safari de iPhone acerca la página cuando se enfoca un campo con letra menor a 16px (y los
    formularios del panel enfocan el nombre al abrirse), y la deja acercada al cerrar. En

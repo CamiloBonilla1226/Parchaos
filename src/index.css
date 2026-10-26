@@ -2991,9 +2991,12 @@ body.body--con-nav-inferior .toast-contenedor {
 /* --- Inicio: tarjeta de oferta (también la vista previa de /admin/ofertas) ---
    Franja sobria: superficie oscura con línea fina, un tubo amarillo al borde izquierdo (la
    firma de la carta, en el color de las ofertas), el ícono de línea, el texto y una flecha.
-   El amarillo se usa poco y a propósito: tubo, ícono y rótulo. */
+   El amarillo se usa poco y a propósito: tubo, ícono y rótulo. Efecto: el tubo "respira"
+   como un neón encendido y un reflejo de luz cruza la franja cada pocos segundos (ambos
+   solo con transform/opacity y apagados con prefers-reduced-motion). */
 .tarjeta-oferta {
   position: relative;
+  overflow: hidden;
   width: 100%;
   min-height: 64px;
   display: flex;
@@ -3007,7 +3010,6 @@ body.body--con-nav-inferior .toast-contenedor {
   background: var(--pc-superficie);
   border: 1px solid var(--pc-linea);
   border-radius: 0;
-  box-shadow: inset 3px 0 0 var(--pc-amarillo);
   cursor: pointer;
   transition:
     border-color 200ms var(--curva-salida),
@@ -3016,6 +3018,74 @@ body.body--con-nav-inferior .toast-contenedor {
 
 .tarjeta-oferta:active {
   transform: scale(0.985);
+}
+
+/* Tubo amarillo del borde izquierdo con su halo. El halo vive en un pseudo-elemento propio
+   (::before del ícono no sirve: el ícono no ocupa todo el alto), así que se anima su
+   opacidad en vez de la sombra. */
+.tarjeta-oferta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--pc-amarillo);
+  box-shadow:
+    0 0 10px 1px color-mix(in srgb, var(--pc-amarillo) 85%, transparent),
+    0 0 36px 4px color-mix(in srgb, var(--pc-amarillo) 40%, transparent);
+  animation: oferta-tubo 2.6s ease-in-out infinite;
+}
+
+/* Reflejo: una franja de luz diagonal que cruza de izquierda a derecha y luego descansa. */
+.tarjeta-oferta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    color-mix(in srgb, var(--pc-amarillo) 14%, transparent) 42%,
+    rgba(255, 255, 255, 0.16) 50%,
+    color-mix(in srgb, var(--pc-amarillo) 14%, transparent) 58%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  pointer-events: none;
+  animation: oferta-reflejo 6s var(--curva-salida) 1s infinite;
+}
+
+@keyframes oferta-tubo {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes oferta-reflejo {
+  0% {
+    transform: translateX(-120%);
+  }
+  35%,
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-oferta::before {
+    animation: none;
+  }
+
+  .tarjeta-oferta::after {
+    display: none;
+  }
 }
 
 @media (hover: hover) {

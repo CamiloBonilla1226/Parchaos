@@ -56,14 +56,14 @@ export function usePedidos({ tiempoReal = false } = {}) {
     }
   }, [tiempoReal, recargar])
 
+  // Sin .select(): el cliente inserta como anon y RLS no le deja leer pedidos, así que pedir
+  // la fila de vuelta (INSERT ... RETURNING) falla con 42501 aunque la inserción sea válida.
   const crearPedido = useCallback(async (pedido) => {
-    const { data, error: errorCrear } = await supabase
+    const { error: errorCrear } = await supabase
       .from('pedidos')
       .insert({ ...pedido, negocio_id: negocioConfig.negocioId, estado: 'nuevo' })
-      .select()
-      .single()
 
-    return { exito: !errorCrear, error: errorCrear, pedido: data }
+    return { exito: !errorCrear, error: errorCrear }
   }, [])
 
   // `atendidoPor`: nombre del admin/empleado que hizo el cambio (ver useAuth.js), para dejar

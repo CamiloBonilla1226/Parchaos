@@ -323,58 +323,78 @@ p {
   box-shadow: var(--neon-magenta);
 }
 
-/* --- Carta física (QR en mesa): solo lectura, sin carrito. Una sola página por secciones
-   (una por categoría), con barra fija de buscador + pestañas que siguen el scroll. Las
-   reglas van bajo .carta-fisica / .producto-fisica / .detalle-fisico para no afectar la
-   carta de domicilios. Mismo lenguaje que el resto: esquinas rectas, blanco y negro. */
+/* --- Carta física (QR en mesa): solo lectura, sin carrito. Una categoría a la vez, con
+   barra fija de buscador + pestañas numeradas. Las reglas van bajo .carta-fisica /
+   .producto-fisica / .detalle-fisico para no afectar la carta de domicilios.
+   Rediseño 2026-10-28: minimalista, como una carta impresa de neón. Encabezado compacto
+   (el logo ya dice el nombre), índice numerado 01, 02… en pestañas y secciones, precios en
+   su propia columna a la derecha y un solo acento de color (magenta) para lo activo; el
+   amarillo queda reservado para los precios con descuento. Esquinas rectas. */
 .carta-fisica {
   flex: 1;
-  padding-bottom: var(--espacio-6);
+  display: flex;
+  flex-direction: column;
   /* El swipe a los lados cambia de categoría (ver CartaFisica.jsx): el navegador se queda
      con el scroll vertical y el zoom; lo horizontal queda para la página. */
   touch-action: pan-y pinch-zoom;
 }
 
+/* Encabezado: logo mediano, rótulo "Carta del local" entre dos tubos y una línea de ayuda. */
+.carta-fisica__encabezado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: var(--espacio-5) var(--espacio-3) var(--espacio-4);
+  text-align: center;
+}
+
 .carta-fisica__logo {
-  display: block;
-  width: 100%;
-  max-height: 180px;
+  width: 112px;
+  height: 112px;
   object-fit: contain;
-  background: var(--color-bg);
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--pc-magenta) 28%, transparent));
 }
 
-.carta-fisica__marca {
-  padding-block: var(--espacio-3) var(--espacio-2);
-}
-
-.carta-fisica__titulo {
-  margin: 0;
-  font-family: var(--fuente-titulos);
-  font-weight: 400;
-  font-size: 1.75rem;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
-}
-
-/* "Carta" con el rótulo de tubo de la carta de domicilios. */
 .carta-fisica__subtitulo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 8px 0 0;
-  font-size: 0.6875rem;
+  gap: 12px;
+  margin: 6px 0 0;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--color-primario);
+  color: var(--pc-texto);
 }
 
-.carta-fisica__subtitulo::before {
+.carta-fisica__subtitulo::before,
+.carta-fisica__subtitulo::after {
   content: '';
-  flex: 0 0 18px;
-  height: 3px;
-  background: currentColor;
+  width: 22px;
+  height: 2px;
+  background: var(--pc-magenta);
   box-shadow: var(--neon-magenta);
+}
+
+.carta-fisica__ayuda {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--pc-texto-3);
+  text-wrap: balance;
+}
+
+.carta-fisica__ayuda-swipe {
+  display: block;
+}
+
+/* Con mouse no se desliza: la parte del gesto solo se explica en pantallas táctiles. */
+@media (hover: hover) and (pointer: fine) {
+  .carta-fisica__ayuda-swipe {
+    display: none;
+  }
 }
 
 /* Barra fija: buscador y pestañas de secciones. */
@@ -382,20 +402,22 @@ p {
   position: sticky;
   top: 0;
   z-index: 10;
-  padding-top: var(--espacio-2);
-  background: var(--color-fondo);
-  border-bottom: 1px solid var(--color-borde);
+  padding-top: 12px;
+  background: color-mix(in srgb, var(--pc-fondo) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--pc-linea);
+  border-bottom: 1px solid var(--pc-linea);
 }
 
 .carta-fisica__buscador {
   display: flex;
   align-items: center;
-  gap: var(--espacio-2);
-  padding: 0 var(--espacio-3);
-  height: 46px;
-  margin-bottom: var(--espacio-2);
-  background: color-mix(in srgb, #000 30%, var(--color-bg));
-  border: 1px solid var(--color-borde);
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linea);
   color: var(--pc-texto-3);
   transition:
     border-color 150ms ease,
@@ -403,8 +425,9 @@ p {
 }
 
 .carta-fisica__buscador:focus-within {
-  border-color: var(--color-primario);
-  box-shadow: 0 0 0 1px var(--color-primario);
+  border-color: var(--pc-magenta);
+  box-shadow: 0 0 0 1px var(--pc-magenta);
+  color: var(--pc-texto-2);
 }
 
 .carta-fisica__buscador input {
@@ -413,10 +436,14 @@ p {
   height: 100%;
   border: none;
   background: transparent;
-  color: var(--color-texto);
+  color: var(--pc-texto);
   font: inherit;
   font-size: 16px; /* 16px evita el zoom automático de iOS al enfocar */
   outline: none;
+}
+
+.carta-fisica__buscador input::placeholder {
+  color: var(--pc-texto-3);
 }
 
 .carta-fisica__buscador input::-webkit-search-cancel-button {
@@ -424,22 +451,27 @@ p {
 }
 
 .carta-fisica__limpiar {
-  padding: 0 var(--espacio-1);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-right: -8px;
   border: none;
   background: none;
-  color: var(--color-texto-suave);
-  font-size: 1.3rem;
+  color: var(--pc-texto-2);
+  font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
 }
 
-/* Pestañas de categorías: chips rectos que ocupan el ancho con scroll horizontal (de borde a
-   borde, sin cortarse en el margen). La activa se enciende con el tubo magenta al pie, igual
-   que en el Menú de domicilios; cada una muestra cuántos productos tiene. */
+/* Pestañas: texto plano con su número, sin cajas. La activa se enciende en blanco con el
+   número en magenta y el tubo al pie, sobre la línea inferior de la barra. Scroll
+   horizontal de borde a borde en el celular. */
 .carta-fisica__pestanas {
   display: flex;
-  gap: var(--espacio-2);
-  padding: var(--espacio-1) var(--espacio-3) var(--espacio-3);
+  gap: 22px;
+  margin-top: 4px;
+  padding: 0 var(--espacio-3);
   overflow-x: auto;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
@@ -453,40 +485,64 @@ p {
 .carta-fisica__pestana {
   flex: 0 0 auto;
   display: inline-flex;
-  align-items: center;
-  gap: var(--espacio-2);
+  align-items: baseline;
+  gap: 6px;
   position: relative;
-  height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--color-borde);
-  background: var(--color-fondo);
-  color: var(--color-texto-suave);
+  height: 48px;
+  padding: 15px 0 0;
+  border: none;
+  background: none;
+  color: var(--pc-texto-2);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
+.carta-fisica__pestana-numero {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--pc-texto-3);
+  transition: color 0.15s ease;
+}
+
 .carta-fisica__pestana--activa {
-  border-color: color-mix(in srgb, var(--color-primario) 55%, var(--color-borde));
-  color: var(--color-texto);
+  color: var(--pc-texto);
+}
+
+.carta-fisica__pestana--activa .carta-fisica__pestana-numero {
+  color: var(--pc-magenta);
 }
 
 .carta-fisica__pestana--activa::after {
   content: '';
   position: absolute;
-  left: -1px;
-  right: -1px;
+  left: 0;
+  right: 0;
   bottom: -1px;
-  height: 3px;
-  background: var(--color-primario);
+  height: 2px;
+  background: var(--pc-magenta);
   box-shadow: var(--neon-magenta);
 }
 
+@media (hover: hover) {
+  .carta-fisica__pestana:hover {
+    color: var(--pc-texto);
+  }
+}
+
+.carta-fisica__pestana:focus-visible {
+  outline: 2px solid var(--pc-magenta);
+  outline-offset: 2px;
+}
+
 .carta-fisica__contenido {
+  flex: 1;
   max-width: 720px;
 }
 
@@ -497,7 +553,7 @@ p {
 
 .carta-fisica__seccion {
   padding-top: var(--espacio-4);
-  animation: carta-fisica-entrar 0.2s ease;
+  animation: carta-fisica-entrar 0.22s var(--curva-salida);
 }
 
 @keyframes carta-fisica-entrar {
@@ -513,63 +569,133 @@ p {
   }
 }
 
+/* Encabezado de sección: "02 / 05" encima del título, cantidad a la derecha, y la línea
+   con un tubo corto al inicio (firma de la carta). */
 .carta-fisica__seccion-encabezado {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--espacio-3);
   position: relative;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-borde);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--pc-linea);
 }
 
-/* Tubo corto sobre la línea, al inicio del título de la categoría. */
 .carta-fisica__seccion-encabezado::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -2px;
-  width: 40px;
-  height: 3px;
-  background: var(--color-primario);
+  bottom: -1px;
+  width: 32px;
+  height: 2px;
+  background: var(--pc-magenta);
   box-shadow: var(--neon-magenta);
+}
+
+.carta-fisica__seccion-indice {
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--pc-texto-3);
+}
+
+.carta-fisica__seccion-indice span {
+  color: var(--pc-magenta);
 }
 
 .carta-fisica__seccion-titulo {
   margin: 0;
   font-family: var(--fuente-titulos);
   font-weight: 400;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  line-height: 1.05;
   letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
-.carta-fisica__seccion-encabezado .texto-suave {
-  font-size: 0.82rem;
+.carta-fisica__seccion-cantidad {
+  flex: 0 0 auto;
+  padding-bottom: 3px;
+  font-size: 0.8125rem;
+  color: var(--pc-texto-2);
   white-space: nowrap;
 }
 
-/* Atajo al final de cada categoría para pasar a la siguiente sin volver arriba. */
+/* Atajo al final de cada categoría: "Siguiente · 03" + nombre, y la flecha en un cuadro
+   con borde magenta. */
 .carta-fisica__siguiente {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--espacio-3);
   width: 100%;
   margin-top: var(--espacio-4);
-  padding: var(--espacio-3);
-  border: 1px solid var(--color-borde);
-  background: none;
-  color: var(--color-texto);
+  padding: 14px 14px 14px var(--espacio-3);
+  border: 1px solid var(--pc-linea);
+  background: var(--pc-superficie);
+  color: var(--pc-texto);
   font: inherit;
+  text-align: left;
   cursor: pointer;
+  transition: border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.carta-fisica__siguiente > span:last-child {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--espacio-2);
-  font-weight: 600;
+.carta-fisica__siguiente-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
+.carta-fisica__siguiente-etiqueta {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pc-texto-3);
+}
+
+.carta-fisica__siguiente-nombre {
+  font-family: var(--fuente-titulos);
+  font-size: 1.125rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carta-fisica__siguiente-flecha {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--pc-magenta);
+  color: var(--pc-magenta);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.carta-fisica__siguiente:active .carta-fisica__siguiente-flecha {
+  background: var(--pc-magenta);
+  color: var(--pc-fondo);
+}
+
+@media (hover: hover) {
+  .carta-fisica__siguiente:hover {
+    border-color: color-mix(in srgb, var(--pc-magenta) 50%, var(--pc-linea));
+  }
+
+  .carta-fisica__siguiente:hover .carta-fisica__siguiente-flecha {
+    background: var(--pc-magenta);
+    color: var(--pc-fondo);
+  }
+}
+
+/* Sección "Adiciones": nombre | "+ $X", con los precios alineados. */
 .carta-fisica__adiciones {
   list-style: none;
   margin: 0;
@@ -579,58 +705,87 @@ p {
 .carta-fisica__adiciones li {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: var(--espacio-3);
-  padding: 12px 0;
-  border-bottom: 1px solid var(--color-borde);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--pc-linea);
+  font-weight: 600;
 }
 
-/* Fila de producto: foto | nombre, descripción (2 líneas) y precio. */
+.carta-fisica__adicion-precio {
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--pc-texto-2);
+}
+
+.carta-fisica__pie {
+  padding-block: var(--espacio-5) var(--espacio-6);
+  text-align: center;
+}
+
+.carta-fisica__pie p {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--pc-texto-3);
+}
+
+/* Fila de producto: foto | nombre, descripción (2 líneas) y opciones | precio. */
 .productos-fisica {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.productos-fisica li + li .producto-fisica {
-  border-top: 1px solid var(--color-borde);
+.productos-fisica li {
+  border-bottom: 1px solid var(--pc-linea);
 }
 
 .producto-fisica {
-  display: flex;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--espacio-3);
+  gap: 14px;
   width: 100%;
-  padding: 12px 0;
+  padding: 16px 0;
   border: none;
   background: none;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .producto-fisica:active {
-  background: var(--color-secundario);
+  background: var(--pc-superficie);
+}
+
+.producto-fisica:focus-visible {
+  outline: 2px solid var(--pc-magenta);
+  outline-offset: 2px;
 }
 
 .producto-fisica__imagen {
-  flex: 0 0 76px;
-  width: 76px;
-  background: var(--color-secundario);
+  align-self: start;
+  width: 64px;
+  background: var(--pc-superficie);
+  outline: 1px solid var(--pc-linea);
+  outline-offset: -1px;
 }
 
 .producto-fisica__info {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
 .producto-fisica__nombre {
-  font-weight: 600;
-  line-height: 1.3;
+  font-weight: 700;
+  line-height: 1.25;
+  transition: color 0.15s ease;
 }
 
 .producto-fisica__descripcion {
@@ -638,45 +793,118 @@ p {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: var(--color-texto-suave);
-  font-size: 0.84rem;
-  line-height: 1.35;
+  color: var(--pc-texto-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
 }
 
-.producto-fisica__precio {
+.producto-fisica__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 2px;
-  font-size: 1rem;
+  font-size: 0.6875rem;
   font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pc-texto-3);
+}
+
+.producto-fisica__meta::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: var(--pc-magenta);
+}
+
+/* Columna del precio: alineado a la derecha; con descuento, el tachado va encima. */
+.producto-fisica__precio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.producto-fisica__precio .precio-producto {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.producto-fisica__desde {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pc-texto-3);
+}
+
+@media (hover: hover) {
+  .producto-fisica:hover .producto-fisica__nombre {
+    color: var(--pc-magenta);
+  }
 }
 
 /* --- Detalle de producto de la carta física --- */
+.detalle-fisico__contenido {
+  gap: 0;
+  padding-top: var(--espacio-4);
+}
+
 .detalle-fisico__intro {
   padding-bottom: var(--espacio-3);
-  border-bottom: 1px solid var(--color-borde);
 }
 
 .detalle-fisico__descripcion {
-  margin: var(--espacio-1) 0 0;
-  line-height: 1.45;
+  margin: 8px 0 0;
+  line-height: 1.5;
 }
 
 .detalle-fisico__precio {
-  margin-top: var(--espacio-2);
-  font-size: 1.15rem;
+  margin-top: var(--espacio-3);
+  font-size: 1.375rem;
   font-weight: 700;
+}
+
+.detalle-fisico__desde {
+  margin-right: 8px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pc-texto-3);
 }
 
 .detalle-fisico__bloque {
   padding-top: var(--espacio-3);
+  border-top: 1px solid var(--pc-linea);
+}
+
+.detalle-fisico__bloque + .detalle-fisico__bloque {
+  margin-top: var(--espacio-2);
+}
+
+.detalle-fisico__bloque-encabezado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  margin-bottom: 2px;
 }
 
 .detalle-fisico__bloque-titulo {
-  margin: 0 0 var(--espacio-1);
+  margin: 0;
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-texto-suave);
+  color: var(--pc-texto);
+}
+
+.detalle-fisico__bloque-nota {
+  font-size: 0.75rem;
+  color: var(--pc-texto-3);
 }
 
 .detalle-fisico__lista {
@@ -688,13 +916,24 @@ p {
 .detalle-fisico__lista li {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: var(--espacio-3);
-  padding: 10px 0;
-  border-bottom: 1px solid var(--color-borde);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--pc-linea);
 }
 
 .detalle-fisico__lista li:last-child {
   border-bottom: none;
+}
+
+.detalle-fisico__lista li > span:last-child {
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.detalle-fisico .opciones-producto__acciones {
+  margin-top: var(--espacio-4);
 }
 
 .grid-productos {
@@ -6391,15 +6630,19 @@ body.admin .notificaciones-push__boton--secundario:hover:not(:disabled) {
   }
 
   /* Carta física */
-  .carta-fisica__contenido {
+  .carta-fisica__contenido,
+  .carta-fisica__pie {
     max-width: 920px;
     padding-inline: var(--espacio-5);
   }
 
-  .carta-fisica__barra > .contenedor,
-  .carta-fisica__marca {
+  .carta-fisica__barra > .contenedor {
     max-width: 920px;
     padding-inline: var(--espacio-5);
+  }
+
+  .carta-fisica__encabezado {
+    padding-top: var(--espacio-6);
   }
 
   /* Las pestañas quedan alineadas con el buscador y el contenido (en el celular van de
@@ -6417,12 +6660,16 @@ body.admin .notificaciones-push__boton--secundario:hover:not(:disabled) {
     column-gap: var(--espacio-5);
   }
 
-  .productos-fisica li + li .producto-fisica {
-    border-top: none;
+  .producto-fisica {
+    grid-template-columns: 72px minmax(0, 1fr) auto;
   }
 
-  .productos-fisica li:nth-child(n + 3) .producto-fisica {
-    border-top: 1px solid var(--color-borde);
+  .producto-fisica__imagen {
+    width: 72px;
+  }
+
+  .carta-fisica__seccion-titulo {
+    font-size: 2rem;
   }
 
   /* Panel admin */
@@ -6810,12 +7057,8 @@ body.admin .notificaciones-push__boton--secundario:hover:not(:disabled) {
   .carta-fisica__contenido,
   .carta-fisica__barra > .contenedor,
   .carta-fisica__pestanas,
-  .carta-fisica__marca {
+  .carta-fisica__pie {
     max-width: 1080px;
-  }
-
-  .producto-fisica {
-    cursor: pointer;
   }
 
   /* Panel admin: barra lateral fija con la navegación. */

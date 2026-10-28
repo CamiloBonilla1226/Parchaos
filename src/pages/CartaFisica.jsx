@@ -25,11 +25,15 @@ const SECCION_ADICIONES = '__adiciones__'
 // propio scroll horizontal), en el buscador o dentro del detalle abierto.
 const SELECTOR_SIN_SWIPE = '.carta-fisica__pestanas, .superposicion, input'
 
+// Número de la sección con dos cifras ("01", "02"…), como el índice de una carta impresa.
+const numeroSeccion = (indice) => String(indice + 1).padStart(2, '0')
+
 // Carta de solo lectura para el punto físico (QR en mesa): mismo catálogo, sin carrito ni
 // checkout, y sin nada que invite a "pedir a domicilio" (el cliente ya está en el local).
 // Se ve una categoría a la vez: las pestañas de la barra fija (o deslizar a los lados)
 // cambian de sección. Solo aparecen las categorías con productos, más "Otros" (productos sin
-// categoría) y "Adiciones". El buscador busca en toda la carta.
+// categoría) y "Adiciones". El buscador busca en toda la carta. Las secciones van numeradas
+// (pestaña y encabezado) para que siempre se sepa en cuál se está y cuántas faltan.
 export function CartaFisica() {
   const { categorias: categoriasCargadas, error: errorCategorias } = useCategorias({
     soloActivas: true,
@@ -111,12 +115,15 @@ export function CartaFisica() {
       onTouchStart={resultados ? undefined : swipe.onTouchStart}
       onTouchEnd={resultados ? undefined : swipe.onTouchEnd}
     >
+      {/* El logo ya trae el nombre del negocio: el h1 queda solo para lectores de pantalla. */}
       <header className="carta-fisica__encabezado" ref={encabezadoRef}>
-        <img src="/logo.webp" alt="" className="carta-fisica__logo" />
-        <div className="contenedor carta-fisica__marca">
-          <h1 className="carta-fisica__titulo">{negocioConfig.nombre}</h1>
-          <p className="carta-fisica__subtitulo">Carta</p>
-        </div>
+        <img src="/logo.webp" alt="" className="carta-fisica__logo" width="112" height="112" />
+        <h1 className="visualmente-oculto">{negocioConfig.nombre} — Carta</h1>
+        <p className="carta-fisica__subtitulo">Carta del local</p>
+        <p className="carta-fisica__ayuda">
+          Toca un producto para ver sus opciones.
+          <span className="carta-fisica__ayuda-swipe">Desliza a los lados para cambiar de categoría.</span>
+        </p>
       </header>
 
       <div className="carta-fisica__barra">
@@ -153,6 +160,7 @@ export function CartaFisica() {
                   aria-current={activa ? 'page' : undefined}
                   onClick={() => irASeccion(indice)}
                 >
+                  <span className="carta-fisica__pestana-numero">{numeroSeccion(indice)}</span>
                   {item.nombre}
                 </button>
               )
@@ -169,8 +177,11 @@ export function CartaFisica() {
         {resultados ? (
           <section className="carta-fisica__seccion">
             <div className="carta-fisica__seccion-encabezado">
-              <h2 className="carta-fisica__seccion-titulo">Resultados</h2>
-              <span className="texto-suave">
+              <div>
+                <p className="carta-fisica__seccion-indice">Búsqueda</p>
+                <h2 className="carta-fisica__seccion-titulo">Resultados</h2>
+              </div>
+              <span className="carta-fisica__seccion-cantidad">
                 {resultados.length === 0
                   ? `Nada coincide con "${busqueda.trim()}"`
                   : `${resultados.length} ${resultados.length === 1 ? 'producto' : 'productos'}`}
@@ -186,10 +197,15 @@ export function CartaFisica() {
             {seccion && (
               <section className="carta-fisica__seccion" key={seccion.id} aria-labelledby="carta-fisica-seccion">
                 <div className="carta-fisica__seccion-encabezado">
-                  <h2 className="carta-fisica__seccion-titulo" id="carta-fisica-seccion">
-                    {seccion.nombre}
-                  </h2>
-                  <span className="texto-suave">
+                  <div>
+                    <p className="carta-fisica__seccion-indice">
+                      <span>{numeroSeccion(indiceActivo)}</span> / {numeroSeccion(secciones.length - 1)}
+                    </p>
+                    <h2 className="carta-fisica__seccion-titulo" id="carta-fisica-seccion">
+                      {seccion.nombre}
+                    </h2>
+                  </div>
+                  <span className="carta-fisica__seccion-cantidad">
                     {seccion.id === SECCION_ADICIONES
                       ? 'Para acompañar tu pedido'
                       : `${seccion.productos.length} ${seccion.productos.length === 1 ? 'producto' : 'productos'}`}
@@ -200,7 +216,7 @@ export function CartaFisica() {
                     {adiciones.map((adicion) => (
                       <li key={adicion.id}>
                         <span>{adicion.nombre}</span>
-                        <span className="texto-suave">
+                        <span className="carta-fisica__adicion-precio">
                           {adicion.precio > 0 ? `+ ${formatoPrecio.format(adicion.precio)}` : 'Sin costo'}
                         </span>
                       </li>
@@ -213,10 +229,14 @@ export function CartaFisica() {
                 {/* Al final de una categoría, atajo a la siguiente (no hace falta volver arriba). */}
                 {secciones[indiceActivo + 1] && (
                   <button type="button" className="carta-fisica__siguiente" onClick={() => irASeccion(indiceActivo + 1)}>
-                    <span className="texto-suave">Siguiente</span>
-                    <span>
-                      {secciones[indiceActivo + 1].nombre}
-                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <span className="carta-fisica__siguiente-texto">
+                      <span className="carta-fisica__siguiente-etiqueta">
+                        Siguiente · {numeroSeccion(indiceActivo + 1)}
+                      </span>
+                      <span className="carta-fisica__siguiente-nombre">{secciones[indiceActivo + 1].nombre}</span>
+                    </span>
+                    <span className="carta-fisica__siguiente-flecha" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M5 12h14M13 6l6 6-6 6" />
                       </svg>
                     </span>
@@ -227,6 +247,10 @@ export function CartaFisica() {
           </>
         )}
       </div>
+
+      <footer className="contenedor carta-fisica__pie">
+        <p>Precios en pesos colombianos</p>
+      </footer>
 
       {productoSeleccionado && (
         <div className="superposicion" role="dialog" aria-modal="true" onClick={alSoltarFondo(cerrarDetalle)}>

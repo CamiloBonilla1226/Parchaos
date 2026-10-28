@@ -9,9 +9,11 @@ const formatoPrecio = new Intl.NumberFormat('es-CO', {
   maximumFractionDigits: 0,
 })
 
-// Productos de la carta física: fila con foto cuadrada, nombre, descripción corta (máximo
-// dos líneas) y precio. Toda la fila abre el detalle. Los precios son los de la carta física
-// (pueden ser distintos a domicilios, ver lib/preciosCartaFisica.js).
+// Productos de la carta física, como en una carta impresa: foto pequeña | nombre y
+// descripción corta (máximo dos líneas) | precio en su propia columna a la derecha, para
+// que todos los precios se lean en la misma línea vertical. Si el producto tiene variantes,
+// el precio dice "Desde" y debajo del nombre se indica cuántas opciones tiene. Toda la fila
+// abre el detalle. Los precios son los de la carta física (ver lib/preciosCartaFisica.js).
 export function ListaProductosFisica({ productos, onSeleccionar }) {
   if (productos.length === 0) return null
 
@@ -29,13 +31,17 @@ export function ListaProductosFisica({ productos, onSeleccionar }) {
               <span className="producto-fisica__info">
                 <span className="producto-fisica__nombre">{producto.nombre}</span>
                 {producto.descripcion && <span className="producto-fisica__descripcion">{producto.descripcion}</span>}
-                <span className="producto-fisica__precio">
-                  {variantes.length > 0 ? (
-                    <span className="precio-producto">Desde {formatoPrecio.format(precioMinimo(variantes))}</span>
-                  ) : (
-                    <PrecioProducto precio={precio} precioOferta={precioOferta} />
-                  )}
-                </span>
+                {variantes.length > 1 && <span className="producto-fisica__meta">{variantes.length} opciones</span>}
+              </span>
+              <span className="producto-fisica__precio">
+                {variantes.length > 0 ? (
+                  <>
+                    <span className="producto-fisica__desde">Desde</span>
+                    <span className="precio-producto">{formatoPrecio.format(precioMinimo(variantes))}</span>
+                  </>
+                ) : (
+                  <PrecioProducto precio={precio} precioOferta={precioOferta} />
+                )}
               </span>
             </button>
           </li>

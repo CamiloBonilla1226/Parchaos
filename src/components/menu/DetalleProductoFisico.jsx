@@ -11,11 +11,16 @@ const formatoPrecio = new Intl.NumberFormat('es-CO', {
   maximumFractionDigits: 0,
 })
 
-function ListaPrecios({ titulo, filas }) {
+// Bloque de precios del detalle: título en versalitas, una nota corta que explica cómo se
+// lee el precio (final o "se suma") y las filas nombre | precio alineadas a la derecha.
+function ListaPrecios({ titulo, nota, filas }) {
   if (filas.length === 0) return null
   return (
     <section className="detalle-fisico__bloque">
-      <h3 className="detalle-fisico__bloque-titulo">{titulo}</h3>
+      <div className="detalle-fisico__bloque-encabezado">
+        <h3 className="detalle-fisico__bloque-titulo">{titulo}</h3>
+        <span className="detalle-fisico__bloque-nota">{nota}</span>
+      </div>
       <ul className="detalle-fisico__lista">
         {filas.map((fila) => (
           <li key={fila.id}>
@@ -54,7 +59,10 @@ export function DetalleProductoFisico({ producto, adiciones, onCerrar }) {
           {producto.descripcion && <p className="texto-suave detalle-fisico__descripcion">{producto.descripcion}</p>}
           <div className="detalle-fisico__precio">
             {variantes.length > 0 ? (
-              <span className="precio-producto">Desde {formatoPrecio.format(precioMinimo(variantes))}</span>
+              <span className="precio-producto">
+                <span className="detalle-fisico__desde">Desde</span>
+                {formatoPrecio.format(precioMinimo(variantes))}
+              </span>
             ) : (
               <PrecioProducto precio={precio} precioOferta={precioOferta} />
             )}
@@ -63,10 +71,12 @@ export function DetalleProductoFisico({ producto, adiciones, onCerrar }) {
 
         <ListaPrecios
           titulo="Opciones"
+          nota="Precio final"
           filas={variantes.map((v) => ({ id: v.id, nombre: v.nombre, precio: formatoPrecio.format(v.precio) }))}
         />
         <ListaPrecios
           titulo="Adiciones"
+          nota="Se suman al precio"
           filas={adiciones.map((a) => ({
             id: a.id,
             nombre: a.nombre,

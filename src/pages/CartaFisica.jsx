@@ -94,13 +94,26 @@ export function CartaFisica() {
   }
 
   // Al cambiar de sección, si se había bajado, la página vuelve al inicio de la lista (con la
-  // barra fija arriba) en vez de dejar al cliente a mitad de una categoría distinta.
+  // barra fija arriba) en vez de dejar al cliente a mitad de una categoría distinta. La barra
+  // no salta aunque la categoría nueva sea corta: el contenido tiene alto mínimo (index.css).
+  // La fila de pestañas solo se desplaza si la activa quedó cortada en un borde (al deslizar
+  // o con "Siguiente"), y apenas lo justo: centrarla siempre corría la pestaña bajo el dedo.
+  // Se desplaza la fila a mano en vez de usar scrollIntoView, que también puede mover la
+  // página en vertical.
   useEffect(() => {
     const altoEncabezado = encabezadoRef.current?.offsetHeight ?? 0
     if (window.scrollY > altoEncabezado) window.scrollTo({ top: altoEncabezado })
-    pestanasRef.current
-      ?.querySelector('.carta-fisica__pestana--activa')
-      ?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+
+    const fila = pestanasRef.current
+    const activa = fila?.querySelector('.carta-fisica__pestana--activa')
+    if (!fila || !activa) return
+    const margen = 16
+    const cajaFila = fila.getBoundingClientRect()
+    const cajaActiva = activa.getBoundingClientRect()
+    let desplazamiento = 0
+    if (cajaActiva.left < cajaFila.left + margen) desplazamiento = cajaActiva.left - cajaFila.left - margen
+    else if (cajaActiva.right > cajaFila.right - margen) desplazamiento = cajaActiva.right - cajaFila.right + margen
+    if (desplazamiento !== 0) fila.scrollBy({ left: desplazamiento, behavior: 'smooth' })
   }, [seccion?.id])
 
   const swipe = useSwipeNavegacion({

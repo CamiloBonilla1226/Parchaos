@@ -541,9 +541,12 @@ p {
   outline-offset: 2px;
 }
 
+/* Alto mínimo = pantalla menos la barra fija (~112px): así, con la barra pegada arriba, una
+   categoría corta no encoge la página y la barra no salta hacia abajo al cambiar. */
 .carta-fisica__contenido {
   flex: 1;
   max-width: 720px;
+  min-height: calc(100svh - 112px);
 }
 
 .carta-fisica__aviso {

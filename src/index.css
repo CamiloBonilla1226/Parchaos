@@ -474,8 +474,12 @@ p {
   padding: 0 var(--espacio-3);
   overflow-x: auto;
   scrollbar-width: none;
-  overscroll-behavior-x: contain;
+  overscroll-behavior: contain;
   scroll-padding-inline: var(--espacio-3);
+  /* Solo desplazamiento horizontal: en el celular, un arrastre algo inclinado sobre la fila
+     movía toda la página arriba o abajo (o hacía el rebote de iPhone) mientras se buscaba
+     una categoría. Así el dedo sobre las pestañas solo recorre la fila. */
+  touch-action: pan-x;
 }
 
 .carta-fisica__pestanas::-webkit-scrollbar {

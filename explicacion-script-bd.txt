@@ -1843,7 +1843,10 @@ iniciar sesión; sin las columnas, ambos fallan):
 
     commit;
 
-ESTADO: PENDIENTE — propuesto el 2026-10-29, todavía no se ha corrido.
+ESTADO: YA SE CORRIÓ — el dueño lo ejecutó el 2026-10-29; verificado con
+una consulta de solo lectura (sabores, productos.cantidad_sabores y
+variantes_producto.descripcion/cantidad_sabores responden, y un insert
+anónimo en sabores es rechazado por la RLS).
 
 CONSECUENCIA EN EL CÓDIGO:
 - hooks/useSabores.js: CRUD del catálogo (mismo patrón que useAdiciones).

@@ -5,6 +5,7 @@ import { DetalleProductoFisico } from '../components/menu/DetalleProductoFisico'
 import { useCategorias } from '../hooks/useCategorias'
 import { useProductos } from '../hooks/useProductos'
 import { useAdiciones } from '../hooks/useAdiciones'
+import { useSabores } from '../hooks/useSabores'
 import { useCerrarConAtras } from '../hooks/useCerrarConAtras'
 import { useSwipeNavegacion } from '../hooks/useSwipeNavegacion'
 import { alSoltarFondo } from '../lib/superposicion'
@@ -45,6 +46,7 @@ export function CartaFisica() {
     error: errorProductos,
   } = useProductos({ soloDisponibles: true, soloVisibleCartaFisica: true })
   const { adiciones } = useAdiciones({ soloDisponibles: true, soloVisibleCartaFisica: true })
+  const { sabores } = useSabores({ soloDisponibles: true })
 
   const [busqueda, setBusqueda] = useState('')
   const [seccionElegida, setSeccionElegida] = useState(null)
@@ -267,7 +269,12 @@ export function CartaFisica() {
 
       {productoSeleccionado && (
         <div className="superposicion" role="dialog" aria-modal="true" onClick={alSoltarFondo(cerrarDetalle)}>
-          <DetalleProductoFisico producto={productoSeleccionado} adiciones={adiciones} onCerrar={cerrarDetalle} />
+          <DetalleProductoFisico
+            producto={productoSeleccionado}
+            adiciones={adiciones}
+            sabores={sabores}
+            onCerrar={cerrarDetalle}
+          />
         </div>
       )}
     </main>

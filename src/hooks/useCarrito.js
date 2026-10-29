@@ -15,10 +15,12 @@ function idOpciones(opcionesElegidas) {
 }
 
 // Dos selecciones idénticas del mismo producto (mismo producto + misma variante + mismas
-// opciones) se agrupan en una sola línea del carrito, sumando cantidad, en vez de duplicar
-// filas. Variantes distintas del mismo producto quedan en líneas separadas.
-function construirItemId(productoId, varianteId, opcionesElegidas) {
-  return `${productoId}|${varianteId ?? ''}|${idOpciones(opcionesElegidas)}`
+// opciones + mismos sabores) se agrupan en una sola línea del carrito, sumando cantidad, en vez
+// de duplicar filas. Variantes o sabores distintos del mismo producto quedan en líneas separadas.
+// Los sabores se repiten (Mango, Mango, Mora), así que se ordenan sin quitar repetidos.
+function construirItemId(productoId, varianteId, opcionesElegidas, saboresElegidos = []) {
+  const sabores = saboresElegidos.map((s) => s.id).sort().join(',')
+  return `${productoId}|${varianteId ?? ''}|${idOpciones(opcionesElegidas)}|${sabores}`
 }
 
 function calcularSubtotal(precioBase, opcionesElegidas, cantidad) {
@@ -29,8 +31,10 @@ function calcularSubtotal(precioBase, opcionesElegidas, cantidad) {
 export function useCarrito() {
   const [items, setItems] = useState([])
 
-  const agregarProducto = useCallback((producto, opcionesElegidas = [], cantidad = 1, variante = null) => {
-    const itemId = construirItemId(producto.id, variante?.id, opcionesElegidas)
+  // `saboresElegidos`: [{ id, nombre }], con repetidos si el cliente repitió un sabor. No
+  // cambian el precio (ver lib/sabores.js).
+  const agregarProducto = useCallback((producto, opcionesElegidas = [], cantidad = 1, variante = null, saboresElegidos = []) => {
+    const itemId = construirItemId(producto.id, variante?.id, opcionesElegidas, saboresElegidos)
     const precioBase = precioEfectivo(producto, variante)
 
     setItems((actuales) => {
@@ -58,6 +62,7 @@ export function useCarrito() {
           imagenUrl: producto.imagen_url ?? null,
           varianteId: variante?.id ?? null,
           varianteNombre: variante?.nombre ?? null,
+          saboresElegidos,
           precioBase,
           cantidad,
           opcionesElegidas,
@@ -95,6 +100,7 @@ export function useCarrito() {
           imagenUrl: adicion.imagen_url ?? null,
           varianteId: null,
           varianteNombre: null,
+          saboresElegidos: [],
           precioBase,
           cantidad,
           opcionesElegidas: [],
@@ -130,8 +136,8 @@ export function useCarrito() {
   // Editar una línea desde el carrito (cambiar variante, adiciones o cantidad): la línea queda
   // en su mismo lugar con la nueva elección. Si la nueva elección es idéntica a otra línea que
   // ya existía, se suman en esa otra (misma regla de agrupación que agregarProducto).
-  const reemplazarItem = useCallback((itemIdAnterior, producto, opcionesElegidas = [], cantidad = 1, variante = null) => {
-    const itemId = construirItemId(producto.id, variante?.id, opcionesElegidas)
+  const reemplazarItem = useCallback((itemIdAnterior, producto, opcionesElegidas = [], cantidad = 1, variante = null, saboresElegidos = []) => {
+    const itemId = construirItemId(producto.id, variante?.id, opcionesElegidas, saboresElegidos)
     const precioBase = precioEfectivo(producto, variante)
 
     setItems((actuales) => {
@@ -158,6 +164,7 @@ export function useCarrito() {
               imagenUrl: producto.imagen_url ?? null,
               varianteId: variante?.id ?? null,
               varianteNombre: variante?.nombre ?? null,
+              saboresElegidos,
               precioBase,
               cantidad,
               opcionesElegidas,

@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { ImagenProducto } from './ImagenProducto'
 import { ListaAdiciones } from './ListaAdiciones'
+import { SelectorSabores } from './SelectorSabores'
 import { PrecioProducto } from '../promociones/BadgeOferta'
 import { useSwipeParaCerrar } from '../../hooks/useSwipeParaCerrar'
 import { useVariantesProducto } from '../../hooks/useVariantesProducto'
 import { precioMinimo } from '../../lib/variantes'
+import { cantidadSabores } from '../../lib/sabores'
 
 const formatoPrecio = new Intl.NumberFormat('es-CO', {
   style: 'currency',
@@ -26,7 +28,16 @@ function precioEfectivo(producto, variante) {
 // elección es obligatoria: cambian el precio final en vez de sumarse.
 // `itemInicial`: una línea del carrito (ver useCarrito.js) para editarla. El panel arranca con
 // su variante, adiciones y cantidad, y el botón dice "Actualizar" en vez de "Agregar".
-export function OpcionesProducto({ producto, adiciones = [], itemInicial = null, onConfirmar, onCancelar }) {
+// Sabores (`sabores`: los disponibles hoy del catálogo del negocio, ver useSabores.js): si el
+// producto o la variante elegida pide N, hay que elegir exactamente N (se pueden repetir) antes
+// de poder agregar. No cambian el precio.
+function conteoInicial(saboresElegidos = []) {
+  const conteo = {}
+  for (const sabor of saboresElegidos) conteo[sabor.id] = (conteo[sabor.id] ?? 0) + 1
+  return conteo
+}
+
+export function OpcionesProducto({ producto, adiciones = [], sabores = [], itemInicial = null, onConfirmar, onCancelar }) {
   const { variantes } = useVariantesProducto(producto.id, { soloDisponibles: true })
   // Las adiciones elegidas se guardan con la forma de la tabla (`precio`), ver opcionesElegidas.
   const [seleccionadas, setSeleccionadas] = useState(() =>
@@ -36,12 +47,42 @@ export function OpcionesProducto({ producto, adiciones = [], itemInicial = null,
   // variante de la línea que se edita queda marcada apenas cargan.
   const [varianteId, setVarianteId] = useState(itemInicial?.varianteId ?? null)
   const varianteSeleccionada = variantes.find((variante) => variante.id === varianteId) ?? null
+  // { [saborId]: veces }. Solo cuentan los sabores que siguen disponibles: si uno se apagó
+  // después de agregarlo al carrito, al editar la línea hay que volver a elegir ese hueco.
+  const [conteoSabores, setConteoSabores] = useState(() => conteoInicial(itemInicial?.saboresElegidos))
   const [cantidad, setCantidad] = useState(itemInicial?.cantidad ?? 1)
   const swipe = useSwipeParaCerrar(onCancelar)
   const editando = Boolean(itemInicial)
 
   const tieneVariantes = variantes.length > 0
   const faltaElegirVariante = tieneVariantes && !varianteSeleccionada
+  // Con variantes, la cantidad de sabores se conoce cuando ya se eligió la variante.
+  const saboresPedidos = tieneVariantes && !varianteSeleccionada ? 0 : cantidadSabores(producto, varianteSeleccionada)
+  const saboresElegidos = useMemo(
+    () => sabores.flatMap((sabor) => Array.from({ length: conteoSabores[sabor.id] ?? 0 }, () => ({ id: sabor.id, nombre: sabor.nombre }))),
+    [sabores, conteoSabores]
+  )
+  const faltanSabores = Math.max(0, saboresPedidos - saboresElegidos.length)
+
+  // Si la nueva variante pide menos sabores de los que ya se marcaron, se empieza de cero en vez
+  // de adivinar cuáles quitar.
+  const elegirVariante = (variante) => {
+    setVarianteId(variante.id)
+    if (saboresElegidos.length > (variante.cantidad_sabores ?? 0)) setConteoSabores({})
+  }
+
+  const cambiarSabor = (saborId, delta) => {
+    setConteoSabores((actual) => {
+      const total = Object.values(actual).reduce((suma, veces) => suma + veces, 0)
+      const veces = actual[saborId] ?? 0
+      if (delta > 0 && total >= saboresPedidos) return actual
+      if (delta < 0 && veces === 0) return actual
+      return { ...actual, [saborId]: veces + delta }
+    })
+  }
+
+  // Con un solo sabor se elige como un radio: tocar otro reemplaza el anterior.
+  const elegirSaborUnico = (saborId) => setConteoSabores({ [saborId]: 1 })
 
   const alternarAdicion = (adicion) => {
     setSeleccionadas((actuales) => {
@@ -98,13 +139,27 @@ export function OpcionesProducto({ producto, adiciones = [], itemInicial = null,
                   type="radio"
                   name="variante-producto"
                   checked={varianteSeleccionada?.id === variante.id}
-                  onChange={() => setVarianteId(variante.id)}
+                  onChange={() => elegirVariante(variante)}
                 />
-                <span>{variante.nombre}</span>
+                <span className="opcion-item__texto">
+                  <span>{variante.nombre}</span>
+                  {variante.descripcion && <span className="opcion-item__descripcion">{variante.descripcion}</span>}
+                </span>
                 <span className="texto-suave">{formatoPrecio.format(variante.precio)}</span>
               </label>
             ))}
           </fieldset>
+        )}
+
+        {saboresPedidos > 0 && (
+          <SelectorSabores
+            sabores={sabores}
+            pedidos={saboresPedidos}
+            conteo={conteoSabores}
+            elegidos={saboresElegidos.length}
+            onCambiar={cambiarSabor}
+            onElegirUnico={elegirSaborUnico}
+          />
         )}
 
         <ListaAdiciones adiciones={adiciones} seleccionadas={seleccionadas} onAlternar={alternarAdicion} />
@@ -129,12 +184,14 @@ export function OpcionesProducto({ producto, adiciones = [], itemInicial = null,
           <button
             type="button"
             className="boton"
-            disabled={faltaElegirVariante}
-            onClick={() => onConfirmar(cantidad, opcionesElegidas, varianteSeleccionada)}
+            disabled={faltaElegirVariante || faltanSabores > 0}
+            onClick={() => onConfirmar(cantidad, opcionesElegidas, varianteSeleccionada, saboresElegidos)}
           >
             {faltaElegirVariante
               ? 'Elige una opción'
-              : `${editando ? 'Actualizar' : 'Agregar'} · ${formatoPrecio.format(subtotal)}`}
+              : faltanSabores > 0
+                ? `Elige ${faltanSabores} ${faltanSabores === 1 ? 'sabor' : 'sabores'} más`
+                : `${editando ? 'Actualizar' : 'Agregar'} · ${formatoPrecio.format(subtotal)}`}
           </button>
         </div>
       </div>

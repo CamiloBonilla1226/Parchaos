@@ -1,6 +1,7 @@
 import { CarruselDestacados } from '../menu/CarruselDestacados'
 import { ImagenProducto } from '../menu/ImagenProducto'
 import { evaluarOfertas, formatoPrecio } from '../../lib/tiposOferta'
+import { textoSabores } from '../../lib/sabores'
 
 // Barra por cada oferta activa con una meta de compra (ej. domicilio gratis desde $X, ver
 // lib/tiposOferta.js) que se llena a medida que el pedido crece. Sin recuadro: texto corto y
@@ -120,6 +121,11 @@ export function Carrito({
               <div className="carrito__item-info">
                 <span className="carrito__item-nombre">{item.nombre}</span>
                 {item.varianteNombre && <span className="carrito__item-variante">{item.varianteNombre}</span>}
+                {item.saboresElegidos?.length > 0 && (
+                  <span className="texto-suave carrito__item-detalle">
+                    {textoSabores(item.saboresElegidos.map((s) => s.nombre))}
+                  </span>
+                )}
                 {adicionesTexto && <span className="texto-suave carrito__item-detalle">+ {adicionesTexto}</span>}
                 {item.cantidad > 1 && (
                   <span className="texto-suave carrito__item-detalle">{formatoPrecio.format(precioUnidad)} c/u</span>

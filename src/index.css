@@ -933,6 +933,17 @@ p {
   border-bottom: none;
 }
 
+.detalle-fisico__fila-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.detalle-fisico__fila-detalle {
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
 .detalle-fisico__lista li > span:last-child {
   flex: 0 0 auto;
   font-weight: 700;
@@ -1177,6 +1188,42 @@ body.admin .superposicion__panel::before {
   align-items: center;
   gap: var(--espacio-2);
   padding: var(--espacio-1) 0;
+}
+
+/* Nombre + descripción corta (variante: "qué trae"; sabor: ej. "Whisky y ron"). */
+.opcion-item__texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.opcion-item__descripcion {
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
+/* Sabores con contador: nombre a la izquierda, − n + a la derecha. */
+.selector-sabores__fila {
+  justify-content: space-between;
+}
+
+.selector-sabores__fila--elegido .opcion-item__texto > span:first-child {
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+.selector-sabores__contador {
+  flex-shrink: 0;
+}
+
+.selector-sabores__contador button {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.selector-sabores__contador button:disabled {
+  opacity: 0.35;
 }
 
 .opciones-producto__cantidad {
@@ -2391,10 +2438,41 @@ body:has(.acciones-masivas) .toast-contenedor {
   gap: var(--espacio-1);
 }
 
+/* Cada variante: la fila nombre | precio(s) | Quitar y debajo "Qué trae" + "Sabores". Un
+   borde inferior separa una variante de la siguiente, ahora que cada una ocupa dos líneas. */
 .gestion-opciones__lista li {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  padding-bottom: var(--espacio-2);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.gestion-opciones__form-extra {
+  display: flex;
   gap: var(--espacio-2);
+  align-items: center;
+}
+
+.gestion-opciones__form-extra input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-1) var(--espacio-2);
+}
+
+.gestion-opciones__sabores {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  font-size: 0.8125rem;
+  color: var(--color-texto-suave);
+}
+
+.gestion-opciones__sabores input {
+  width: 56px;
+  border: 1px solid var(--color-borde);
+  padding: var(--espacio-1);
 }
 
 .gestion-opciones__form-opcion,

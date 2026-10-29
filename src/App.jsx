@@ -7,6 +7,7 @@ import { Dashboard } from './pages/admin/Dashboard'
 import { Productos } from './pages/admin/Productos'
 import { Categorias } from './pages/admin/Categorias'
 import { Adiciones } from './pages/admin/Adiciones'
+import { Sabores } from './pages/admin/Sabores'
 import { Pedidos } from './pages/admin/Pedidos'
 import { Usuarios } from './pages/admin/Usuarios'
 import { Negocio } from './pages/admin/Negocio'
@@ -80,6 +81,14 @@ function App() {
                   element={
                     <RutaProtegida permiso="puedeAdiciones">
                       <Adiciones />
+                    </RutaProtegida>
+                  }
+                />
+                <Route
+                  path="/admin/sabores"
+                  element={
+                    <RutaProtegida permiso="puedeSabores">
+                      <Sabores />
                     </RutaProtegida>
                   }
                 />

@@ -13,11 +13,12 @@ import { negocioConfig } from '../config/negocio.config'
 // pública sepa, sin una consulta aparte por producto, si debe mostrar "Desde $X" en la
 // tarjeta y forzar el modal de selección obligatoria antes de agregar al carrito (ver
 // Carta.jsx/ProductoCard.jsx). El detalle completo (id, nombre, orden) se carga con
-// useVariantesProducto.js cuando el modal ya está abierto.
+// useVariantesProducto.js cuando el modal ya está abierto. `cantidad_sabores` va en el embed
+// para mostrar "Elige N sabores" en la lista sin abrir el producto (ver lib/sabores.js).
 const SELECT_PRODUCTO_COMPLETO = `
   *,
   productos_categorias(categoria:categorias(id, nombre, activo, visible_domicilios, visible_carta_fisica)),
-  variantes_producto(precio, precio_carta_fisica, disponible)
+  variantes_producto(precio, precio_carta_fisica, disponible, cantidad_sabores)
 `
 
 // Aplana productos_categorias → `producto.categorias` (arreglo de categorías, por nombre).
@@ -56,12 +57,15 @@ function verificarAfectados(data, esperados) {
 // Inserta las filas de variantes de un producto (nombre + precio, orden = posición en la
 // lista). Se usa tanto al crear como al editar; en ambos casos el llamador decide qué hacer
 // si falla (ver crearProducto/actualizarProducto). `precio_carta_fisica` vacío = la carta
-// física usa el mismo precio (ver lib/preciosCartaFisica.js).
+// física usa el mismo precio (ver lib/preciosCartaFisica.js). `descripcion` (lo que trae ese
+// tamaño) y `cantidad_sabores` (cuántos sabores se eligen, 0 = ninguno) son opcionales.
 async function insertarVariantes(productoId, variantes) {
   const filas = variantes.map((variante, indice) => ({
     producto_id: productoId,
     negocio_id: negocioConfig.negocioId,
     nombre: variante.nombre.trim(),
+    descripcion: variante.descripcion?.trim() || null,
+    cantidad_sabores: Number(variante.cantidad_sabores) || 0,
     precio: Number(variante.precio) || 0,
     precio_carta_fisica:
       variante.precio_carta_fisica == null || variante.precio_carta_fisica === ''

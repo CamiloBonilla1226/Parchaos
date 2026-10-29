@@ -1,3 +1,5 @@
+import { textoSabores } from '../../lib/sabores'
+
 const formatoPrecio = new Intl.NumberFormat('es-CO', {
   style: 'currency',
   currency: 'COP',
@@ -49,9 +51,11 @@ export function TablaPedidos({ pedidos, onActualizarEstado }) {
 
           <ul className="pedido-item__detalle">
             {pedido.productos_detalle.map((item, indice) => {
-              const detalles = [item.variante_elegida, ...(item.opciones_elegidas?.map((o) => o.nombre) ?? [])].filter(
-                Boolean
-              )
+              const detalles = [
+                item.variante_elegida,
+                textoSabores(item.sabores_elegidos),
+                ...(item.opciones_elegidas?.map((o) => o.nombre) ?? []),
+              ].filter(Boolean)
               return (
                 <li key={indice}>
                   {item.cantidad}x {item.nombre}

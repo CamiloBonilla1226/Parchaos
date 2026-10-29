@@ -12,6 +12,7 @@ import { Checkout } from '../components/carrito/Checkout'
 import { useCategorias } from '../hooks/useCategorias'
 import { useProductos } from '../hooks/useProductos'
 import { useAdiciones } from '../hooks/useAdiciones'
+import { useSabores } from '../hooks/useSabores'
 import { useOfertas } from '../hooks/useOfertas'
 import { useNegocioConfig } from '../hooks/useNegocioConfig'
 import { useCarrito } from '../hooks/useCarrito'
@@ -28,6 +29,7 @@ import {
   productosRecomendados,
 } from '../lib/productosVisibles'
 import { variantesDisponibles } from '../lib/variantes'
+import { pideSabores } from '../lib/sabores'
 import { categoriasDeInicio } from '../lib/categoriasInicio'
 import { normalizarTexto } from '../lib/texto'
 
@@ -100,6 +102,8 @@ export function Carta() {
   }, [productosVisibles, categoriaSeleccionada, busqueda])
 
   const { adiciones } = useAdiciones({ soloDisponibles: true, soloVisibleDomicilios: true })
+  // Solo los sabores prendidos hoy (Admin → Sabores); un negocio sin sabores recibe [] y nada cambia.
+  const { sabores } = useSabores({ soloDisponibles: true })
   // Si el negocio lo activa (Admin → Adiciones), las adiciones también se pueden pedir solas
   // desde el Menú: pestaña "Adiciones" al final del filtro y, en "Todas", al final de la lista.
   const { config: configNegocio } = useNegocioConfig()
@@ -176,10 +180,11 @@ export function Carta() {
   })
 
   // Las adiciones son extras opcionales (ver useAdiciones): que el negocio tenga adiciones
-  // configuradas no debe forzar el modal de "+" rápido. Solo la variante es obligatoria, así
+  // configuradas no debe forzar el modal de "+" rápido. Solo la variante y los sabores son
+  // obligatorios (un producto sin variantes también puede pedir sabores), así
   // que solo ella determina si hace falta abrir el detalle antes de poder agregar.
   const agregarRapido = (producto) => {
-    if (variantesDisponibles(producto).length > 0) {
+    if (variantesDisponibles(producto).length > 0 || pideSabores(producto)) {
       setProductoSeleccionado(producto)
     } else {
       carrito.agregarProducto(producto, [], 1)
@@ -215,12 +220,12 @@ export function Carta() {
     setItemEditando(null)
   }
 
-  const confirmarOpciones = (cantidad, opcionesElegidas, variante) => {
+  const confirmarOpciones = (cantidad, opcionesElegidas, variante, saboresElegidos) => {
     if (itemEditando) {
-      carrito.reemplazarItem(itemEditando.itemId, productoSeleccionado, opcionesElegidas, cantidad, variante)
+      carrito.reemplazarItem(itemEditando.itemId, productoSeleccionado, opcionesElegidas, cantidad, variante, saboresElegidos)
       mostrarToast('Producto actualizado')
     } else {
-      carrito.agregarProducto(productoSeleccionado, opcionesElegidas, cantidad, variante)
+      carrito.agregarProducto(productoSeleccionado, opcionesElegidas, cantidad, variante, saboresElegidos)
       mostrarToast('Agregado al carrito')
     }
     cerrarDetalle()
@@ -350,6 +355,7 @@ export function Carta() {
             key={itemEditando?.itemId ?? productoSeleccionado.id}
             producto={productoSeleccionado}
             adiciones={adiciones}
+            sabores={sabores}
             itemInicial={itemEditando}
             onConfirmar={confirmarOpciones}
             onCancelar={cerrarDetalle}

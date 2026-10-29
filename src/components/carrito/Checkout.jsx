@@ -39,6 +39,8 @@ export function Checkout({ items, total, ofertas = [], onPedidoConfirmado }) {
       ...(item.adicionId && { adicion_id: item.adicionId, tipo: 'adicion' }),
       nombre: item.nombre,
       variante_elegida: item.varianteNombre,
+      // Nombres con repetidos (Mango, Mango, Mora); los pedidos viejos no traen el campo.
+      ...(item.saboresElegidos?.length > 0 && { sabores_elegidos: item.saboresElegidos.map((s) => s.nombre) }),
       cantidad: item.cantidad,
       precio_base: item.precioBase,
       opciones_elegidas: item.opcionesElegidas.map((o) => ({ nombre: o.nombre, precio_extra: o.precio_extra ?? 0 })),

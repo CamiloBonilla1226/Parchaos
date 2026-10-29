@@ -271,7 +271,7 @@ function useAuthInterno() {
     nombre: perfil?.nombre ?? null,
     // El dueño siempre tiene acceso completo, sin depender de estas columnas (que solo
     // aplican a empleados): puedePedidos, puedeProductos, puedeCategorias, puedeAdiciones,
-    // puedeOfertas, puedeNegocio (ver PERMISOS_EMPLEADO).
+    // puedeSabores, puedeOfertas, puedeNegocio (ver PERMISOS_EMPLEADO).
     ...Object.fromEntries(
       PERMISOS_EMPLEADO.map((permiso) => [permiso.clave, esDueno || perfil?.[permiso.columna] === true])
     ),

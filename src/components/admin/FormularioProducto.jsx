@@ -5,11 +5,13 @@ import { SelectorCategorias } from './SelectorCategorias'
 import { subirImagenProducto } from '../../lib/storage'
 import { negocioConfig } from '../../config/negocio.config'
 import { useVariantesProducto } from '../../hooks/useVariantesProducto'
+import { useSabores } from '../../hooks/useSabores'
 import { mensajeAmigablePostgres } from '../../lib/erroresAmigables'
 import { tienePrecioCartaFisica } from '../../lib/preciosCartaFisica'
 
 const MAX_VARIANTES = 5
-const VARIANTE_VACIA = { nombre: '', precio: '', precio_carta_fisica: '' }
+const VARIANTE_VACIA = { nombre: '', precio: '', precio_carta_fisica: '', descripcion: '', cantidad_sabores: '' }
+const MAX_SABORES = 12
 
 const VACIO = {
   nombre: '',
@@ -24,6 +26,7 @@ const VACIO = {
   visible_domicilios: true,
   visible_carta_fisica: true,
   destacado: false,
+  cantidad_sabores: '',
 }
 
 // Formulario único de producto: si tiene variantes (switch "¿Tiene variantes?"), se
@@ -36,6 +39,9 @@ const VACIO = {
 // la carta física usa los mismos precios de domicilios (se guarda null). Al encenderlo se
 // copian los precios de domicilios como punto de partida, y se edita el precio, el de oferta
 // (o, con variantes, el precio en el local de cada variante). Ver lib/preciosCartaFisica.js.
+// Sabores a elegir (por variante, o del producto si no tiene variantes): cuántos sabores del
+// catálogo del negocio escoge el cliente. Solo aparece si el negocio tiene sabores creados, así
+// un negocio que no los usa ve el formulario igual que siempre (ver useSabores.js).
 export function FormularioProducto({ categorias, productoInicial, onGuardar, onCancelar }) {
   const [valores, setValores] = useState(
     productoInicial
@@ -52,6 +58,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           visible_domicilios: productoInicial.visible_domicilios ?? true,
           visible_carta_fisica: productoInicial.visible_carta_fisica ?? true,
           destacado: productoInicial.destacado ?? false,
+          cantidad_sabores: productoInicial.cantidad_sabores ? String(productoInicial.cantidad_sabores) : '',
         }
       : VACIO
   )
@@ -66,6 +73,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
   const [subiendoImagen, setSubiendoImagen] = useState(false)
   const [errorImagen, setErrorImagen] = useState(null)
   const [errorGuardado, setErrorGuardado] = useState(null)
+  const { sabores } = useSabores()
 
   // Al editar un producto que ya tiene variantes, se precargan editables en la misma lista.
   const { variantes: variantesExistentes, cargando: cargandoVariantes } = useVariantesProducto(
@@ -78,6 +86,8 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           nombre: v.nombre,
           precio: String(v.precio),
           precio_carta_fisica: v.precio_carta_fisica == null ? '' : String(v.precio_carta_fisica),
+          descripcion: v.descripcion ?? '',
+          cantidad_sabores: v.cantidad_sabores ? String(v.cantidad_sabores) : '',
         }))
       )
     }
@@ -85,6 +95,13 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
     // lo que la persona ya esté editando en filas posteriores.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cargandoVariantes])
+
+  // También si el producto ya pedía sabores, para no esconder (y perder al guardar) un valor
+  // que se puso cuando el negocio sí tenía sabores creados.
+  const usaSabores =
+    sabores.length > 0 ||
+    Number(valores.cantidad_sabores) > 0 ||
+    variantes.some((v) => Number(v.cantidad_sabores) > 0)
 
   const actualizar = (campo) => (evento) => {
     const valor = evento.target.type === 'checkbox' ? evento.target.checked : evento.target.value
@@ -160,6 +177,8 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           precio: v.precio,
           // Sin precio en el local (o con el switch apagado) = mismo precio de domicilios.
           precio_carta_fisica: precioFisicaDistinto && v.precio_carta_fisica !== '' ? v.precio_carta_fisica : null,
+          descripcion: v.descripcion,
+          cantidad_sabores: Math.min(MAX_SABORES, Number(v.cantidad_sabores) || 0),
         }))
         .filter((v) => v.nombre !== '' && v.precio !== '')
 
@@ -193,6 +212,8 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
         visible_carta_fisica: valores.visible_carta_fisica,
         destacado: valores.destacado,
         tiene_variantes: tieneVariantes,
+        // Con variantes manda la cantidad de cada variante; la del producto queda en 0.
+        cantidad_sabores: tieneVariantes ? 0 : Math.min(MAX_SABORES, Number(valores.cantidad_sabores) || 0),
       },
       tieneVariantes ? variantesValidas : [],
       valores.categoria_ids
@@ -230,7 +251,10 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           <div className="gestion-opciones__grupo tarjeta">
             <div className="gestion-opciones__grupo-encabezado">
               <strong>Variantes</strong>
-              <span className="texto-suave">Ej. tamaños o sabores (máximo {MAX_VARIANTES}).</span>
+              <span className="texto-suave">
+                Ej. tamaños (máximo {MAX_VARIANTES}). La descripción cuenta lo que trae cada uno
+                {usaSabores ? '; "Sabores" es cuántos elige el cliente (0 = ninguno).' : '.'}
+              </span>
             </div>
 
             {precioFisicaDistinto && (
@@ -284,6 +308,30 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
                     >
                       Quitar
                     </button>
+                  </div>
+                  <div className="gestion-opciones__form-extra">
+                    <input
+                      type="text"
+                      value={variante.descripcion}
+                      onChange={actualizarVariante(indice, 'descripcion')}
+                      placeholder="Qué trae (opcional)"
+                      aria-label="Descripción de la variante"
+                      maxLength={120}
+                    />
+                    {usaSabores && (
+                      <label className="gestion-opciones__sabores">
+                        <span>Sabores</span>
+                        <input
+                          type="number"
+                          min="0"
+                          max={MAX_SABORES}
+                          step="1"
+                          value={variante.cantidad_sabores}
+                          onChange={actualizarVariante(indice, 'cantidad_sabores')}
+                          placeholder="0"
+                        />
+                      </label>
+                    )}
                   </div>
                 </li>
               ))}
@@ -340,6 +388,21 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
             </fieldset>
           )}
         </div>
+      )}
+
+      {usaSabores && !tieneVariantes && (
+        <label className="campo">
+          <span>Sabores a elegir (0 = no pide sabores)</span>
+          <input
+            type="number"
+            min="0"
+            max={MAX_SABORES}
+            step="1"
+            value={valores.cantidad_sabores}
+            onChange={actualizar('cantidad_sabores')}
+            placeholder="0"
+          />
+        </label>
       )}
 
       <div className="precios-carta__interruptor">

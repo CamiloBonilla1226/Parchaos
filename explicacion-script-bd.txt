@@ -1698,6 +1698,175 @@ CONSECUENCIA EN EL CÓDIGO:
   el panel o abre /admin/pedidos.
 
 
+22. TABLA sabores (catálogo de sabores que se eligen al pedir) + cantidad
+    de sabores por producto/variante
+--------------------------------------------------------------------
+TABLAS AFECTADAS: sabores (tabla nueva), variantes_producto (2 columnas
+nuevas), productos (1 columna nueva), usuarios_admin (1 permiso nuevo).
+pedidos no cambia de esquema, solo el contenido de productos_detalle.
+
+QUÉ ES (2026-10-29, pedido del dueño de PAR CHAOS): un catálogo de
+sabores por negocio (ej. Fresa, Maracuyá, Mango, Tussi, Mora) que varios
+productos comparten. Lo que cambia entre productos es CUÁNTOS sabores se
+escogen, y eso depende del tamaño:
+- Granizado Pequeño / Mediano / Grande → 1 sabor cada uno.
+- Nevera tamaño A → 2 sabores; tamaño B → 4 sabores.
+- Un producto sin sabores (comida, gaseosa) → 0, no pide nada.
+Los sabores se pueden repetir (una nevera de 4 puede ser Mango, Mango,
+Mora, Mora) y ninguno cambia el precio: el precio lo pone la variante.
+
+DIFERENCIA CON variantes_producto Y adiciones:
+- variante: propia de UN producto, se elige una, define el precio.
+- adición: catálogo del negocio, opcional, se suma al precio.
+- sabor: catálogo del negocio, OBLIGATORIO en la cantidad exacta que pide
+  el producto/variante, se puede repetir, NO cambia el precio.
+Por eso no se reutilizó ninguna de las dos: con variantes, el día que se
+acaba el mango habría que apagarlo en cada producto; con adiciones no se
+puede exigir "exactamente 4" ni repetir.
+
+MULTI-NEGOCIO (la base la comparten todos los negocios):
+- Todo viene APAGADO por defecto: cantidad_sabores = 0 en productos y
+  variantes, y ningún negocio tiene filas en sabores. Un negocio que no
+  usa sabores no ve ningún cambio, ni en la carta ni en el panel (el
+  formulario de producto solo muestra los campos de sabores si el
+  negocio tiene al menos un sabor creado).
+- Cada negocio tiene su propio catálogo (negocio_id + RLS igual que el
+  resto). Para activarlo en otro negocio basta con crear sus sabores en
+  Admin → Sabores y poner "Sabores a elegir" en sus productos/variantes.
+- Cada tabla y columna nueva lleva un COMMENT en la base con esta misma
+  explicación, para que se vea desde el editor de Supabase.
+- Si en el futuro un negocio necesita listas de sabores distintas por
+  producto (ej. sabores de granizado ≠ sabores de limonada), se agrega
+  una tabla de grupos sin tocar lo que ya hay: hoy cada negocio tiene
+  UNA lista, compartida por todos sus productos.
+
+CÓMO FUNCIONA CADA CAMPO:
+sabores
+- negocio_id: a qué negocio pertenece (RLS).
+- nombre: único por negocio sin importar mayúsculas (índice único).
+- descripcion: opcional, ej. "Whisky y ron" para Tussi.
+- disponible: interruptor del día. Apagado, el sabor desaparece de TODOS
+  los productos del negocio a la vez.
+- orden: orden en que se muestran (luego por nombre).
+variantes_producto
+- descripcion: opcional, lo que trae ese tamaño (ej. "16 oz + gomitas").
+- cantidad_sabores: cuántos sabores se eligen con esa variante (0-12).
+productos
+- cantidad_sabores: lo mismo para un producto SIN variantes (0-12). Si
+  el producto tiene variantes, manda la de la variante elegida.
+usuarios_admin
+- puede_sabores: permiso de empleado para la sección Sabores (default
+  false, como los demás salvo pedidos). Pensado para que un empleado
+  pueda prender/apagar sabores cada día sin tocar productos.
+
+RLS: sabores se crea CON sus políticas en el mismo script (regla de la
+sección 11): lectura pública, escritura del dueño y de empleados activos
+con puede_sabores, todo vía app_metadata (nunca user_metadata). Las
+columnas nuevas de las otras tablas heredan las políticas que ya tienen.
+
+SCRIPT SQL (correrlo ANTES de desplegar el código nuevo: la carta pide
+cantidad_sabores al cargar los productos y el panel pide puede_sabores al
+iniciar sesión; sin las columnas, ambos fallan):
+
+    begin;
+
+    create table sabores (
+      id uuid primary key default gen_random_uuid(),
+      negocio_id uuid not null references negocios(id) on delete cascade,
+      nombre text not null,
+      descripcion text,
+      disponible boolean not null default true,
+      orden int not null default 0,
+      creado_en timestamptz not null default now()
+    );
+
+    create unique index sabores_negocio_nombre_unico on sabores (negocio_id, lower(nombre));
+    create index idx_sabores_negocio on sabores (negocio_id);
+
+    alter table sabores enable row level security;
+
+    create policy "lectura publica de sabores"
+    on sabores for select
+    using (true);
+
+    create policy "dueño gestiona sabores de su negocio"
+    on sabores for all to authenticated
+    using (negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid)
+    with check (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and (auth.jwt() -> 'app_metadata' ->> 'rol') = 'dueño'
+    );
+
+    alter table usuarios_admin
+      add column puede_sabores boolean not null default false;
+
+    create policy "Empleados con permiso gestionan sabores"
+    on sabores for all to authenticated
+    using (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+        select 1 from usuarios_admin ua
+        where ua.negocio_id = sabores.negocio_id
+          and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+          and ua.activo = true and ua.puede_sabores = true
+      )
+    )
+    with check (
+      negocio_id = (auth.jwt() -> 'app_metadata' ->> 'negocio_id')::uuid
+      and exists (
+        select 1 from usuarios_admin ua
+        where ua.negocio_id = sabores.negocio_id
+          and ua.numero = split_part(auth.jwt() ->> 'email', '.', 1)
+          and ua.activo = true and ua.puede_sabores = true
+      )
+    );
+
+    alter table variantes_producto
+      add column descripcion text,
+      add column cantidad_sabores int not null default 0
+        check (cantidad_sabores between 0 and 12);
+
+    alter table productos
+      add column cantidad_sabores int not null default 0
+        check (cantidad_sabores between 0 and 12);
+
+    comment on table sabores is
+      'Catálogo de sabores de cada negocio. Opcional: un negocio sin filas aquí no ve ningún cambio. Se eligen al pedir un producto/variante con cantidad_sabores > 0, se pueden repetir y no cambian el precio. disponible apaga el sabor en todos los productos a la vez. Ver explicacion-script-bd.txt sección 22.';
+    comment on column variantes_producto.descripcion is
+      'Opcional: lo que trae esa variante (ej. tamaño Grande: 32 oz + gomitas).';
+    comment on column variantes_producto.cantidad_sabores is
+      'Cuántos sabores (tabla sabores) elige el cliente con esta variante. 0 = no pide sabores (valor por defecto).';
+    comment on column productos.cantidad_sabores is
+      'Cuántos sabores (tabla sabores) elige el cliente si el producto NO tiene variantes. 0 = no pide sabores (valor por defecto). Con variantes manda variantes_producto.cantidad_sabores.';
+    comment on column usuarios_admin.puede_sabores is
+      'Permiso de empleado para la sección Sabores del panel (prender/apagar sabores del día).';
+
+    commit;
+
+ESTADO: PENDIENTE — propuesto el 2026-10-29, todavía no se ha corrido.
+
+CONSECUENCIA EN EL CÓDIGO:
+- hooks/useSabores.js: CRUD del catálogo (mismo patrón que useAdiciones).
+- /admin/sabores (pages/admin/Sabores.jsx): lista con interruptor de
+  disponible por sabor, crear/editar/eliminar. Sección y permiso nuevos
+  en lib/seccionesAdmin.js (PERMISOS_EMPLEADO → aparece solo en
+  /admin/usuarios, useAuth y el menú).
+- FormularioProducto: por variante, descripción y "Sabores a elegir";
+  sin variantes, un "Sabores a elegir" del producto. Solo se muestran si
+  el negocio tiene sabores creados.
+- useProductos: el embed liviano trae variantes_producto(...,
+  cantidad_sabores) para que la carta sepa si debe abrir el detalle.
+- Carta (OpcionesProducto): después de la variante, "Elige N sabores"
+  con contador por sabor (o radio si N = 1). No se puede agregar al
+  carrito hasta completar N. Solo salen los sabores disponibles.
+- Carrito, WhatsApp, pedidos.productos_detalle (campo nuevo
+  sabores_elegidos: arreglo de nombres, repetidos si se repiten) y el
+  panel de pedidos muestran los sabores, agrupados ("Mango x2, Mora").
+  Los pedidos viejos no tienen el campo y se muestran igual que antes.
+- Carta física (detalle): bloque "Sabores" con los disponibles y su
+  descripción, y la descripción de cada variante.
+
+
 RESUMEN GENERAL
 --------------------------------------------------------------------
 La base de datos completa (negocios, usuarios_admin, categorias,

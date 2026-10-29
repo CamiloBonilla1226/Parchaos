@@ -24,7 +24,10 @@ function ListaPrecios({ titulo, nota, filas }) {
       <ul className="detalle-fisico__lista">
         {filas.map((fila) => (
           <li key={fila.id}>
-            <span>{fila.nombre}</span>
+            <span className="detalle-fisico__fila-texto">
+              <span>{fila.nombre}</span>
+              {fila.detalle && <span className="detalle-fisico__fila-detalle">{fila.detalle}</span>}
+            </span>
             <span className={fila.suave ? 'texto-suave' : undefined}>{fila.precio}</span>
           </li>
         ))}
@@ -37,11 +40,20 @@ function ListaPrecios({ titulo, nota, filas }) {
 // (esa carta no tiene carrito). Foto, nombre, descripción y precio del local; debajo, las
 // variantes con su precio (es el precio final, no un extra) y las adiciones disponibles
 // (esas sí se suman: "+ $X"). Precios de la carta física, ver lib/preciosCartaFisica.js.
-export function DetalleProductoFisico({ producto, adiciones, onCerrar }) {
+// Cada variante muestra lo que trae y cuántos sabores lleva; si el producto pide sabores, un
+// bloque con los sabores disponibles hoy (sin precio: no lo cambian, ver lib/sabores.js).
+function detalleVariante(variante) {
+  const sabores = variante.cantidad_sabores ?? 0
+  const textoSabores = sabores > 0 ? `${sabores} ${sabores === 1 ? 'sabor' : 'sabores'}` : null
+  return [variante.descripcion, textoSabores].filter(Boolean).join(' · ') || null
+}
+
+export function DetalleProductoFisico({ producto, adiciones, sabores = [], onCerrar }) {
   const swipe = useSwipeParaCerrar(onCerrar)
   const { variantes: variantesBase } = useVariantesProducto(producto.id, { soloDisponibles: true })
   const variantes = variantesBase.map(varianteCartaFisica)
   const { precio, precioOferta } = preciosCartaFisica(producto)
+  const pideSabores = (producto.cantidad_sabores ?? 0) > 0 || variantes.some((v) => (v.cantidad_sabores ?? 0) > 0)
 
   return (
     <div
@@ -72,8 +84,24 @@ export function DetalleProductoFisico({ producto, adiciones, onCerrar }) {
         <ListaPrecios
           titulo="Opciones"
           nota="Precio final"
-          filas={variantes.map((v) => ({ id: v.id, nombre: v.nombre, precio: formatoPrecio.format(v.precio) }))}
+          filas={variantes.map((v) => ({
+            id: v.id,
+            nombre: v.nombre,
+            detalle: detalleVariante(v),
+            precio: formatoPrecio.format(v.precio),
+          }))}
         />
+        {pideSabores && (
+          <ListaPrecios
+            titulo="Sabores"
+            nota={
+              producto.cantidad_sabores > 0 && variantes.length === 0
+                ? `Elige ${producto.cantidad_sabores}`
+                : 'Disponibles hoy'
+            }
+            filas={sabores.map((s) => ({ id: s.id, nombre: s.nombre, detalle: s.descripcion, precio: '' }))}
+          />
+        )}
         <ListaPrecios
           titulo="Adiciones"
           nota="Se suman al precio"

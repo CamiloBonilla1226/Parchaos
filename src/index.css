@@ -2438,7 +2438,7 @@ body:has(.acciones-masivas) .toast-contenedor {
   gap: var(--espacio-1);
 }
 
-/* Cada variante: la fila nombre | precio(s) | Quitar y debajo "Qué trae" + "Sabores". Un
+/* Cada variante: la fila nombre | precio(s) | Quitar y debajo el comentario. Un
    borde inferior separa una variante de la siguiente, ahora que cada una ocupa dos líneas. */
 .gestion-opciones__lista li {
   display: flex;
@@ -2459,20 +2459,6 @@ body:has(.acciones-masivas) .toast-contenedor {
   min-width: 0;
   border: 1px solid var(--color-borde);
   padding: var(--espacio-1) var(--espacio-2);
-}
-
-.gestion-opciones__sabores {
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-1);
-  font-size: 0.8125rem;
-  color: var(--color-texto-suave);
-}
-
-.gestion-opciones__sabores input {
-  width: 56px;
-  border: 1px solid var(--color-borde);
-  padding: var(--espacio-1);
 }
 
 .gestion-opciones__form-opcion,

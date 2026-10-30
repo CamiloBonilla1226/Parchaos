@@ -958,3 +958,9 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
 
 ## 2026-10-29 (3)
 - **Ícono para la sección Sabores del panel** (pedido del dueño): había quedado sin ícono en el menú. Se agregó una gota en el mismo estilo de línea que las demás secciones (`ICONOS_SECCION` en `AdminNav.jsx`), en vez de un emoji, para que se vea igual que el resto del menú en el celular y en la barra lateral.
+
+## 2026-10-29 (4)
+- **Formulario de producto: las variantes ya no piden sabores y se quitó la ayuda del selector de sabor** (pedido del dueño). El dueño decidió manejar los granizados como un producto por sabor (`sabor_id`, entrada (2)), así que el campo "Sabores" de cada variante sobraba.
+  - Al guardar, las variantes quedan con `cantidad_sabores = 0`; si alguna tenía otro valor, se limpia la próxima vez que se edite el producto. La columna se deja en la base (no estorba y otro negocio podría usarla).
+  - Se mantienen el "Comentario" por variante, el selector "Sabor del producto" (sin el texto de ayuda) y "Sabores a elegir" en productos sin variantes.
+  - Se borró el CSS `.gestion-opciones__sabores`, que ya no se usa. `npm run build` sin errores.

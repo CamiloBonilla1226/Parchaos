@@ -10,7 +10,7 @@ import { mensajeAmigablePostgres } from '../../lib/erroresAmigables'
 import { tienePrecioCartaFisica } from '../../lib/preciosCartaFisica'
 
 const MAX_VARIANTES = 5
-const VARIANTE_VACIA = { nombre: '', precio: '', precio_carta_fisica: '', descripcion: '', cantidad_sabores: '' }
+const VARIANTE_VACIA = { nombre: '', precio: '', precio_carta_fisica: '', descripcion: '' }
 const MAX_SABORES = 12
 
 const VACIO = {
@@ -40,9 +40,10 @@ const VACIO = {
 // la carta física usa los mismos precios de domicilios (se guarda null). Al encenderlo se
 // copian los precios de domicilios como punto de partida, y se edita el precio, el de oferta
 // (o, con variantes, el precio en el local de cada variante). Ver lib/preciosCartaFisica.js.
-// Sabores a elegir (por variante, o del producto si no tiene variantes): cuántos sabores del
-// catálogo del negocio escoge el cliente. Solo aparece si el negocio tiene sabores creados, así
-// un negocio que no los usa ve el formulario igual que siempre (ver useSabores.js).
+// Sabores (solo si el negocio tiene sabores creados, así un negocio que no los usa ve el
+// formulario igual que siempre, ver useSabores.js): "Sabor del producto" lo liga a un sabor y
+// "Sabores a elegir" (solo sin variantes) dice cuántos escoge el cliente. Las variantes no
+// piden sabores: al guardar se dejan en 0.
 export function FormularioProducto({ categorias, productoInicial, onGuardar, onCancelar }) {
   const [valores, setValores] = useState(
     productoInicial
@@ -89,7 +90,6 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           precio: String(v.precio),
           precio_carta_fisica: v.precio_carta_fisica == null ? '' : String(v.precio_carta_fisica),
           descripcion: v.descripcion ?? '',
-          cantidad_sabores: v.cantidad_sabores ? String(v.cantidad_sabores) : '',
         }))
       )
     }
@@ -103,8 +103,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
   const usaSabores =
     sabores.length > 0 ||
     Boolean(valores.sabor_id) ||
-    Number(valores.cantidad_sabores) > 0 ||
-    variantes.some((v) => Number(v.cantidad_sabores) > 0)
+    Number(valores.cantidad_sabores) > 0
 
   const actualizar = (campo) => (evento) => {
     const valor = evento.target.type === 'checkbox' ? evento.target.checked : evento.target.value
@@ -181,7 +180,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           // Sin precio en el local (o con el switch apagado) = mismo precio de domicilios.
           precio_carta_fisica: precioFisicaDistinto && v.precio_carta_fisica !== '' ? v.precio_carta_fisica : null,
           descripcion: v.descripcion,
-          cantidad_sabores: Math.min(MAX_SABORES, Number(v.cantidad_sabores) || 0),
+          cantidad_sabores: 0,
         }))
         .filter((v) => v.nombre !== '' && v.precio !== '')
 
@@ -260,10 +259,6 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
               </option>
             ))}
           </select>
-          <span className="texto-suave">
-            Ej. "Granizado de Tussi" → Tussi. Si apagas ese sabor en Sabores, este producto deja de salir en la carta
-            hasta que lo vuelvas a prender.
-          </span>
         </label>
       )}
 
@@ -275,8 +270,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
             <div className="gestion-opciones__grupo-encabezado">
               <strong>Variantes</strong>
               <span className="texto-suave">
-                Ej. tamaños (máximo {MAX_VARIANTES}). El comentario sale debajo del nombre en la carta (ej. lo que trae)
-                {usaSabores ? '; "Sabores" es cuántos elige el cliente (0 = ninguno).' : '.'}
+                Ej. tamaños (máximo {MAX_VARIANTES}). El comentario sale debajo del nombre en la carta (ej. lo que trae).
               </span>
             </div>
 
@@ -341,20 +335,6 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
                       aria-label="Comentario de la variante"
                       maxLength={120}
                     />
-                    {usaSabores && (
-                      <label className="gestion-opciones__sabores">
-                        <span>Sabores</span>
-                        <input
-                          type="number"
-                          min="0"
-                          max={MAX_SABORES}
-                          step="1"
-                          value={variante.cantidad_sabores}
-                          onChange={actualizarVariante(indice, 'cantidad_sabores')}
-                          placeholder="0"
-                        />
-                      </label>
-                    )}
                   </div>
                 </li>
               ))}

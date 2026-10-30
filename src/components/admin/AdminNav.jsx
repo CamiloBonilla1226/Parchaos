@@ -14,6 +14,7 @@ const ICONOS_SECCION = {
   '/admin/productos': <path d="M6 7h12l-1.4 13H7.4zM9 7V5.5a3 3 0 0 1 6 0V7" />,
   '/admin/categorias': <path d="M4.5 4.5h6v6h-6zM13.5 4.5h6v6h-6zM4.5 13.5h6v6h-6zM13.5 13.5h6v6h-6z" />,
   '/admin/adiciones': <path d="M12 4.5v15M4.5 12h15" />,
+  '/admin/sabores': <path d="M12 3.5c3.2 3.8 6 7.3 6 10.5a6 6 0 0 1-12 0c0-3.2 2.8-6.7 6-10.5zM9.3 14.3a2.8 2.8 0 0 0 2.7 2.7" />,
   '/admin/ofertas': <path d="M3.5 12.5V4h8.5l8.5 8.5-8 8zM8 8.5h.01" />,
   '/admin/usuarios': <path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.6a3.5 3.5 0 0 1 0 6.3M18 15.3c1.6.7 2.7 2.2 3 4.7" />,
   '/admin/negocio': <path d="M4 9.5 5.5 4h13L20 9.5M4 9.5h16M4 9.5c0 1.7 1.3 2.5 2.7 2.5S9.3 11.2 9.3 9.5c0 1.7 1.3 2.5 2.7 2.5s2.7-.8 2.7-2.5c0 1.7 1.3 2.5 2.6 2.5S20 11.2 20 9.5M5.5 12v8h13v-8M10 20v-5h4v5" />,

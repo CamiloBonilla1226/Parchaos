@@ -955,3 +955,6 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - Multi-negocio: `sabor_id` es NULL por defecto, ningún producto existente cambia.
   - Verificación: `npm run build` sin errores. Consulta de solo lectura: `sabor_id` todavía no existe, así que el commit queda local hasta que el dueño corra el script.
 - **Script de la sección 23 corrido** por el dueño el mismo día; verificado con una consulta de solo lectura (la consulta completa de productos con el sabor embebido funciona). Se hizo el push.
+
+## 2026-10-29 (3)
+- **Ícono para la sección Sabores del panel** (pedido del dueño): había quedado sin ícono en el menú. Se agregó una gota en el mismo estilo de línea que las demás secciones (`ICONOS_SECCION` en `AdminNav.jsx`), en vez de un emoji, para que se vea igual que el resto del menú en el celular y en la barra lateral.

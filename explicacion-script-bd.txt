@@ -1922,7 +1922,9 @@ sabor_id y el sabor embebido al cargar los productos):
 
     commit;
 
-ESTADO: PENDIENTE — propuesto el 2026-10-29, todavía no se ha corrido.
+ESTADO: YA SE CORRIÓ — el dueño lo ejecutó el 2026-10-29; verificado con
+una consulta de solo lectura (sabor_id responde y la consulta completa de
+la carta con sabor:sabores!productos_sabor_fk(...) funciona).
 
 CONSECUENCIA EN EL CÓDIGO:
 - useProductos: trae sabor:sabores(id, nombre, disponible) embebido; con

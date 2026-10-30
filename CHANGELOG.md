@@ -954,3 +954,4 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - **Comentario por variante**: ya existía como `variantes_producto.descripcion` (sección 22); en el formulario ahora se llama "Comentario" y la ayuda dice que sale debajo del nombre en la carta.
   - Multi-negocio: `sabor_id` es NULL por defecto, ningún producto existente cambia.
   - Verificación: `npm run build` sin errores. Consulta de solo lectura: `sabor_id` todavía no existe, así que el commit queda local hasta que el dueño corra el script.
+- **Script de la sección 23 corrido** por el dueño el mismo día; verificado con una consulta de solo lectura (la consulta completa de productos con el sabor embebido funciona). Se hizo el push.

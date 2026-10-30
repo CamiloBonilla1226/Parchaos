@@ -1870,6 +1870,72 @@ CONSECUENCIA EN EL CÓDIGO:
   descripción, y la descripción de cada variante.
 
 
+23. PRODUCTO LIGADO A UN SABOR (productos.sabor_id)
+--------------------------------------------------------------------
+TABLAS AFECTADAS: productos (1 columna nueva), sabores (1 restricción
+unique nueva, solo para la llave compuesta). No cambia ninguna política.
+
+QUÉ ES (2026-10-29, pedido del dueño de PAR CHAOS): un producto puede
+"ser" de un sabor (ej. "Granizado de Tussi" ligado al sabor Tussi). Si
+ese sabor se apaga en Admin → Sabores, el producto deja de salir en las
+dos cartas; al volver a prenderlo, el producto vuelve solo.
+
+POR QUÉ NO SE ESCRIBE EN productos.disponible: se calcula al mostrar la
+carta (producto visible = disponible Y, si tiene sabor, sabor
+disponible). Si se apagara disponible automáticamente, al prender el
+sabor no se sabría si el producto estaba apagado a mano por otra razón
+(ej. se acabó el vaso) y se prendería por error. Así los dos
+interruptores son independientes.
+
+DIFERENCIA CON cantidad_sabores (sección 22): cantidad_sabores hace que
+el cliente ELIJA sabores; sabor_id dice de qué sabor ES el producto. Son
+independientes y se pueden usar juntos o por separado.
+
+MULTI-NEGOCIO: sabor_id es NULL por defecto, así que ningún producto
+existente cambia. La llave foránea es compuesta (sabor_id, negocio_id)
+→ sabores(id, negocio_id), mismo patrón que productos_categorias
+(sección 16): un producto solo puede apuntar a un sabor de SU negocio.
+"on delete set null (sabor_id)" (Postgres 15+): si se elimina el sabor,
+el producto queda sin sabor (y visible), sin tocar su negocio_id.
+
+SCRIPT SQL (correrlo ANTES de desplegar el código nuevo: la carta pide
+sabor_id y el sabor embebido al cargar los productos):
+
+    begin;
+
+    alter table sabores
+      add constraint sabores_id_negocio_unico unique (id, negocio_id);
+
+    alter table productos
+      add column sabor_id uuid;
+
+    alter table productos
+      add constraint productos_sabor_fk
+        foreign key (sabor_id, negocio_id)
+        references sabores (id, negocio_id)
+        on delete set null (sabor_id);
+
+    create index idx_productos_sabor on productos (sabor_id);
+
+    comment on column productos.sabor_id is
+      'Opcional: el sabor del que ES este producto (ej. Granizado de Tussi). Si ese sabor está apagado (sabores.disponible = false), las cartas ocultan el producto; no se modifica productos.disponible. Ver explicacion-script-bd.txt sección 23.';
+
+    commit;
+
+ESTADO: PENDIENTE — propuesto el 2026-10-29, todavía no se ha corrido.
+
+CONSECUENCIA EN EL CÓDIGO:
+- useProductos: trae sabor:sabores(id, nombre, disponible) embebido; con
+  soloDisponibles (las cartas) descarta los productos cuyo sabor está
+  apagado. El panel los sigue viendo todos.
+- FormularioProducto: selector "Sabor del producto (opcional)", visible
+  solo si el negocio tiene sabores.
+- Lista de productos del admin: etiqueta "Sabor X apagado" en los que hoy
+  no salen por su sabor.
+- Variantes: el campo descripcion (sección 22) se muestra en el
+  formulario como "Comentario".
+
+
 RESUMEN GENERAL
 --------------------------------------------------------------------
 La base de datos completa (negocios, usuarios_admin, categorias,

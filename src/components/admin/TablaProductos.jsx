@@ -88,6 +88,12 @@ export function TablaProductos({
                     Agotado
                   </span>
                 )}
+                {/* Ligado a un sabor apagado: no sale en las cartas aunque esté disponible. */}
+                {producto.disponible && producto.sabor?.disponible === false && (
+                  <span className="producto-admin-item__etiqueta producto-admin-item__etiqueta--agotado">
+                    Sabor {producto.sabor.nombre} apagado
+                  </span>
+                )}
               </span>
             </div>
             <div className="producto-admin-item__acciones" onClick={(evento) => evento.stopPropagation()}>

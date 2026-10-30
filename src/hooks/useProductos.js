@@ -15,11 +15,21 @@ import { negocioConfig } from '../config/negocio.config'
 // Carta.jsx/ProductoCard.jsx). El detalle completo (id, nombre, orden) se carga con
 // useVariantesProducto.js cuando el modal ya está abierto. `cantidad_sabores` va en el embed
 // para mostrar "Elige N sabores" en la lista sin abrir el producto (ver lib/sabores.js).
+// `sabor`: el sabor del que ES el producto (productos.sabor_id, opcional). Si está apagado, las
+// cartas no muestran el producto (ver productoSaborDisponible y la sección 23 del script).
 const SELECT_PRODUCTO_COMPLETO = `
   *,
   productos_categorias(categoria:categorias(id, nombre, activo, visible_domicilios, visible_carta_fisica)),
-  variantes_producto(precio, precio_carta_fisica, disponible, cantidad_sabores)
+  variantes_producto(precio, precio_carta_fisica, disponible, cantidad_sabores),
+  sabor:sabores!productos_sabor_fk(id, nombre, disponible)
 `
+
+// Un producto ligado a un sabor apagado no sale en las cartas. No se escribe en
+// productos.disponible: así, al prender el sabor, vuelve solo, sin pisar un "Agotado" puesto a
+// mano por otra razón.
+export function productoSaborDisponible(producto) {
+  return !producto.sabor || producto.sabor.disponible !== false
+}
 
 // Aplana productos_categorias → `producto.categorias` (arreglo de categorías, por nombre).
 function normalizarProducto({ productos_categorias: enlaces, ...producto }) {
@@ -112,7 +122,8 @@ export function useProductos({
       setError(errorConsulta)
       setProductos([])
     } else {
-      setProductos(data.map(normalizarProducto))
+      const normalizados = data.map(normalizarProducto)
+      setProductos(soloDisponibles ? normalizados.filter(productoSaborDisponible) : normalizados)
     }
     setCargando(false)
   }, [soloDisponibles, soloVisibleDomicilios, soloVisibleCartaFisica])

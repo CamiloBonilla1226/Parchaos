@@ -946,3 +946,11 @@ Todas las decisiones técnicas relevantes y funcionalidades implementadas en el 
   - **Despliegue**: el script debe correrse ANTES del push (la carta pide `cantidad_sabores` y el panel `puede_sabores`). Verificado con consulta de solo lectura que todavía no existe, así que el commit queda local hasta que el dueño lo corra.
   - Verificación: `npm run build` y `oxlint` sin errores nuevos. Pendiente probar el flujo completo contra la base cuando exista el esquema.
 - **Script corrido** por el dueño el mismo día; verificado con consultas de solo lectura (tabla y columnas responden, la consulta completa de productos de la carta funciona, y un insert anónimo en `sabores` es rechazado). Se hizo el push.
+
+## 2026-10-29 (2)
+- **Producto ligado a un sabor: si el sabor se apaga, el producto deja de salir en las cartas** (pedido del dueño: "un granizado que se le pueda poner un sabor, que al desactivar el sabor se desactive el producto también"). Script en `explicacion-script-bd.txt`, sección 23 (`productos.sabor_id`, llave compuesta con `negocio_id` para que solo apunte a sabores del mismo negocio).
+  - **No se escribe en `productos.disponible`**: se calcula al cargar las cartas (`productoSaborDisponible` en `useProductos`). Si se apagara `disponible` automáticamente, al prender el sabor no se sabría si el producto estaba apagado a mano por otra razón. Así, al prender el sabor el producto vuelve solo, y un "Agotado" manual se respeta.
+  - **Panel**: selector "Sabor del producto (opcional)" en el formulario (solo si el negocio tiene sabores) y etiqueta "Sabor X apagado" en la lista de productos para saber por qué no sale en la carta.
+  - **Comentario por variante**: ya existía como `variantes_producto.descripcion` (sección 22); en el formulario ahora se llama "Comentario" y la ayuda dice que sale debajo del nombre en la carta.
+  - Multi-negocio: `sabor_id` es NULL por defecto, ningún producto existente cambia.
+  - Verificación: `npm run build` sin errores. Consulta de solo lectura: `sabor_id` todavía no existe, así que el commit queda local hasta que el dueño corra el script.

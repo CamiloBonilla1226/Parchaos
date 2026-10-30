@@ -27,6 +27,7 @@ const VACIO = {
   visible_carta_fisica: true,
   destacado: false,
   cantidad_sabores: '',
+  sabor_id: '',
 }
 
 // Formulario único de producto: si tiene variantes (switch "¿Tiene variantes?"), se
@@ -59,6 +60,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
           visible_carta_fisica: productoInicial.visible_carta_fisica ?? true,
           destacado: productoInicial.destacado ?? false,
           cantidad_sabores: productoInicial.cantidad_sabores ? String(productoInicial.cantidad_sabores) : '',
+          sabor_id: productoInicial.sabor_id ?? '',
         }
       : VACIO
   )
@@ -100,6 +102,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
   // que se puso cuando el negocio sí tenía sabores creados.
   const usaSabores =
     sabores.length > 0 ||
+    Boolean(valores.sabor_id) ||
     Number(valores.cantidad_sabores) > 0 ||
     variantes.some((v) => Number(v.cantidad_sabores) > 0)
 
@@ -214,6 +217,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
         tiene_variantes: tieneVariantes,
         // Con variantes manda la cantidad de cada variante; la del producto queda en 0.
         cantidad_sabores: tieneVariantes ? 0 : Math.min(MAX_SABORES, Number(valores.cantidad_sabores) || 0),
+        sabor_id: valores.sabor_id || null,
       },
       tieneVariantes ? variantesValidas : [],
       valores.categoria_ids
@@ -244,6 +248,25 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
         onCambiar={(categoria_ids) => setValores((actual) => ({ ...actual, categoria_ids }))}
       />
 
+      {usaSabores && (
+        <label className="campo">
+          <span>Sabor del producto (opcional)</span>
+          <select value={valores.sabor_id} onChange={actualizar('sabor_id')}>
+            <option value="">Ninguno</option>
+            {sabores.map((sabor) => (
+              <option key={sabor.id} value={sabor.id}>
+                {sabor.nombre}
+                {sabor.disponible ? '' : ' (apagado hoy)'}
+              </option>
+            ))}
+          </select>
+          <span className="texto-suave">
+            Ej. "Granizado de Tussi" → Tussi. Si apagas ese sabor en Sabores, este producto deja de salir en la carta
+            hasta que lo vuelvas a prender.
+          </span>
+        </label>
+      )}
+
       <Interruptor activo={tieneVariantes} etiqueta="¿Tiene variantes?" onCambiar={setTieneVariantes} />
 
       {tieneVariantes ? (
@@ -252,7 +275,7 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
             <div className="gestion-opciones__grupo-encabezado">
               <strong>Variantes</strong>
               <span className="texto-suave">
-                Ej. tamaños (máximo {MAX_VARIANTES}). La descripción cuenta lo que trae cada uno
+                Ej. tamaños (máximo {MAX_VARIANTES}). El comentario sale debajo del nombre en la carta (ej. lo que trae)
                 {usaSabores ? '; "Sabores" es cuántos elige el cliente (0 = ninguno).' : '.'}
               </span>
             </div>
@@ -314,8 +337,8 @@ export function FormularioProducto({ categorias, productoInicial, onGuardar, onC
                       type="text"
                       value={variante.descripcion}
                       onChange={actualizarVariante(indice, 'descripcion')}
-                      placeholder="Qué trae (opcional)"
-                      aria-label="Descripción de la variante"
+                      placeholder="Comentario (opcional, ej. 16 oz + gomitas)"
+                      aria-label="Comentario de la variante"
                       maxLength={120}
                     />
                     {usaSabores && (
